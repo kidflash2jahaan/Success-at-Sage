@@ -1,13 +1,19 @@
 export const dynamic = 'force-dynamic'
 
 import { getAllDepartmentsWithCourses } from '@/lib/db/queries/courses'
+import { getCurrentUser } from '@/lib/auth'
+import BackToDashboard from '@/components/BackToDashboard'
 import Link from 'next/link'
 
 export default async function BrowsePage() {
-  const departments = await getAllDepartmentsWithCourses()
+  const [departments, user] = await Promise.all([
+    getAllDepartmentsWithCourses(),
+    getCurrentUser().catch(() => null),
+  ])
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
+      {user && <BackToDashboard />}
       <h1 className="text-3xl font-bold text-white mb-2">Browse Courses</h1>
       <p className="text-white/50 mb-10">Find your courses and add them to your schedule.</p>
       <div className="flex flex-col gap-10">

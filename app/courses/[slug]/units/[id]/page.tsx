@@ -4,6 +4,7 @@ import { requireUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getApprovedMaterialsForUnit } from '@/lib/db/queries/materials'
 import MaterialCard from '@/components/materials/MaterialCard'
+import BackToDashboard from '@/components/BackToDashboard'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -42,6 +43,7 @@ export default async function UnitPage({
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
+      <BackToDashboard />
       <div className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: (dept as any).color_accent }}>
         <Link href={`/courses/${slug}`} className="hover:underline">{course.name}</Link>
       </div>

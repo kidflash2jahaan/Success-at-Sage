@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { getCourseWithUnits, isUserEnrolled } from '@/lib/db/queries/courses'
 import { getCurrentUser } from '@/lib/auth'
 import { addCourseToSchedule, removeCourseFromSchedule } from '@/app/actions/courses'
+import BackToDashboard from '@/components/BackToDashboard'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -21,6 +22,7 @@ export default async function CourseDetailPage({
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
+      {user && <BackToDashboard />}
       <div className="text-sm font-semibold uppercase tracking-wide mb-2" style={{ color: department.colorAccent }}>
         {department.name}
       </div>
