@@ -1,12 +1,12 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { createUnit, deleteUnit } from '@/app/actions/admin'
+import { createCourse, deleteCourse, createUnit, deleteUnit } from '@/app/actions/admin'
 
 export default async function AdminCoursesPage() {
   const [{ data: depsData }, { data: coursesData }, { data: unitsData }] = await Promise.all([
     supabaseAdmin.from('departments').select('id, name, color_accent'),
-    supabaseAdmin.from('courses').select('id, name, department_id').order('name'),
+    supabaseAdmin.from('courses').select('id, name, description, department_id').order('name'),
     supabaseAdmin.from('units').select('id, title, course_id, order_index').order('order_index'),
   ])
 
@@ -24,14 +24,23 @@ export default async function AdminCoursesPage() {
     <div className="p-8 max-w-3xl">
       <h1 className="text-2xl font-bold text-white mb-8">Course Management</h1>
       {depsWithCourses.map((dept: any) => (
-        <div key={dept.id} className="mb-8">
-          <div className="flex items-center gap-2 mb-3">
+        <div key={dept.id} className="mb-10">
+          <div className="flex items-center gap-2 mb-4">
             <div className="w-2.5 h-2.5 rounded-full" style={{ background: dept.color_accent }} />
             <h2 className="text-lg font-semibold text-white">{dept.name}</h2>
           </div>
+
+          {/* Existing courses */}
           {dept.courses.map((course: any) => (
             <div key={course.id} className="mb-4 bg-white/5 border border-white/10 rounded-xl p-4">
-              <div className="text-white font-medium mb-3">{course.name}</div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-white font-medium">{course.name}</div>
+                <form action={deleteCourse.bind(null, course.id)}>
+                  <button type="submit" className="text-red-400/60 hover:text-red-400 text-xs">
+                    Delete course
+                  </button>
+                </form>
+              </div>
               <div className="flex flex-col gap-1 mb-3">
                 {course.units.map((unit: any) => (
                   <div key={unit.id} className="flex items-center justify-between bg-white/5 rounded-lg px-3 py-2">
@@ -49,10 +58,27 @@ export default async function AdminCoursesPage() {
               }} className="flex gap-2">
                 <input name="title" placeholder="New unit title..."
                   className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500" />
-                <button type="submit" className="text-sm bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg transition-colors">Add</button>
+                <button type="submit" className="text-sm bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg transition-colors">Add Unit</button>
               </form>
             </div>
           ))}
+
+          {/* Add new course */}
+          <form action={async (formData: FormData) => {
+            'use server'
+            const name = formData.get('name') as string
+            const description = formData.get('description') as string
+            if (name) await createCourse(dept.id, name, description ?? '')
+          }} className="bg-white/3 border border-dashed border-white/10 rounded-xl p-4 flex flex-col gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/30 mb-1">Add Course to {dept.name}</p>
+            <input name="name" required placeholder="Course name"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500" />
+            <input name="description" placeholder="Description (optional)"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500" />
+            <button type="submit" className="self-end text-sm bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-lg transition-colors">
+              Add Course
+            </button>
+          </form>
         </div>
       ))}
     </div>
