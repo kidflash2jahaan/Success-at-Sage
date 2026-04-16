@@ -3,7 +3,7 @@ import { useState, useTransition } from 'react'
 import { updateUnitTitle, deleteUnit, createUnit, createAdminMaterial, deleteMaterial, adminEditMaterial } from '@/app/actions/admin'
 
 interface Unit { id: string; title: string; orderIndex: number }
-interface Material { id: string; title: string; type: string; contentType: 'pdf' | 'richtext'; contentText: string; linkUrl: string }
+interface Material { id: string; title: string; type: string; contentText: string; linkUrl: string; attachmentUrl: string }
 
 interface Props {
   courseId: string
@@ -19,13 +19,14 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
   const [editTitle, setEditTitle] = useState('')
   const [newUnitTitle, setNewUnitTitle] = useState('')
   const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null)
-  const [addMat, setAddMat] = useState<{ title: string; type: 'note' | 'test'; content: string; linkUrl: string }>({ title: '', type: 'note', content: '', linkUrl: '' })
+  const [addMat, setAddMat] = useState<{ title: string; type: 'note' | 'test'; content: string; linkUrl: string; attachmentUrl: string }>({ title: '', type: 'note', content: '', linkUrl: '', attachmentUrl: '' })
   // Material view/edit state
   const [viewingMatId, setViewingMatId] = useState<string | null>(null)
   const [editingMatId, setEditingMatId] = useState<string | null>(null)
   const [editMatTitle, setEditMatTitle] = useState('')
   const [editMatContent, setEditMatContent] = useState('')
   const [editMatLinkUrl, setEditMatLinkUrl] = useState('')
+  const [editMatAttachmentUrl, setEditMatAttachmentUrl] = useState('')
   const [pending, startTransition] = useTransition()
 
   function startEdit(unit: Unit) { setEditingId(unit.id); setEditTitle(unit.title) }
@@ -63,13 +64,13 @@ function handleSaveTitle(unitId: string) {
   function handleAddMaterial(unitId: string) {
     if (!addMat.title.trim()) return
     const snap = { ...addMat }
-    setAddMat({ title: '', type: 'note', content: '', linkUrl: '' })
+    setAddMat({ title: '', type: 'note', content: '', linkUrl: '', attachmentUrl: '' })
     const tempId = `temp-${Date.now()}`
     setUnitMaterials(prev => ({
       ...prev,
-      [unitId]: [...(prev[unitId] ?? []), { id: tempId, title: snap.title.trim(), type: snap.type, contentType: 'richtext', contentText: snap.content, linkUrl: snap.linkUrl }],
+      [unitId]: [...(prev[unitId] ?? []), { id: tempId, title: snap.title.trim(), type: snap.type, contentText: snap.content, linkUrl: snap.linkUrl, attachmentUrl: snap.attachmentUrl }],
     }))
-    startTransition(() => createAdminMaterial(unitId, snap.title, snap.type, snap.content, snap.linkUrl))
+    startTransition(() => createAdminMaterial(unitId, snap.title, snap.type, snap.content, snap.linkUrl, snap.attachmentUrl))
   }
 
   function startEditMat(m: Material) {
@@ -78,6 +79,7 @@ function handleSaveTitle(unitId: string) {
     setEditMatTitle(m.title)
     setEditMatContent(m.contentText)
     setEditMatLinkUrl(m.linkUrl)
+    setEditMatAttachmentUrl(m.attachmentUrl)
   }
 
   function handleSaveMat(unitId: string, mat: Material) {
@@ -85,11 +87,11 @@ function handleSaveTitle(unitId: string) {
     setUnitMaterials(prev => ({
       ...prev,
       [unitId]: (prev[unitId] ?? []).map(m => m.id === mat.id
-        ? { ...m, title: editMatTitle.trim(), contentText: editMatContent, linkUrl: editMatLinkUrl }
+        ? { ...m, title: editMatTitle.trim(), contentText: editMatContent, linkUrl: editMatLinkUrl, attachmentUrl: editMatAttachmentUrl }
         : m),
     }))
     setEditingMatId(null)
-    startTransition(() => adminEditMaterial(mat.id, editMatTitle, mat.contentType === 'richtext' ? editMatContent : null, editMatLinkUrl))
+    startTransition(() => adminEditMaterial(mat.id, editMatTitle, editMatContent, editMatLinkUrl, editMatAttachmentUrl))
   }
 
   return (
@@ -168,7 +170,7 @@ function handleSaveTitle(unitId: string) {
                           <span className="text-white/60 text-xs truncate">{m.title}</span>
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
-                          {m.contentType === 'richtext' && m.contentText && (
+                          {m.contentText && (
                             <button type="button"
                               onClick={() => setViewingMatId(viewingMatId === m.id ? null : m.id)}
                               className="text-white/20 hover:text-white/60 opacity-0 group-hover/mat:opacity-100 text-xs px-1 transition-all">
@@ -188,7 +190,7 @@ function handleSaveTitle(unitId: string) {
                       </div>
 
                       {/* View content */}
-                      {viewingMatId === m.id && m.contentType === 'richtext' && (
+                      {viewingMatId === m.id && (
                         <div className="mx-1 mb-1 bg-white/[0.02] rounded-lg px-3 py-2 text-white/50 text-xs leading-relaxed whitespace-pre-wrap border border-white/[0.05]">
                           {m.contentText || <span className="italic text-white/20">No content.</span>}
                         </div>
@@ -204,7 +206,7 @@ function handleSaveTitle(unitId: string) {
                             placeholder="Title"
                             className="glass-input w-full rounded-lg px-2 py-1 text-xs"
                           />
-                          {m.contentType === 'richtext' && (
+                          {(
                             <textarea
                               value={editMatContent}
                               onChange={e => setEditMatContent(e.target.value)}
@@ -213,6 +215,12 @@ function handleSaveTitle(unitId: string) {
                               className="glass-input w-full rounded-lg px-2 py-1 text-xs resize-y"
                             />
                           )}
+                          <input
+                            value={editMatAttachmentUrl}
+                            onChange={e => setEditMatAttachmentUrl(e.target.value)}
+                            placeholder="Attachment URL (optional)"
+                            className="glass-input w-full rounded-lg px-2 py-1 text-xs"
+                          />
                           <input
                             value={editMatLinkUrl}
                             onChange={e => setEditMatLinkUrl(e.target.value)}
@@ -249,6 +257,9 @@ function handleSaveTitle(unitId: string) {
                       placeholder="Content (optional)..."
                       rows={3}
                       className="glass-input w-full rounded-lg px-3 py-1.5 text-xs resize-none" />
+                    <input value={addMat.attachmentUrl} onChange={e => setAddMat(p => ({ ...p, attachmentUrl: e.target.value }))}
+                      placeholder="Attachment URL (optional)..."
+                      className="glass-input w-full rounded-lg px-3 py-1.5 text-xs" />
                     <input value={addMat.linkUrl} onChange={e => setAddMat(p => ({ ...p, linkUrl: e.target.value }))}
                       placeholder="Link URL (optional)..."
                       className="glass-input w-full rounded-lg px-3 py-1.5 text-xs" />

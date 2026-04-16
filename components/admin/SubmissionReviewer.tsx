@@ -7,10 +7,9 @@ interface SubmissionItem {
   id: string
   title: string
   type: string
-  contentType: 'pdf' | 'richtext'
   contentJson: unknown
-  pdfPath: string | null
   linkUrl: string | null
+  attachmentUrl: string | null
   uploaderName: string
   uploaderEmail: string
   unitTitle: string
@@ -26,6 +25,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
     (item.contentJson as { text?: string } | null)?.text ?? ''
   )
   const [editLinkUrl, setEditLinkUrl] = useState(item.linkUrl ?? '')
+  const [editAttachmentUrl, setEditAttachmentUrl] = useState(item.attachmentUrl ?? '')
   const [pending, startTransition] = useTransition()
 
   return (
@@ -38,17 +38,18 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
           </div>
           <div className="flex gap-2 mt-1">
             <span className="text-xs px-2 py-0.5 bg-white/10 rounded-full text-white/60 capitalize">{item.type}</span>
-            <span className="text-xs px-2 py-0.5 bg-white/10 rounded-full text-white/60">{item.contentType === 'pdf' ? 'PDF' : 'Text'}</span>
+            {item.attachmentUrl && <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full text-emerald-400/70">Attachment</span>}
+            {item.linkUrl && <span className="text-xs px-2 py-0.5 bg-sky-500/10 rounded-full text-sky-400/70">Link</span>}
           </div>
         </div>
-        <button onClick={() => setExpanded(e => !e)} className="text-violet-400 hover:text-violet-300 text-sm shrink-0 transition-colors">
+        <button type="button" onClick={() => setExpanded(e => !e)} className="text-violet-400 hover:text-violet-300 text-sm shrink-0 transition-colors">
           {expanded ? 'Hide' : 'Preview'}
         </button>
       </div>
 
       {expanded && (
         <div className="border-t border-white/[0.07]">
-          <MaterialViewer material={{ contentType: item.contentType, contentJson: item.contentJson, pdfPath: item.pdfPath }} />
+          <MaterialViewer material={{ contentJson: item.contentJson }} />
         </div>
       )}
 
@@ -79,15 +80,19 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 placeholder="Title"
                 className="glass-input w-full rounded-lg px-3 py-2 text-sm"
               />
-              {item.contentType === 'richtext' && (
-                <textarea
-                  value={editContent}
-                  onChange={e => setEditContent(e.target.value)}
-                  placeholder="Content"
-                  rows={6}
-                  className="glass-input w-full rounded-lg px-3 py-2 text-sm resize-y"
-                />
-              )}
+              <textarea
+                value={editContent}
+                onChange={e => setEditContent(e.target.value)}
+                placeholder="Content (optional)"
+                rows={6}
+                className="glass-input w-full rounded-lg px-3 py-2 text-sm resize-y"
+              />
+              <input
+                value={editAttachmentUrl}
+                onChange={e => setEditAttachmentUrl(e.target.value)}
+                placeholder="Attachment URL (optional)"
+                className="glass-input w-full rounded-lg px-3 py-2 text-sm"
+              />
               <input
                 value={editLinkUrl}
                 onChange={e => setEditLinkUrl(e.target.value)}
@@ -100,7 +105,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 type="button"
                 disabled={pending}
                 onClick={() => startTransition(async () => {
-                  await adminEditMaterial(item.id, editTitle, item.contentType === 'richtext' ? editContent : null, editLinkUrl)
+                  await adminEditMaterial(item.id, editTitle, editContent, editLinkUrl, editAttachmentUrl)
                   setMode('review')
                 })}
                 className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"

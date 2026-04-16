@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { incrementViewCount } from '@/app/actions/materials'
 import MaterialViewer from './MaterialViewer'
 
@@ -8,10 +7,9 @@ interface Material {
   id: string
   title: string
   type: 'note' | 'test'
-  contentType: 'pdf' | 'richtext'
   contentJson: unknown
-  pdfPath: string | null
   linkUrl: string | null
+  attachmentUrl: string | null
   viewCount: number
   uploaderName: string
 }
@@ -49,21 +47,13 @@ export default function MaterialCard({
 }) {
   const [open, setOpen] = useState(false)
   const [viewCount, setViewCount] = useState(material.viewCount)
-  const isPdf = material.contentType === 'pdf'
 
   async function handleOpen() {
-    pushRecentMaterial({ id: material.id, title: material.title, type: material.type, courseSlug, unitId })
-    await incrementViewCount(material.id)
-    setViewCount(v => v + 1)
-
-    if (isPdf) {
-      if (!material.pdfPath) return
-      const supabase = createSupabaseBrowserClient()
-      const { data } = await supabase.storage.from('materials').createSignedUrl(material.pdfPath, 3600)
-      if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
-      return
+    if (!open) {
+      pushRecentMaterial({ id: material.id, title: material.title, type: material.type, courseSlug, unitId })
+      await incrementViewCount(material.id)
+      setViewCount(v => v + 1)
     }
-
     setOpen(o => !o)
   }
 
@@ -79,7 +69,21 @@ export default function MaterialCard({
             by {material.uploaderName} · {viewCount} view{viewCount !== 1 ? 's' : ''}
           </div>
         </div>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          {material.attachmentUrl && (
+            <a
+              href={material.attachmentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              className="flex items-center gap-1 text-xs text-emerald-400/70 hover:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-400/20 hover:border-emerald-400/40 transition-colors"
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+              Attachment
+            </a>
+          )}
           {material.linkUrl && (
             <a
               href={material.linkUrl}
@@ -94,34 +98,22 @@ export default function MaterialCard({
               Link
             </a>
           )}
-          <span
-            className="text-xs px-2 py-0.5 rounded-full border"
-            style={{ color: accentColor, borderColor: `${accentColor}35` }}
-          >
-            {isPdf ? 'PDF' : 'Text'}
-          </span>
           <svg
-            className={`w-4 h-4 text-white/25 transition-transform duration-300 ${!isPdf && open ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-white/25 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor"
           >
-            {isPdf ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            )}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
       </button>
 
-      {!isPdf && (
-        <div className={`accordion-grid${open ? ' open' : ''}`}>
-          <div>
-            <div className="border-t border-white/[0.07]">
-              <MaterialViewer material={material} />
-            </div>
+      <div className={`accordion-grid${open ? ' open' : ''}`}>
+        <div>
+          <div className="border-t border-white/[0.07]">
+            <MaterialViewer material={material} />
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { submitMaterial, getSignedUploadUrl, submitNewUnit } from '@/app/actions/materials'
+import { submitMaterial, submitNewUnit } from '@/app/actions/materials'
 import { useRouter } from 'next/navigation'
 
 interface Course { id: string; name: string; slug: string }
@@ -11,25 +11,21 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
 
   const initialCourse = preselectedSlug ? (courses.find(c => c.slug === preselectedSlug) ?? null) : null
 
-  // Course search state
   const [courseQuery, setCourseQuery] = useState(initialCourse?.name ?? '')
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialCourse)
   const [courseDropdownOpen, setCourseDropdownOpen] = useState(false)
   const courseInputRef = useRef<HTMLInputElement>(null)
   const courseDropdownRef = useRef<HTMLDivElement>(null)
 
-  // Unit state
   const [selectedUnitId, setSelectedUnitId] = useState(preselectedUnitId ?? '')
   const [creatingUnit, setCreatingUnit] = useState(false)
   const [newUnitTitle, setNewUnitTitle] = useState('')
 
-  // Material state
   const [title, setTitle] = useState('')
   const [type, setType] = useState<'note' | 'test'>('note')
-  const [contentType, setContentType] = useState<'pdf' | 'richtext'>('richtext')
   const [contentText, setContentText] = useState('')
-  const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [linkUrl, setLinkUrl] = useState('')
+  const [attachmentUrl, setAttachmentUrl] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -38,7 +34,6 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
   )
   const filteredUnits = units.filter(u => u.courseId === selectedCourse?.id)
 
-  // Close course dropdown on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (
@@ -85,27 +80,17 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
 
     try {
       let unitId = selectedUnitId
-
       if (creatingUnit) {
         unitId = await submitNewUnit(selectedCourse.id, newUnitTitle)
-      }
-
-      let pdfPath: string | undefined
-      if (contentType === 'pdf' && pdfFile) {
-        const { signedUrl, path } = await getSignedUploadUrl(pdfFile.name, unitId)
-        const res = await fetch(signedUrl, { method: 'PUT', body: pdfFile, headers: { 'Content-Type': 'application/pdf' } })
-        if (!res.ok) throw new Error('PDF upload failed')
-        pdfPath = path
       }
 
       await submitMaterial({
         unitId,
         title,
         type,
-        contentType,
-        pdfPath,
-        contentJson: contentType === 'richtext' && contentText ? { text: contentText } : undefined,
+        contentText,
         linkUrl: linkUrl || undefined,
+        attachmentUrl: attachmentUrl || undefined,
       })
 
       router.push('/profile')
@@ -227,67 +212,49 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         />
       </div>
 
-      {/* Type + Format toggles */}
-      <div className="flex gap-4">
-        <div className="flex flex-col gap-1.5 flex-1">
-          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Type</label>
-          <div className="flex gap-2">
-            {(['note', 'test'] as const).map(t => (
-              <button key={t} type="button" onClick={() => setType(t)}
-                className={`btn-press flex-1 py-2 rounded-xl text-sm font-medium border transition-all ${
-                  type === t
-                    ? 'bg-violet-600 border-violet-600 text-white'
-                    : 'glass text-white/60 hover:text-white'
-                }`}>
-                {t === 'note' ? 'Study Note' : 'Practice Test'}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col gap-1.5 flex-1">
-          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Format</label>
-          <div className="flex gap-2">
-            {(['richtext', 'pdf'] as const).map(ct => (
-              <button key={ct} type="button" onClick={() => setContentType(ct)}
-                className={`btn-press flex-1 py-2 rounded-xl text-sm font-medium border transition-all ${
-                  contentType === ct
-                    ? 'bg-violet-600 border-violet-600 text-white'
-                    : 'glass text-white/60 hover:text-white'
-                }`}>
-                {ct === 'richtext' ? 'Text Editor' : 'PDF Upload'}
-              </button>
-            ))}
-          </div>
+      {/* Type */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Type</label>
+        <div className="flex gap-2">
+          {(['note', 'test'] as const).map(t => (
+            <button key={t} type="button" onClick={() => setType(t)}
+              className={`btn-press flex-1 py-2 rounded-xl text-sm font-medium border transition-all ${
+                type === t
+                  ? 'bg-violet-600 border-violet-600 text-white'
+                  : 'glass text-white/60 hover:text-white'
+              }`}>
+              {t === 'note' ? 'Study Note' : 'Practice Test'}
+            </button>
+          ))}
         </div>
       </div>
 
-      {contentType === 'richtext' && (
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Content</label>
-          <textarea
-            value={contentText}
-            onChange={e => setContentText(e.target.value)}
-            placeholder="Type your notes here..."
-            rows={12}
-            className="glass-input w-full rounded-xl px-4 py-3 text-sm resize-y leading-relaxed"
-          />
-        </div>
-      )}
+      {/* Content */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Content <span className="text-white/25 normal-case">(optional)</span></label>
+        <textarea
+          value={contentText}
+          onChange={e => setContentText(e.target.value)}
+          placeholder="Type your notes here..."
+          rows={12}
+          className="glass-input w-full rounded-xl px-4 py-3 text-sm resize-y leading-relaxed"
+        />
+      </div>
 
-      {contentType === 'pdf' && (
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">PDF File (max 10MB)</label>
-          <input
-            type="file"
-            accept="application/pdf"
-            onChange={e => setPdfFile(e.target.files?.[0] ?? null)}
-            required
-            className="text-white/60 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-violet-600 file:text-white file:font-medium hover:file:bg-violet-500 file:transition-colors"
-          />
-        </div>
-      )}
+      {/* Attachment */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Attachment <span className="text-white/25 normal-case">(optional)</span></label>
+        <input
+          value={attachmentUrl}
+          onChange={e => setAttachmentUrl(e.target.value)}
+          type="url"
+          placeholder="https://..."
+          className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
+        />
+        <p className="text-xs text-white/25 px-1">Link to a file — Google Drive, Dropbox, etc.</p>
+      </div>
 
-      {/* Optional link */}
+      {/* Link */}
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Link <span className="text-white/25 normal-case">(optional)</span></label>
         <input
@@ -297,12 +264,12 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
           placeholder="https://..."
           className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
         />
-        <p className="text-xs text-white/25 px-1">Attach a relevant URL — a video, article, or Google Doc.</p>
+        <p className="text-xs text-white/25 px-1">Attach a relevant URL — a video, article, or website.</p>
       </div>
 
       <button
         type="submit"
-        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title || (contentType === 'richtext' && !contentText.trim())}
+        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title}
         className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
       >
         {submitting ? 'Submitting...' : 'Submit for Review'}

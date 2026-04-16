@@ -7,18 +7,19 @@ import Link from 'next/link'
 interface Props {
   id: string
   initialTitle: string
-  contentType: 'pdf' | 'richtext'
   initialContent: string
   initialLinkUrl: string
+  initialAttachmentUrl: string
   unitTitle: string
   courseName: string
 }
 
-export default function EditMaterialForm({ id, initialTitle, contentType, initialContent, initialLinkUrl, unitTitle, courseName }: Props) {
+export default function EditMaterialForm({ id, initialTitle, initialContent, initialLinkUrl, initialAttachmentUrl, unitTitle, courseName }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState(initialTitle)
   const [content, setContent] = useState(initialContent)
   const [linkUrl, setLinkUrl] = useState(initialLinkUrl)
+  const [attachmentUrl, setAttachmentUrl] = useState(initialAttachmentUrl)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -28,7 +29,7 @@ export default function EditMaterialForm({ id, initialTitle, contentType, initia
     setSaving(true)
     setError('')
     try {
-      await editMaterial(id, title, contentType === 'richtext' ? content : null, linkUrl)
+      await editMaterial(id, title, content, linkUrl, attachmentUrl)
       router.push('/profile')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -69,23 +70,27 @@ export default function EditMaterialForm({ id, initialTitle, contentType, initia
         />
       </div>
 
-      {contentType === 'richtext' && (
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Content</label>
-          <textarea
-            value={content}
-            onChange={e => setContent(e.target.value)}
-            rows={12}
-            className="glass-input w-full rounded-xl px-4 py-3 text-sm resize-y leading-relaxed"
-          />
-        </div>
-      )}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Content <span className="text-white/25 normal-case">(optional)</span></label>
+        <textarea
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          rows={12}
+          className="glass-input w-full rounded-xl px-4 py-3 text-sm resize-y leading-relaxed"
+        />
+      </div>
 
-      {contentType === 'pdf' && (
-        <p className="text-white/30 text-sm glass rounded-xl px-4 py-3">
-          PDF files cannot be replaced — only the title and link can be edited.
-        </p>
-      )}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Attachment <span className="text-white/25 normal-case">(optional)</span></label>
+        <input
+          value={attachmentUrl}
+          onChange={e => setAttachmentUrl(e.target.value)}
+          type="url"
+          placeholder="https://..."
+          className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
+        />
+        <p className="text-xs text-white/25 px-1">Link to a file — Google Drive, Dropbox, etc.</p>
+      </div>
 
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Link <span className="text-white/25 normal-case">(optional)</span></label>
@@ -96,7 +101,7 @@ export default function EditMaterialForm({ id, initialTitle, contentType, initia
           placeholder="https://..."
           className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
         />
-        <p className="text-xs text-white/25 px-1">Attach a relevant URL — a video, article, or Google Doc.</p>
+        <p className="text-xs text-white/25 px-1">Attach a relevant URL — a video, article, or website.</p>
       </div>
 
       <div className="flex gap-3">

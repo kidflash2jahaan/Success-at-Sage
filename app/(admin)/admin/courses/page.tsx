@@ -9,21 +9,21 @@ export default async function AdminCoursesPage() {
     supabaseAdmin.from('courses').select('id, name, department_id').order('name'),
     supabaseAdmin.from('units').select('id, title, course_id')
       .eq('status', 'approved').order('title'),
-    supabaseAdmin.from('materials').select('id, title, type, unit_id, content_type, content_json, link_url')
+    supabaseAdmin.from('materials').select('id, title, type, unit_id, content_json, link_url, attachment_url')
       .eq('status', 'approved').order('created_at'),
   ])
 
   // Build unitMaterials map: unitId → materials[]
-  const unitMaterials: Record<string, { id: string; title: string; type: string; contentType: 'pdf' | 'richtext'; contentText: string; linkUrl: string }[]> = {}
+  const unitMaterials: Record<string, { id: string; title: string; type: string; contentText: string; linkUrl: string; attachmentUrl: string }[]> = {}
   for (const m of (materialsData ?? []) as any[]) {
     if (!unitMaterials[m.unit_id]) unitMaterials[m.unit_id] = []
     unitMaterials[m.unit_id].push({
       id: m.id,
       title: m.title,
       type: m.type,
-      contentType: m.content_type,
       contentText: (m.content_json as { text?: string } | null)?.text ?? '',
       linkUrl: m.link_url ?? '',
+      attachmentUrl: m.attachment_url ?? '',
     })
   }
 
