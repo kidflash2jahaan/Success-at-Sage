@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Success at Sage",
-  description: "Study notes and past tests for Sage Hill High School students",
+  description: "Study notes and past tests for Sage Hill School students",
 };
 
 export default function RootLayout({

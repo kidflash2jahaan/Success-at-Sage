@@ -24,7 +24,7 @@ export default async function LandingPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 text-center">
         <div className="max-w-2xl">
           <div className="inline-block text-xs font-semibold uppercase tracking-wider text-purple-400 bg-purple-400/10 border border-purple-400/20 rounded-full px-3 py-1 mb-6">
-            For Sage Hill High School Students
+            For Sage Hill School Students
           </div>
           <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
             Study smarter.<br />
@@ -47,7 +47,7 @@ export default async function LandingPage() {
       </main>
 
       <footer className="px-6 py-4 border-t border-white/10 text-center text-white/20 text-sm">
-        Success at Sage — A passion project for Sage Hill High School
+        Success at Sage — A passion project for Sage Hill School
       </footer>
     </div>
   )
