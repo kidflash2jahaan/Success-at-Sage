@@ -8,7 +8,7 @@ export default async function SubmitPage() {
   await requireUser()
   const [{ data: coursesData }, { data: unitsData }] = await Promise.all([
     supabaseAdmin.from('courses').select('id, name').order('name'),
-    supabaseAdmin.from('units').select('id, title, course_id').order('order_index'),
+    supabaseAdmin.from('units').select('id, title, course_id').eq('status', 'approved').order('order_index'),
   ])
 
   return (

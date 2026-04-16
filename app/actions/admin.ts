@@ -55,6 +55,20 @@ export async function deleteUnit(unitId: string) {
   revalidatePath('/admin/courses')
 }
 
+export async function approveUnit(unitId: string) {
+  await requireAdmin()
+  await supabaseAdmin.from('units').update({ status: 'approved' }).eq('id', unitId)
+  revalidatePath('/admin/submissions')
+}
+
+export async function rejectUnit(unitId: string) {
+  await requireAdmin()
+  // Reject the unit and any pending materials attached to it
+  await supabaseAdmin.from('materials').update({ status: 'rejected' }).eq('unit_id', unitId).eq('status', 'pending')
+  await supabaseAdmin.from('units').delete().eq('id', unitId)
+  revalidatePath('/admin/submissions')
+}
+
 export async function promoteToAdmin(userId: string) {
   await requireAdmin()
   await supabaseAdmin.from('users').update({ role: 'admin' }).eq('id', userId)

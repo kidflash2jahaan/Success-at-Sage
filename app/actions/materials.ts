@@ -4,6 +4,18 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
+export async function submitNewUnit(courseId: string, title: string): Promise<string> {
+  const user = await requireUser()
+  const { data, error } = await supabaseAdmin
+    .from('units')
+    .insert({ course_id: courseId, title: title.trim(), order_index: 9999, status: 'pending', submitted_by: user.id })
+    .select('id')
+    .single()
+  if (error || !data) throw new Error('Could not create unit')
+  revalidatePath('/admin/submissions')
+  return (data as any).id as string
+}
+
 export async function getSignedUploadUrl(fileName: string, unitId: string) {
   const user = await requireUser()
   const supabase = await createSupabaseServerClient()

@@ -1,6 +1,6 @@
 'use client'
-import { useState } from 'react'
-import { submitMaterial, getSignedUploadUrl } from '@/app/actions/materials'
+import { useState, useRef, useEffect } from 'react'
+import { submitMaterial, getSignedUploadUrl, submitNewUnit } from '@/app/actions/materials'
 import TiptapEditor from '@/components/editor/TiptapEditor'
 import { useRouter } from 'next/navigation'
 
@@ -9,8 +9,20 @@ interface Unit { id: string; title: string; courseId: string }
 
 export default function SubmitForm({ courses, units }: { courses: Course[]; units: Unit[] }) {
   const router = useRouter()
-  const [selectedCourseId, setSelectedCourseId] = useState('')
+
+  // Course search state
+  const [courseQuery, setCourseQuery] = useState('')
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
+  const [courseDropdownOpen, setCourseDropdownOpen] = useState(false)
+  const courseInputRef = useRef<HTMLInputElement>(null)
+  const courseDropdownRef = useRef<HTMLDivElement>(null)
+
+  // Unit state
   const [selectedUnitId, setSelectedUnitId] = useState('')
+  const [creatingUnit, setCreatingUnit] = useState(false)
+  const [newUnitTitle, setNewUnitTitle] = useState('')
+
+  // Material state
   const [title, setTitle] = useState('')
   const [type, setType] = useState<'note' | 'test'>('note')
   const [contentType, setContentType] = useState<'pdf' | 'richtext'>('richtext')
@@ -19,26 +31,73 @@ export default function SubmitForm({ courses, units }: { courses: Course[]; unit
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  const filteredUnits = units.filter(u => u.courseId === selectedCourseId)
+  const filteredCourses = courses.filter(c =>
+    c.name.toLowerCase().includes(courseQuery.toLowerCase())
+  )
+  const filteredUnits = units.filter(u => u.courseId === selectedCourse?.id)
+
+  // Close course dropdown on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (
+        courseDropdownRef.current &&
+        !courseDropdownRef.current.contains(e.target as Node) &&
+        courseInputRef.current &&
+        !courseInputRef.current.contains(e.target as Node)
+      ) {
+        setCourseDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  function selectCourse(course: Course) {
+    setSelectedCourse(course)
+    setCourseQuery(course.name)
+    setCourseDropdownOpen(false)
+    setSelectedUnitId('')
+    setCreatingUnit(false)
+    setNewUnitTitle('')
+  }
+
+  function handleCourseInputChange(value: string) {
+    setCourseQuery(value)
+    setCourseDropdownOpen(true)
+    if (selectedCourse && value !== selectedCourse.name) {
+      setSelectedCourse(null)
+      setSelectedUnitId('')
+      setCreatingUnit(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!selectedUnitId || !title) return
+    if (!selectedCourse) return
+    if (!creatingUnit && !selectedUnitId) return
+    if (creatingUnit && !newUnitTitle.trim()) return
+    if (!title) return
+
     setSubmitting(true)
     setError('')
 
     try {
-      let pdfPath: string | undefined
+      let unitId = selectedUnitId
 
+      if (creatingUnit) {
+        unitId = await submitNewUnit(selectedCourse.id, newUnitTitle)
+      }
+
+      let pdfPath: string | undefined
       if (contentType === 'pdf' && pdfFile) {
-        const { signedUrl, path } = await getSignedUploadUrl(pdfFile.name, selectedUnitId)
+        const { signedUrl, path } = await getSignedUploadUrl(pdfFile.name, unitId)
         const res = await fetch(signedUrl, { method: 'PUT', body: pdfFile, headers: { 'Content-Type': 'application/pdf' } })
         if (!res.ok) throw new Error('PDF upload failed')
         pdfPath = path
       }
 
       await submitMaterial({
-        unitId: selectedUnitId,
+        unitId,
         title,
         type,
         contentType,
@@ -56,54 +115,142 @@ export default function SubmitForm({ courses, units }: { courses: Course[]; unit
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto px-4 py-10 flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-white">Submit Study Material</h1>
-
-      {error && <div className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-3">{error}</div>}
-
-      <div className="flex flex-col gap-1">
-        <label className="text-sm text-white/60">Course</label>
-        <select value={selectedCourseId} onChange={e => { setSelectedCourseId(e.target.value); setSelectedUnitId('') }}
-          required className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-purple-500">
-          <option value="">Select a course</option>
-          {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+      <div>
+        <h1 className="text-2xl font-bold text-white tracking-tight">Submit Study Material</h1>
+        <p className="text-white/40 text-sm mt-1">Your submission will be reviewed before going live.</p>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-sm text-white/60">Unit</label>
-        <select value={selectedUnitId} onChange={e => setSelectedUnitId(e.target.value)}
-          required disabled={!selectedCourseId}
-          className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-purple-500 disabled:opacity-40">
-          <option value="">Select a unit</option>
-          {filteredUnits.map(u => <option key={u.id} value={u.id}>{u.title}</option>)}
-        </select>
+      {error && (
+        <div className="text-red-400 text-sm glass border-red-400/20 rounded-xl px-4 py-3"
+          style={{ background: 'rgba(248,113,113,0.08)', borderColor: 'rgba(248,113,113,0.2)' }}>
+          {error}
+        </div>
+      )}
+
+      {/* Course search */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Course</label>
+        <div className="relative">
+          <input
+            ref={courseInputRef}
+            value={courseQuery}
+            onChange={e => handleCourseInputChange(e.target.value)}
+            onFocus={() => setCourseDropdownOpen(true)}
+            placeholder="Search for a course..."
+            autoComplete="off"
+            className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
+          />
+          {selectedCourse && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-green-400"
+              style={{ boxShadow: '0 0 6px rgba(74,222,128,0.6)' }} />
+          )}
+          {courseDropdownOpen && courseQuery.length > 0 && filteredCourses.length > 0 && (
+            <div
+              ref={courseDropdownRef}
+              className="absolute z-20 w-full mt-1.5 glass rounded-xl overflow-hidden"
+              style={{ maxHeight: '220px', overflowY: 'auto' }}
+            >
+              {filteredCourses.map(course => (
+                <button
+                  key={course.id}
+                  type="button"
+                  onMouseDown={() => selectCourse(course)}
+                  className="w-full text-left px-4 py-2.5 text-sm text-white/80 hover:bg-white/[0.07] hover:text-white transition-colors"
+                >
+                  {course.name}
+                </button>
+              ))}
+            </div>
+          )}
+          {courseDropdownOpen && courseQuery.length > 0 && filteredCourses.length === 0 && (
+            <div ref={courseDropdownRef} className="absolute z-20 w-full mt-1.5 glass rounded-xl px-4 py-3 text-sm text-white/30">
+              No courses found
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <label className="text-sm text-white/60">Title</label>
-        <input value={title} onChange={e => setTitle(e.target.value)} required
-          className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500"
-          placeholder="e.g. Unit 3 Review Sheet" />
+      {/* Unit */}
+      {selectedCourse && (
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Unit</label>
+            <button
+              type="button"
+              onClick={() => { setCreatingUnit(v => !v); setSelectedUnitId(''); setNewUnitTitle('') }}
+              className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
+            >
+              {creatingUnit ? '← Select existing unit' : '+ Create new unit'}
+            </button>
+          </div>
+
+          {creatingUnit ? (
+            <div className="flex flex-col gap-1.5">
+              <input
+                value={newUnitTitle}
+                onChange={e => setNewUnitTitle(e.target.value)}
+                placeholder="e.g. Unit 4: The Cold War"
+                className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
+                autoFocus
+              />
+              <p className="text-xs text-white/25 px-1">
+                This unit will be reviewed and approved before becoming visible to others.
+              </p>
+            </div>
+          ) : (
+            <select
+              value={selectedUnitId}
+              onChange={e => setSelectedUnitId(e.target.value)}
+              className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
+            >
+              <option value="">Select a unit</option>
+              {filteredUnits.map(u => (
+                <option key={u.id} value={u.id}>{u.title}</option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
+
+      {/* Title */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Title</label>
+        <input
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          required
+          className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
+          placeholder="e.g. Unit 3 Review Sheet"
+        />
       </div>
 
+      {/* Type + Format toggles */}
       <div className="flex gap-4">
-        <div className="flex flex-col gap-1 flex-1">
-          <label className="text-sm text-white/60">Type</label>
+        <div className="flex flex-col gap-1.5 flex-1">
+          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Type</label>
           <div className="flex gap-2">
             {(['note', 'test'] as const).map(t => (
               <button key={t} type="button" onClick={() => setType(t)}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${type === t ? 'bg-purple-600 border-purple-600 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:text-white'}`}>
+                className={`btn-press flex-1 py-2 rounded-xl text-sm font-medium border transition-all ${
+                  type === t
+                    ? 'bg-violet-600 border-violet-600 text-white'
+                    : 'glass text-white/60 hover:text-white'
+                }`}>
                 {t === 'note' ? 'Study Note' : 'Past Test'}
               </button>
             ))}
           </div>
         </div>
-        <div className="flex flex-col gap-1 flex-1">
-          <label className="text-sm text-white/60">Format</label>
+        <div className="flex flex-col gap-1.5 flex-1">
+          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Format</label>
           <div className="flex gap-2">
             {(['richtext', 'pdf'] as const).map(ct => (
               <button key={ct} type="button" onClick={() => setContentType(ct)}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${contentType === ct ? 'bg-purple-600 border-purple-600 text-white' : 'bg-white/5 border-white/10 text-white/60 hover:text-white'}`}>
+                className={`btn-press flex-1 py-2 rounded-xl text-sm font-medium border transition-all ${
+                  contentType === ct
+                    ? 'bg-violet-600 border-violet-600 text-white'
+                    : 'glass text-white/60 hover:text-white'
+                }`}>
                 {ct === 'richtext' ? 'Text Editor' : 'PDF Upload'}
               </button>
             ))}
@@ -112,22 +259,30 @@ export default function SubmitForm({ courses, units }: { courses: Course[]; unit
       </div>
 
       {contentType === 'richtext' && (
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-white/60">Content</label>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Content</label>
           <TiptapEditor onChange={json => setContentJson(json)} />
         </div>
       )}
 
       {contentType === 'pdf' && (
-        <div className="flex flex-col gap-1">
-          <label className="text-sm text-white/60">PDF File (max 10MB)</label>
-          <input type="file" accept="application/pdf" onChange={e => setPdfFile(e.target.files?.[0] ?? null)}
-            required className="text-white/60 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:font-medium hover:file:bg-purple-500" />
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">PDF File (max 10MB)</label>
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={e => setPdfFile(e.target.files?.[0] ?? null)}
+            required
+            className="text-white/60 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-violet-600 file:text-white file:font-medium hover:file:bg-violet-500 file:transition-colors"
+          />
         </div>
       )}
 
-      <button type="submit" disabled={submitting}
-        className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-semibold rounded-lg py-3 transition-colors">
+      <button
+        type="submit"
+        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title}
+        className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
+      >
         {submitting ? 'Submitting...' : 'Submit for Review'}
       </button>
     </form>
