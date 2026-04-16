@@ -36,25 +36,36 @@ export default async function CourseDetailPage({
         {course.description && <p className="text-white/50 text-sm leading-relaxed">{course.description}</p>}
 
         {user && (
-          <form action={enrolled
-            ? removeCourseFromSchedule.bind(null, course.id)
-            : addCourseToSchedule.bind(null, course.id)
-          } className="mt-5">
-            <button
-              type="submit"
-              className={`btn-press px-5 py-2 rounded-xl text-sm font-semibold transition-all ${
-                enrolled
-                  ? 'glass text-white/70 hover:text-white hover:bg-white/[0.08]'
-                  : 'text-white hover:shadow-lg'
-              }`}
-              style={enrolled ? {} : {
-                background: department.colorAccent,
-                boxShadow: `0 0 20px ${department.colorAccent}40`,
-              }}
+          <div className="mt-5 flex items-center gap-2 flex-wrap">
+            <form action={enrolled
+              ? removeCourseFromSchedule.bind(null, course.id)
+              : addCourseToSchedule.bind(null, course.id)
+            }>
+              <button
+                type="submit"
+                className={`btn-press px-5 py-2 rounded-xl text-sm font-semibold transition-all ${
+                  enrolled
+                    ? 'glass text-white/70 hover:text-white hover:bg-white/[0.08]'
+                    : 'text-white hover:shadow-lg'
+                }`}
+                style={enrolled ? {} : {
+                  background: department.colorAccent,
+                  boxShadow: `0 0 20px ${department.colorAccent}40`,
+                }}
+              >
+                {enrolled ? 'Remove from Schedule' : '+ Add to My Schedule'}
+              </button>
+            </form>
+            <Link
+              href={`/submit?course=${slug}`}
+              className="btn-press inline-flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-semibold glass text-white/60 hover:text-white hover:bg-white/[0.08] transition-all"
             >
-              {enrolled ? 'Remove from Schedule' : '+ Add to My Schedule'}
-            </button>
-          </form>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Submit Material
+            </Link>
+          </div>
         )}
       </div>
 

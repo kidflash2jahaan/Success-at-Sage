@@ -4,15 +4,17 @@ import { submitMaterial, getSignedUploadUrl, submitNewUnit } from '@/app/actions
 import TiptapEditor from '@/components/editor/TiptapEditor'
 import { useRouter } from 'next/navigation'
 
-interface Course { id: string; name: string }
+interface Course { id: string; name: string; slug: string }
 interface Unit { id: string; title: string; courseId: string }
 
-export default function SubmitForm({ courses, units }: { courses: Course[]; units: Unit[] }) {
+export default function SubmitForm({ courses, units, preselectedSlug }: { courses: Course[]; units: Unit[]; preselectedSlug?: string }) {
   const router = useRouter()
 
+  const initialCourse = preselectedSlug ? (courses.find(c => c.slug === preselectedSlug) ?? null) : null
+
   // Course search state
-  const [courseQuery, setCourseQuery] = useState('')
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
+  const [courseQuery, setCourseQuery] = useState(initialCourse?.name ?? '')
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialCourse)
   const [courseDropdownOpen, setCourseDropdownOpen] = useState(false)
   const courseInputRef = useRef<HTMLInputElement>(null)
   const courseDropdownRef = useRef<HTMLDivElement>(null)
@@ -147,8 +149,8 @@ export default function SubmitForm({ courses, units }: { courses: Course[]; unit
           {courseDropdownOpen && courseQuery.length > 0 && filteredCourses.length > 0 && (
             <div
               ref={courseDropdownRef}
-              className="absolute z-20 w-full mt-1.5 glass rounded-xl overflow-hidden"
-              style={{ maxHeight: '220px', overflowY: 'auto' }}
+              className="absolute z-20 w-full mt-1.5 rounded-xl overflow-hidden border border-white/[0.1]"
+              style={{ maxHeight: '220px', overflowY: 'auto', background: '#0d0f24' }}
             >
               {filteredCourses.map(course => (
                 <button
@@ -163,7 +165,7 @@ export default function SubmitForm({ courses, units }: { courses: Course[]; unit
             </div>
           )}
           {courseDropdownOpen && courseQuery.length > 0 && filteredCourses.length === 0 && (
-            <div ref={courseDropdownRef} className="absolute z-20 w-full mt-1.5 glass rounded-xl px-4 py-3 text-sm text-white/30">
+            <div ref={courseDropdownRef} className="absolute z-20 w-full mt-1.5 rounded-xl px-4 py-3 text-sm text-white/30 border border-white/[0.1]" style={{ background: '#0d0f24' }}>
               No courses found
             </div>
           )}
