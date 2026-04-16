@@ -69,6 +69,33 @@ export async function rejectUnit(unitId: string) {
   revalidatePath('/admin/submissions')
 }
 
+export async function createAdminMaterial(
+  unitId: string,
+  title: string,
+  type: 'note' | 'test',
+  contentText: string,
+) {
+  const admin = await requireAdmin()
+  await supabaseAdmin.from('materials').insert({
+    unit_id: unitId,
+    uploaded_by: admin.id,
+    title: title.trim(),
+    type,
+    content_type: 'richtext',
+    content_json: contentText.trim() ? { text: contentText.trim() } : null,
+    pdf_path: null,
+    status: 'approved',
+  })
+  revalidatePath('/admin/courses')
+}
+
+export async function deleteMaterial(materialId: string) {
+  await requireAdmin()
+  await supabaseAdmin.from('materials').delete().eq('id', materialId)
+  revalidatePath('/admin/courses')
+  revalidatePath('/admin/submissions')
+}
+
 export async function moveUnit(unitId: string, direction: 'up' | 'down') {
   await requireAdmin()
   const { data: unit } = await supabaseAdmin
