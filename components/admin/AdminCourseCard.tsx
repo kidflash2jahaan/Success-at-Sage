@@ -1,9 +1,9 @@
 'use client'
 import { useState, useTransition } from 'react'
-import { moveUnit, updateUnitTitle, deleteUnit, createUnit, createAdminMaterial, deleteMaterial } from '@/app/actions/admin'
+import { moveUnit, updateUnitTitle, deleteUnit, createUnit, createAdminMaterial, deleteMaterial, adminEditMaterial } from '@/app/actions/admin'
 
 interface Unit { id: string; title: string; orderIndex: number }
-interface Material { id: string; title: string; type: string }
+interface Material { id: string; title: string; type: string; contentType: 'pdf' | 'richtext'; contentText: string }
 
 interface Props {
   courseId: string
@@ -20,6 +20,11 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
   const [newUnitTitle, setNewUnitTitle] = useState('')
   const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null)
   const [addMat, setAddMat] = useState<{ title: string; type: 'note' | 'test'; content: string }>({ title: '', type: 'note', content: '' })
+  // Material view/edit state
+  const [viewingMatId, setViewingMatId] = useState<string | null>(null)
+  const [editingMatId, setEditingMatId] = useState<string | null>(null)
+  const [editMatTitle, setEditMatTitle] = useState('')
+  const [editMatContent, setEditMatContent] = useState('')
   const [pending, startTransition] = useTransition()
 
   function startEdit(unit: Unit) { setEditingId(unit.id); setEditTitle(unit.title) }
@@ -61,6 +66,8 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
       ...prev,
       [unitId]: (prev[unitId] ?? []).filter(m => m.id !== materialId),
     }))
+    if (viewingMatId === materialId) setViewingMatId(null)
+    if (editingMatId === materialId) setEditingMatId(null)
     startTransition(() => deleteMaterial(materialId))
   }
 
@@ -68,13 +75,31 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
     if (!addMat.title.trim()) return
     const snap = { ...addMat }
     setAddMat({ title: '', type: 'note', content: '' })
-    // Optimistic fake entry while server syncs
     const tempId = `temp-${Date.now()}`
     setUnitMaterials(prev => ({
       ...prev,
-      [unitId]: [...(prev[unitId] ?? []), { id: tempId, title: snap.title.trim(), type: snap.type }],
+      [unitId]: [...(prev[unitId] ?? []), { id: tempId, title: snap.title.trim(), type: snap.type, contentType: 'richtext', contentText: snap.content }],
     }))
     startTransition(() => createAdminMaterial(unitId, snap.title, snap.type, snap.content))
+  }
+
+  function startEditMat(m: Material) {
+    setViewingMatId(null)
+    setEditingMatId(m.id)
+    setEditMatTitle(m.title)
+    setEditMatContent(m.contentText)
+  }
+
+  function handleSaveMat(unitId: string, mat: Material) {
+    if (!editMatTitle.trim()) return
+    setUnitMaterials(prev => ({
+      ...prev,
+      [unitId]: (prev[unitId] ?? []).map(m => m.id === mat.id
+        ? { ...m, title: editMatTitle.trim(), contentText: editMatContent }
+        : m),
+    }))
+    setEditingMatId(null)
+    startTransition(() => adminEditMaterial(mat.id, editMatTitle, mat.contentType === 'richtext' ? editMatContent : null))
   }
 
   return (
@@ -151,21 +176,73 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
                     <p className="text-white/20 text-xs py-1">No materials yet.</p>
                   )}
                   {mats.map(m => (
-                    <div key={m.id} className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-1.5 group/mat">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0"
-                          style={{
-                            background: m.type === 'note' ? 'rgba(124,58,237,0.2)' : 'rgba(251,191,36,0.15)',
-                            color: m.type === 'note' ? '#a78bfa' : '#fbbf24',
-                          }}>
-                          {m.type === 'note' ? 'Note' : 'Test'}
-                        </span>
-                        <span className="text-white/60 text-xs truncate">{m.title}</span>
+                    <div key={m.id}>
+                      {/* Material row */}
+                      <div className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-1.5 group/mat">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0"
+                            style={{
+                              background: m.type === 'note' ? 'rgba(124,58,237,0.2)' : 'rgba(251,191,36,0.15)',
+                              color: m.type === 'note' ? '#a78bfa' : '#fbbf24',
+                            }}>
+                            {m.type === 'note' ? 'Note' : 'Test'}
+                          </span>
+                          <span className="text-white/60 text-xs truncate">{m.title}</span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {m.contentType === 'richtext' && m.contentText && (
+                            <button type="button"
+                              onClick={() => setViewingMatId(viewingMatId === m.id ? null : m.id)}
+                              className="text-white/20 hover:text-white/60 opacity-0 group-hover/mat:opacity-100 text-xs px-1 transition-all">
+                              {viewingMatId === m.id ? 'Hide' : 'View'}
+                            </button>
+                          )}
+                          <button type="button"
+                            onClick={() => editingMatId === m.id ? setEditingMatId(null) : startEditMat(m)}
+                            className="text-white/20 hover:text-white/60 opacity-0 group-hover/mat:opacity-100 text-xs px-1 transition-all">
+                            {editingMatId === m.id ? '✕' : 'Edit'}
+                          </button>
+                          <button type="button" onClick={() => handleDeleteMaterial(unit.id, m.id)}
+                            className="text-red-400/40 hover:text-red-400 opacity-0 group-hover/mat:opacity-100 text-xs px-1 transition-all">
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                      <button type="button" onClick={() => handleDeleteMaterial(unit.id, m.id)}
-                        className="text-red-400/40 hover:text-red-400 opacity-0 group-hover/mat:opacity-100 text-xs px-1 transition-all shrink-0">
-                        Delete
-                      </button>
+
+                      {/* View content */}
+                      {viewingMatId === m.id && m.contentType === 'richtext' && (
+                        <div className="mx-1 mb-1 bg-white/[0.02] rounded-lg px-3 py-2 text-white/50 text-xs leading-relaxed whitespace-pre-wrap border border-white/[0.05]">
+                          {m.contentText || <span className="italic text-white/20">No content.</span>}
+                        </div>
+                      )}
+
+                      {/* Inline edit form */}
+                      {editingMatId === m.id && (
+                        <div className="mx-1 mb-1 bg-white/[0.02] rounded-lg px-3 py-2 flex flex-col gap-2 border border-white/[0.05]">
+                          <input
+                            autoFocus
+                            value={editMatTitle}
+                            onChange={e => setEditMatTitle(e.target.value)}
+                            placeholder="Title"
+                            className="glass-input w-full rounded-lg px-2 py-1 text-xs"
+                          />
+                          {m.contentType === 'richtext' && (
+                            <textarea
+                              value={editMatContent}
+                              onChange={e => setEditMatContent(e.target.value)}
+                              placeholder="Content"
+                              rows={5}
+                              className="glass-input w-full rounded-lg px-2 py-1 text-xs resize-y"
+                            />
+                          )}
+                          <button type="button"
+                            onClick={() => handleSaveMat(unit.id, m)}
+                            disabled={!editMatTitle.trim() || pending}
+                            className="self-start text-xs bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white px-3 py-1 rounded-lg transition-colors">
+                            Save
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
 

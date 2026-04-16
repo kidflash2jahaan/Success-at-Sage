@@ -91,13 +91,13 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => startTransition(() => adminEditMaterial(item.id, editTitle, item.contentType === 'richtext' ? editContent : null))}
+                onClick={() => startTransition(async () => {
+                  await adminEditMaterial(item.id, editTitle, item.contentType === 'richtext' ? editContent : null)
+                  setMode('review')
+                })}
                 className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"
               >
-                Save Changes
-              </button>
-              <button type="button" onClick={() => setMode('review')} className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">
-                Cancel
+                {pending ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </>

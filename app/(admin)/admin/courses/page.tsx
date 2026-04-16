@@ -9,15 +9,21 @@ export default async function AdminCoursesPage() {
     supabaseAdmin.from('courses').select('id, name, department_id').order('name'),
     supabaseAdmin.from('units').select('id, title, course_id, order_index')
       .eq('status', 'approved').order('order_index'),
-    supabaseAdmin.from('materials').select('id, title, type, unit_id')
+    supabaseAdmin.from('materials').select('id, title, type, unit_id, content_type, content_json')
       .eq('status', 'approved').order('created_at'),
   ])
 
   // Build unitMaterials map: unitId → materials[]
-  const unitMaterials: Record<string, { id: string; title: string; type: string }[]> = {}
+  const unitMaterials: Record<string, { id: string; title: string; type: string; contentType: 'pdf' | 'richtext'; contentText: string }[]> = {}
   for (const m of (materialsData ?? []) as any[]) {
     if (!unitMaterials[m.unit_id]) unitMaterials[m.unit_id] = []
-    unitMaterials[m.unit_id].push({ id: m.id, title: m.title, type: m.type })
+    unitMaterials[m.unit_id].push({
+      id: m.id,
+      title: m.title,
+      type: m.type,
+      contentType: m.content_type,
+      contentText: (m.content_json as { text?: string } | null)?.text ?? '',
+    })
   }
 
   const depsWithCourses = (depsData ?? []).map((d: any) => ({
