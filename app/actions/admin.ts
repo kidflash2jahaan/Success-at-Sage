@@ -11,13 +11,14 @@ export async function approveMaterial(materialId: string) {
     .select('id, title, uploaded_by')
     .eq('id', materialId)
     .single()
+  if (!material) return
   await supabaseAdmin.from('materials').update({ status: 'approved' }).eq('id', materialId)
   const { data: uploader } = await supabaseAdmin
     .from('users')
     .select('email')
     .eq('id', material.uploaded_by)
     .single()
-  await sendApprovalEmail(uploader.email, material.title)
+  if (uploader) await sendApprovalEmail(uploader.email, material.title)
   revalidatePath('/admin/submissions')
 }
 
@@ -28,6 +29,7 @@ export async function rejectMaterial(materialId: string, note: string) {
     .select('id, title, uploaded_by')
     .eq('id', materialId)
     .single()
+  if (!material) return
   await supabaseAdmin
     .from('materials')
     .update({ status: 'rejected', rejection_note: note || null })
@@ -37,7 +39,7 @@ export async function rejectMaterial(materialId: string, note: string) {
     .select('email')
     .eq('id', material.uploaded_by)
     .single()
-  await sendRejectionEmail(uploader.email, material.title, note)
+  if (uploader) await sendRejectionEmail(uploader.email, material.title, note)
   revalidatePath('/admin/submissions')
 }
 
