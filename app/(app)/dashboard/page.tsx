@@ -30,16 +30,17 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-6">
-      <div className="mb-6">
+      <div className="animate-fade-up mb-6">
         <h1 className="text-2xl font-bold text-white tracking-tight">My Courses</h1>
         <p className="text-white/40 text-sm mt-1">{userCourses.length} course{userCourses.length !== 1 ? 's' : ''} in your schedule</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {userCourses.map(({ course, department }) => (
+        {userCourses.map(({ course, department }, i) => (
           <Link
             key={course.id}
             href={`/courses/${course.slug}`}
-            className="glass rounded-2xl p-5 transition-all hover:bg-white/[0.07] hover:border-white/[0.14] group"
+            className="animate-fade-up card-hover glass-shine glass rounded-2xl p-5 transition-all hover:bg-white/[0.07] hover:border-white/[0.14] group"
+            style={{ animationDelay: `${i * 0.06}s` }}
           >
             <div className="flex items-center gap-2 mb-3">
               <div

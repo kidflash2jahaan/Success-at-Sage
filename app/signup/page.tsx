@@ -13,7 +13,7 @@ function SignupForm() {
   if (sent) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-sm">
+        <div className="animate-scale-in w-full max-w-sm">
           <div className="glass rounded-2xl p-8 text-center">
             <div className="w-14 h-14 rounded-2xl glass mx-auto mb-6 flex items-center justify-center"
               style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(13,148,136,0.3))' }}>
@@ -36,7 +36,7 @@ function SignupForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
+      <div className="animate-scale-in w-full max-w-sm">
         <div className="text-center mb-8">
           <div
             className="inline-flex items-center justify-center w-12 h-12 rounded-2xl glass mb-4"

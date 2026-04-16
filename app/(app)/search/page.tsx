@@ -30,15 +30,16 @@ export default async function SearchPage({
       <p className="text-white/40 mb-8">{courses.length + materials.length} results</p>
 
       {courses.length > 0 && (
-        <section className="mb-8">
+        <section className="animate-fade-up mb-8">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-3">Courses</h2>
           <div className="flex flex-col gap-2">
-            {courses.map(course => (
+            {courses.map((course, i) => (
               <Link key={course.id} href={`/courses/${course.slug}`}
-                className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-4 py-3 transition-colors">
-                <div className="w-2 h-2 rounded-full shrink-0" style={{ background: course.colorAccent }} />
+                className="animate-fade-up card-hover glass-shine glass flex items-center gap-3 rounded-xl px-4 py-3 transition-all hover:bg-white/[0.07]"
+                style={{ animationDelay: `${i * 0.06}s` }}>
+                <div className="w-2 h-2 rounded-full shrink-0" style={{ background: course.colorAccent, boxShadow: `0 0 6px ${course.colorAccent}80` }} />
                 <div>
-                  <div className="text-white font-medium">{course.name}</div>
+                  <div className="text-white font-medium text-sm">{course.name}</div>
                   <div className="text-white/40 text-xs">{course.departmentName}</div>
                 </div>
               </Link>
@@ -48,14 +49,15 @@ export default async function SearchPage({
       )}
 
       {materials.length > 0 && (
-        <section>
+        <section className="animate-fade-up stagger-2">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-3">Materials</h2>
           <div className="flex flex-col gap-2">
-            {materials.map(m => (
+            {materials.map((m, i) => (
               <Link key={m.id} href={`/courses/${m.courseSlug}/units/${m.unitId}`}
-                className="flex items-center justify-between bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-4 py-3 transition-colors">
+                className="animate-fade-up card-hover glass-shine glass flex items-center justify-between rounded-xl px-4 py-3 transition-all hover:bg-white/[0.07]"
+                style={{ animationDelay: `${0.12 + i * 0.06}s` }}>
                 <div>
-                  <div className="text-white font-medium">{m.title}</div>
+                  <div className="text-white font-medium text-sm">{m.title}</div>
                   <div className="text-white/40 text-xs">{m.courseName} · {m.unitTitle}</div>
                 </div>
                 <span className="text-xs text-white/30 capitalize">{m.type}</span>

@@ -25,7 +25,7 @@ export default function TopNav({ userName, onMenuClick }: TopNavProps) {
   }
 
   return (
-    <header className="glass-nav h-14 flex items-center px-4 gap-4 shrink-0 sticky top-0 z-10">
+    <header className="animate-fade-in-down glass-nav h-14 flex items-center px-4 gap-4 shrink-0 sticky top-0 z-10">
       <button
         onClick={onMenuClick}
         className="md:hidden text-white/50 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors"

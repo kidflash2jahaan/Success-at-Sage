@@ -29,7 +29,7 @@ export default function MaterialCard({ material, accentColor }: { material: Mate
   }
 
   return (
-    <div className="glass rounded-xl overflow-hidden transition-all hover:border-white/[0.13]">
+    <div className="glass rounded-xl overflow-hidden card-hover transition-all hover:border-white/[0.13]">
       <button
         onClick={handleOpen}
         className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.04] transition-colors"
@@ -48,18 +48,20 @@ export default function MaterialCard({ material, accentColor }: { material: Mate
             {material.contentType === 'pdf' ? 'PDF' : 'Text'}
           </span>
           <svg
-            className={`w-4 h-4 text-white/25 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-white/25 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
       </button>
-      {open && (
-        <div className="border-t border-white/[0.07]">
-          <MaterialViewer material={material} />
+      <div className={`accordion-grid${open ? ' open' : ''}`}>
+        <div>
+          <div className="border-t border-white/[0.07]">
+            <MaterialViewer material={material} />
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }

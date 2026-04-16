@@ -41,13 +41,13 @@ export default async function LandingPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 text-center relative">
         <div className="max-w-2xl w-full">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-300 glass px-4 py-2 rounded-full mb-8">
+          <div className="animate-fade-in-down inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-300 glass px-4 py-2 rounded-full mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-violet-400 inline-block" />
             For Sage Hill School Students
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl sm:text-6xl font-bold text-white mb-5 leading-[1.1] tracking-tight">
+          <h1 className="animate-fade-up stagger-2 text-5xl sm:text-6xl font-bold text-white mb-5 leading-[1.1] tracking-tight">
             Study smarter.<br />
             <span
               style={{
@@ -62,29 +62,29 @@ export default async function LandingPage() {
           </h1>
 
           {/* Subtext */}
-          <p className="text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed">
+          <p className="animate-fade-up stagger-3 text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed">
             Student-submitted study notes and past tests, organized by course and unit.
             Made by Sage Hill students, for Sage Hill students.
           </p>
 
           {/* CTAs */}
-          <div className="flex items-center justify-center gap-3 flex-wrap">
+          <div className="animate-fade-up stagger-4 flex items-center justify-center gap-3 flex-wrap">
             <Link
               href="/signup"
-              className="font-semibold text-white bg-violet-600 hover:bg-violet-500 px-7 py-3 rounded-xl text-base transition-all hover:shadow-[0_0_30px_rgba(124,58,237,0.35)]"
+              className="btn-press btn-glow font-semibold text-white bg-violet-600 hover:bg-violet-500 px-7 py-3 rounded-xl text-base transition-all hover:shadow-[0_0_30px_rgba(124,58,237,0.35)]"
             >
               Create Free Account
             </Link>
             <Link
               href="/browse"
-              className="font-semibold text-white/80 hover:text-white glass px-7 py-3 rounded-xl text-base transition-all hover:bg-white/[0.08]"
+              className="btn-press font-semibold text-white/80 hover:text-white glass px-7 py-3 rounded-xl text-base transition-all hover:bg-white/[0.08]"
             >
               Browse Courses
             </Link>
           </div>
 
           {/* Subtle divider stat pills */}
-          <div className="flex items-center justify-center gap-6 mt-14 flex-wrap">
+          <div className="animate-fade-up stagger-6 flex items-center justify-center gap-6 mt-14 flex-wrap">
             {[
               { label: 'Courses', value: '127+' },
               { label: 'Departments', value: '8' },

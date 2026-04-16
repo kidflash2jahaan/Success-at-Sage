@@ -19,9 +19,9 @@ body {
   overflow-x: hidden;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
+
+select option { background: #0d0f24; color: white; }
 
 /* ─── Blob animations ─── */
 @keyframes blob-1 {
@@ -46,22 +46,113 @@ body {
   70%       { transform: translate(5%, 11%) scale(0.9); }
 }
 
+/* ─── Page / element entry animations ─── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes fade-in-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+}
+
+/* ─── Animation utility classes ─── */
+.animate-fade-up       { animation: fade-up       0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-fade-in       { animation: fade-in       0.4s  ease-out both; }
+.animate-fade-in-down  { animation: fade-in-down  0.4s  cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-scale-in      { animation: scale-in      0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-slide-right   { animation: slide-right   0.4s  cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ─── Stagger delays ─── */
+.stagger-1 { animation-delay: 0.06s; }
+.stagger-2 { animation-delay: 0.12s; }
+.stagger-3 { animation-delay: 0.18s; }
+.stagger-4 { animation-delay: 0.24s; }
+.stagger-5 { animation-delay: 0.30s; }
+.stagger-6 { animation-delay: 0.36s; }
+.stagger-7 { animation-delay: 0.42s; }
+.stagger-8 { animation-delay: 0.48s; }
+
+/* ─── Card hover lift + border brightening ─── */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+.card-hover:active { transform: translateY(0px); transition-duration: 0.1s; }
+
+/* ─── Glass shine sweep on hover ─── */
+.glass-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.glass-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.05) 50%, transparent 65%);
+  transform: translateX(-120%) skewX(-12deg);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.glass-shine:hover::after { transform: translateX(300%) skewX(-12deg); }
+
+/* ─── Sidebar item stagger ─── */
+.sidebar-nav-item { animation: slide-right 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.sidebar-nav-item:nth-child(1) { animation-delay: 0.04s; }
+.sidebar-nav-item:nth-child(2) { animation-delay: 0.09s; }
+.sidebar-nav-item:nth-child(3) { animation-delay: 0.14s; }
+.sidebar-nav-item:nth-child(4) { animation-delay: 0.19s; }
+.sidebar-nav-item:nth-child(5) { animation-delay: 0.24s; }
+.sidebar-nav-item:nth-child(6) { animation-delay: 0.29s; }
+.sidebar-nav-item:nth-child(n+7) { animation-delay: 0.34s; }
+
+/* ─── Button press feel ─── */
+.btn-press {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.btn-press:hover  { transform: scale(1.018); }
+.btn-press:active { transform: scale(0.97); }
+
+/* ─── Primary CTA pulse glow ─── */
+.btn-glow { animation: pulse-ring 2.5s ease-out infinite; }
+
+/* ─── Smooth accordion (grid trick) ─── */
+.accordion-grid {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.accordion-grid.open { grid-template-rows: 1fr; }
+.accordion-grid > div { overflow: hidden; }
+
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.18); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.16); }
 
-/* ─── Select option dark bg ─── */
-select option {
-  background: #0d0f24;
-  color: white;
-}
-
-/* ─── Glass base utility ─── */
+/* ─── Glass base utilities ─── */
 .glass {
   background: rgba(8, 10, 30, 0.5);
   backdrop-filter: blur(24px);
@@ -69,26 +160,27 @@ select option {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .glass-nav {
-  background: rgba(6, 8, 22, 0.75);
+  background: rgba(6, 8, 22, 0.78);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 .glass-sidebar {
-  background: rgba(5, 7, 20, 0.8);
+  background: rgba(5, 7, 20, 0.82);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
 }
 .glass-input {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 .glass-input:focus {
   outline: none;
-  border-color: rgba(168, 85, 247, 0.6);
+  border-color: rgba(124, 58, 237, 0.6);
   background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
-.glass-input::placeholder { color: rgba(255, 255, 255, 0.25); }
+.glass-input::placeholder { color: rgba(255, 255, 255, 0.22); }

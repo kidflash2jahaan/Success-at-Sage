@@ -5,7 +5,7 @@ import Link from 'next/link'
 export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
+      <div className="animate-scale-in w-full max-w-sm">
         <div className="text-center mb-8">
           <div
             className="inline-flex items-center justify-center w-12 h-12 rounded-2xl glass mb-4"

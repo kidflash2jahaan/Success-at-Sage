@@ -25,7 +25,7 @@ export default async function CourseDetailPage({
       {user && <BackToDashboard />}
 
       {/* Header */}
-      <div className="glass rounded-2xl p-6 mb-5">
+      <div className="animate-scale-in glass rounded-2xl p-6 mb-5">
         <div className="flex items-center gap-2 mb-3">
           <div className="w-2 h-2 rounded-full" style={{ background: department.colorAccent, boxShadow: `0 0 8px ${department.colorAccent}80` }} />
           <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: department.colorAccent }}>
@@ -70,11 +70,12 @@ export default async function CourseDetailPage({
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            {units.map(unit => (
+            {units.map((unit, i) => (
               <Link
                 key={unit.id}
                 href={user ? `/courses/${slug}/units/${unit.id}` : '/login'}
-                className="glass rounded-xl px-5 py-4 flex items-center justify-between transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
+                className="animate-fade-up card-hover glass-shine glass rounded-xl px-5 py-4 flex items-center justify-between transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
+                style={{ animationDelay: `${0.15 + i * 0.055}s` }}
               >
                 <span className="text-white/80 text-sm font-medium group-hover:text-white transition-colors">{unit.title}</span>
                 <span className="text-white/25 text-xs group-hover:text-white/50 transition-colors flex items-center gap-1">

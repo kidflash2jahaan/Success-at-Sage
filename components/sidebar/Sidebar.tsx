@@ -29,7 +29,7 @@ export default function Sidebar({ courses, activeCourseSlug, onClose }: SidebarP
               key={course.id}
               href={`/courses/${course.slug}`}
               onClick={onClose}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
+              className={`sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
                 activeCourseSlug === course.slug
                   ? 'glass text-white'
                   : 'text-white/50 hover:text-white hover:bg-white/[0.04]'

@@ -18,8 +18,8 @@ export default async function BrowsePage() {
       <p className="text-white/40 mb-10 text-sm">Find your courses and add them to your schedule.</p>
 
       <div className="flex flex-col gap-10">
-        {departments.map(dept => (
-          <div key={dept.id}>
+        {departments.map((dept, di) => (
+          <div key={dept.id} className="animate-fade-up" style={{ animationDelay: `${di * 0.07}s` }}>
             <div className="flex items-center gap-3 mb-4">
               <div
                 className="w-3 h-3 rounded-full"
@@ -29,11 +29,12 @@ export default async function BrowsePage() {
               <span className="text-xs text-white/25 ml-1">{dept.courses.length}</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-              {dept.courses.map((course: any) => (
+              {dept.courses.map((course: any, ci: number) => (
                 <Link
                   key={course.id}
                   href={`/courses/${course.slug}`}
-                  className="glass rounded-xl p-4 transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
+                  className="card-hover glass-shine glass rounded-xl p-4 transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
+                  style={{ animationDelay: `${di * 0.07 + ci * 0.04}s` }}
                 >
                   <div className="text-xs font-semibold uppercase tracking-widest mb-1.5" style={{ color: dept.colorAccent }}>
                     {dept.name}

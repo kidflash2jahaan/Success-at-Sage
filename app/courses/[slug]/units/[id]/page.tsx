@@ -47,7 +47,7 @@ export default async function UnitPage({
       <BackToDashboard />
 
       {/* Header */}
-      <div className="glass rounded-2xl p-6 mb-6">
+      <div className="animate-scale-in glass rounded-2xl p-6 mb-6">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-2 h-2 rounded-full" style={{ background: accentColor, boxShadow: `0 0 8px ${accentColor}80` }} />
           <Link
@@ -71,19 +71,27 @@ export default async function UnitPage({
       </div>
 
       {notes.length > 0 && (
-        <section className="mb-6">
+        <section className="mb-6 animate-fade-up stagger-2">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-3 px-1">Study Notes</h2>
           <div className="flex flex-col gap-2">
-            {notes.map(m => <MaterialCard key={m.id} material={m} accentColor={accentColor} />)}
+            {notes.map((m, i) => (
+              <div key={m.id} className="animate-fade-up" style={{ animationDelay: `${0.2 + i * 0.06}s` }}>
+                <MaterialCard material={m} accentColor={accentColor} />
+              </div>
+            ))}
           </div>
         </section>
       )}
 
       {tests.length > 0 && (
-        <section>
+        <section className="animate-fade-up stagger-3">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-3 px-1">Past Tests</h2>
           <div className="flex flex-col gap-2">
-            {tests.map(m => <MaterialCard key={m.id} material={m} accentColor={accentColor} />)}
+            {tests.map((m, i) => (
+              <div key={m.id} className="animate-fade-up" style={{ animationDelay: `${0.25 + i * 0.06}s` }}>
+                <MaterialCard material={m} accentColor={accentColor} />
+              </div>
+            ))}
           </div>
         </section>
       )}

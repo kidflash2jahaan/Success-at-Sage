@@ -16,7 +16,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      <div className="glass rounded-2xl p-6 mb-6">
+      <div className="animate-scale-in glass rounded-2xl p-6 mb-6">
         <h1 className="text-2xl font-bold text-white tracking-tight">{user.fullName}</h1>
         <p className="text-white/40 text-sm mt-1">{label} · Class of {user.graduatingYear}</p>
         <p className="text-white/25 text-xs mt-0.5">{user.email}</p>
@@ -35,8 +35,8 @@ export default async function ProfilePage() {
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          {submissions.map(s => (
-            <div key={s.id} className="glass rounded-xl px-5 py-4 flex items-start justify-between gap-4 transition-all hover:bg-white/[0.06]">
+          {submissions.map((s, i) => (
+            <div key={s.id} className="animate-fade-up card-hover glass rounded-xl px-5 py-4 flex items-start justify-between gap-4 transition-all hover:bg-white/[0.06]" style={{ animationDelay: `${0.15 + i * 0.06}s` }}>
               <div>
                 <div className="text-white/90 font-medium text-sm">{s.title}</div>
                 <div className="text-white/30 text-xs mt-0.5">{s.courseName} · {s.unitTitle}</div>
