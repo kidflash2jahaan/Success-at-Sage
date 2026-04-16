@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { submitMaterial, submitNewUnit } from '@/app/actions/materials'
+import { submitMaterial, submitNewUnit, getSignedAttachmentUploadUrl } from '@/app/actions/materials'
+import FileDropZone from '@/components/ui/FileDropZone'
 import { useRouter } from 'next/navigation'
 
 interface Course { id: string; name: string; slug: string }
@@ -25,7 +26,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
   const [type, setType] = useState<'note' | 'test'>('note')
   const [contentText, setContentText] = useState('')
   const [linkUrl, setLinkUrl] = useState('')
-  const [attachmentUrl, setAttachmentUrl] = useState('')
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -84,13 +85,21 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         unitId = await submitNewUnit(selectedCourse.id, newUnitTitle)
       }
 
+      let attachmentPath: string | undefined
+      if (attachmentFile) {
+        const { signedUrl, path } = await getSignedAttachmentUploadUrl(attachmentFile.name, unitId)
+        const res = await fetch(signedUrl, { method: 'PUT', body: attachmentFile, headers: { 'Content-Type': attachmentFile.type || 'application/octet-stream' } })
+        if (!res.ok) throw new Error('Attachment upload failed')
+        attachmentPath = path
+      }
+
       await submitMaterial({
         unitId,
         title,
         type,
         contentText,
         linkUrl: linkUrl || undefined,
-        attachmentUrl: attachmentUrl || undefined,
+        attachmentPath,
       })
 
       router.push('/profile')
@@ -241,18 +250,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         />
       </div>
 
-      {/* Attachment */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Attachment <span className="text-white/25 normal-case">(optional)</span></label>
-        <input
-          value={attachmentUrl}
-          onChange={e => setAttachmentUrl(e.target.value)}
-          type="url"
-          placeholder="https://..."
-          className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-        />
-        <p className="text-xs text-white/25 px-1">Link to a file — Google Drive, Dropbox, etc.</p>
-      </div>
+      <FileDropZone file={attachmentFile} onChange={setAttachmentFile} />
 
       {/* Link */}
       <div className="flex flex-col gap-1.5">

@@ -1,25 +1,28 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { editMaterial } from '@/app/actions/materials'
+import { editMaterial, getSignedAttachmentUploadUrl } from '@/app/actions/materials'
+import FileDropZone from '@/components/ui/FileDropZone'
 import Link from 'next/link'
 
 interface Props {
   id: string
+  unitId: string
   initialTitle: string
   initialContent: string
   initialLinkUrl: string
-  initialAttachmentUrl: string
+  hasAttachment: boolean
   unitTitle: string
   courseName: string
 }
 
-export default function EditMaterialForm({ id, initialTitle, initialContent, initialLinkUrl, initialAttachmentUrl, unitTitle, courseName }: Props) {
+export default function EditMaterialForm({ id, unitId, initialTitle, initialContent, initialLinkUrl, hasAttachment, unitTitle, courseName }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState(initialTitle)
   const [content, setContent] = useState(initialContent)
   const [linkUrl, setLinkUrl] = useState(initialLinkUrl)
-  const [attachmentUrl, setAttachmentUrl] = useState(initialAttachmentUrl)
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null)
+  const [keepAttachment, setKeepAttachment] = useState(hasAttachment)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -29,7 +32,16 @@ export default function EditMaterialForm({ id, initialTitle, initialContent, ini
     setSaving(true)
     setError('')
     try {
-      await editMaterial(id, title, content, linkUrl, attachmentUrl)
+      let newAttachmentPath: string | null | undefined = undefined
+      if (attachmentFile) {
+        const { signedUrl, path } = await getSignedAttachmentUploadUrl(attachmentFile.name, unitId)
+        const res = await fetch(signedUrl, { method: 'PUT', body: attachmentFile, headers: { 'Content-Type': attachmentFile.type || 'application/octet-stream' } })
+        if (!res.ok) throw new Error('Attachment upload failed')
+        newAttachmentPath = path
+      } else if (!keepAttachment) {
+        newAttachmentPath = null
+      }
+      await editMaterial(id, title, content, linkUrl, newAttachmentPath)
       router.push('/profile')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -82,14 +94,22 @@ export default function EditMaterialForm({ id, initialTitle, initialContent, ini
 
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Attachment <span className="text-white/25 normal-case">(optional)</span></label>
-        <input
-          value={attachmentUrl}
-          onChange={e => setAttachmentUrl(e.target.value)}
-          type="url"
-          placeholder="https://..."
-          className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-        />
-        <p className="text-xs text-white/25 px-1">Link to a file — Google Drive, Dropbox, etc.</p>
+        {hasAttachment && keepAttachment && !attachmentFile && (
+          <div className="flex items-center justify-between glass rounded-xl px-4 py-2.5">
+            <span className="text-xs text-emerald-400/70">Existing attachment kept</span>
+            <button type="button" onClick={() => setKeepAttachment(false)} className="text-xs text-red-400/60 hover:text-red-400 transition-colors">
+              Remove
+            </button>
+          </div>
+        )}
+        {(!hasAttachment || !keepAttachment || attachmentFile) && (
+          <FileDropZone file={attachmentFile} onChange={f => { setAttachmentFile(f); if (f) setKeepAttachment(false) }} />
+        )}
+        {hasAttachment && !keepAttachment && !attachmentFile && (
+          <button type="button" onClick={() => setKeepAttachment(true)} className="text-xs text-white/30 hover:text-white/50 px-1 transition-colors text-left">
+            ← Keep existing attachment
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">

@@ -1,5 +1,6 @@
 'use server'
 import { requireUser } from '@/lib/auth'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendAdminSubmissionEmail } from '@/lib/email/resend'
 import { revalidatePath } from 'next/cache'
@@ -22,6 +23,17 @@ async function getAdminEmails(): Promise<string[]> {
   return (data ?? []).map((u: any) => u.email as string)
 }
 
+export async function getSignedAttachmentUploadUrl(fileName: string, unitId: string) {
+  const user = await requireUser()
+  const supabase = await createSupabaseServerClient()
+  const path = `attachments/${user.id}/${unitId}/${Date.now()}-${fileName}`
+  const { data, error } = await supabase.storage
+    .from('materials')
+    .createSignedUploadUrl(path)
+  if (error || !data) throw new Error('Could not create upload URL')
+  return { signedUrl: data.signedUrl, path }
+}
+
 export async function submitNewUnit(courseId: string, title: string): Promise<string> {
   const user = await requireUser()
   const { data, error } = await supabaseAdmin
@@ -40,7 +52,7 @@ export async function submitMaterial(input: {
   type: 'note' | 'test'
   contentText: string
   linkUrl?: string
-  attachmentUrl?: string
+  attachmentPath?: string
 }) {
   const user = await requireUser()
 
@@ -57,7 +69,7 @@ export async function submitMaterial(input: {
     pdf_path: null,
     content_json: input.contentText.trim() ? { text: input.contentText.trim() } : null,
     link_url: input.linkUrl?.trim() || null,
-    attachment_url: input.attachmentUrl?.trim() || null,
+    attachment_path: input.attachmentPath || null,
     status: 'pending',
   })
 
@@ -76,7 +88,7 @@ export async function submitMaterial(input: {
   revalidatePath('/profile')
 }
 
-export async function editMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string, attachmentUrl?: string) {
+export async function editMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string, attachmentPath?: string | null) {
   const user = await requireUser()
   const { data: material } = await supabaseAdmin
     .from('materials').select('id, uploaded_by, status').eq('id', materialId).single()
@@ -93,8 +105,8 @@ export async function editMaterial(materialId: string, title: string, contentTex
     status: 'pending',
     rejection_note: null,
     link_url: linkUrl?.trim() || null,
-    attachment_url: attachmentUrl?.trim() || null,
   }
+  if (attachmentPath !== undefined) updates.attachment_path = attachmentPath
   if (contentText !== null)
     updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
   await supabaseAdmin.from('materials').update(updates).eq('id', materialId)

@@ -8,7 +8,7 @@ export default async function SubmissionsPage() {
   const [{ data: materialsData }, { data: unitsData }] = await Promise.all([
     supabaseAdmin
       .from('materials')
-      .select('id, title, type, content_json, link_url, attachment_url, created_at, users!uploaded_by(full_name, email), units!unit_id(title, courses(name))')
+      .select('id, title, type, content_json, link_url, attachment_path, created_at, users!uploaded_by(full_name, email), units!unit_id(title, courses(name))')
       .eq('status', 'pending')
       .order('created_at'),
     supabaseAdmin
@@ -46,7 +46,7 @@ export default async function SubmissionsPage() {
     type: m.type,
     contentJson: m.content_json,
     linkUrl: m.link_url ?? null,
-    attachmentUrl: m.attachment_url ?? null,
+    attachmentPath: m.attachment_path ?? null,
     createdAt: m.created_at,
     uploaderName: m.users?.full_name ?? 'Unknown',
     uploaderEmail: m.users?.email ?? '',

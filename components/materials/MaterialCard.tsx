@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { incrementViewCount } from '@/app/actions/materials'
 import MaterialViewer from './MaterialViewer'
 
@@ -9,7 +10,7 @@ interface Material {
   type: 'note' | 'test'
   contentJson: unknown
   linkUrl: string | null
-  attachmentUrl: string | null
+  attachmentPath: string | null
   viewCount: number
   uploaderName: string
 }
@@ -32,6 +33,12 @@ function pushRecentMaterial(entry: RecentMaterial) {
     localStorage.setItem(RECENTS_KEY, JSON.stringify(next))
     window.dispatchEvent(new CustomEvent('sas-recents-updated'))
   } catch {}
+}
+
+async function openAttachment(path: string) {
+  const supabase = createSupabaseBrowserClient()
+  const { data } = await supabase.storage.from('materials').createSignedUrl(path, 3600)
+  if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
 }
 
 export default function MaterialCard({
@@ -70,19 +77,17 @@ export default function MaterialCard({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {material.attachmentUrl && (
-            <a
-              href={material.attachmentUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
+          {material.attachmentPath && (
+            <button
+              type="button"
+              onClick={async e => { e.stopPropagation(); await openAttachment(material.attachmentPath!) }}
               className="flex items-center gap-1 text-xs text-emerald-400/70 hover:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-400/20 hover:border-emerald-400/40 transition-colors"
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
               Attachment
-            </a>
+            </button>
           )}
           {material.linkUrl && (
             <a

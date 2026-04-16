@@ -1,7 +1,9 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { approveMaterial, rejectMaterial, adminEditMaterial } from '@/app/actions/admin'
+import { getSignedAttachmentUploadUrl } from '@/app/actions/materials'
 import MaterialViewer from '@/components/materials/MaterialViewer'
+import FileDropZone from '@/components/ui/FileDropZone'
 
 interface SubmissionItem {
   id: string
@@ -9,7 +11,7 @@ interface SubmissionItem {
   type: string
   contentJson: unknown
   linkUrl: string | null
-  attachmentUrl: string | null
+  attachmentPath: string | null
   uploaderName: string
   uploaderEmail: string
   unitTitle: string
@@ -25,7 +27,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
     (item.contentJson as { text?: string } | null)?.text ?? ''
   )
   const [editLinkUrl, setEditLinkUrl] = useState(item.linkUrl ?? '')
-  const [editAttachmentUrl, setEditAttachmentUrl] = useState(item.attachmentUrl ?? '')
+  const [editAttachmentFile, setEditAttachmentFile] = useState<File | null>(null)
   const [pending, startTransition] = useTransition()
 
   return (
@@ -38,7 +40,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
           </div>
           <div className="flex gap-2 mt-1">
             <span className="text-xs px-2 py-0.5 bg-white/10 rounded-full text-white/60 capitalize">{item.type}</span>
-            {item.attachmentUrl && <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full text-emerald-400/70">Attachment</span>}
+            {item.attachmentPath && <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full text-emerald-400/70">Attachment</span>}
             {item.linkUrl && <span className="text-xs px-2 py-0.5 bg-sky-500/10 rounded-full text-sky-400/70">Link</span>}
           </div>
         </div>
@@ -87,12 +89,13 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 rows={6}
                 className="glass-input w-full rounded-lg px-3 py-2 text-sm resize-y"
               />
-              <input
-                value={editAttachmentUrl}
-                onChange={e => setEditAttachmentUrl(e.target.value)}
-                placeholder="Attachment URL (optional)"
-                className="glass-input w-full rounded-lg px-3 py-2 text-sm"
-              />
+              <div className="flex flex-col gap-1">
+                <span className="text-xs text-white/30">Attachment (optional)</span>
+                {item.attachmentPath && !editAttachmentFile && (
+                  <p className="text-xs text-emerald-400/60 px-1">Existing attachment kept — upload below to replace</p>
+                )}
+                <FileDropZone file={editAttachmentFile} onChange={setEditAttachmentFile} />
+              </div>
               <input
                 value={editLinkUrl}
                 onChange={e => setEditLinkUrl(e.target.value)}
@@ -105,7 +108,14 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 type="button"
                 disabled={pending}
                 onClick={() => startTransition(async () => {
-                  await adminEditMaterial(item.id, editTitle, editContent, editLinkUrl, editAttachmentUrl)
+                  let attachmentPath: string | undefined = undefined
+                  if (editAttachmentFile) {
+                    const { signedUrl, path } = await getSignedAttachmentUploadUrl(editAttachmentFile.name, item.id)
+                    const res = await fetch(signedUrl, { method: 'PUT', body: editAttachmentFile, headers: { 'Content-Type': editAttachmentFile.type || 'application/octet-stream' } })
+                    if (!res.ok) throw new Error('Attachment upload failed')
+                    attachmentPath = path
+                  }
+                  await adminEditMaterial(item.id, editTitle, editContent, editLinkUrl, attachmentPath)
                   setMode('review')
                 })}
                 className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"
