@@ -13,7 +13,7 @@ export default async function SubmitPage({
   const { course: preselectedSlug, unit: preselectedUnitId } = await searchParams
   const [{ data: coursesData }, { data: unitsData }] = await Promise.all([
     supabaseAdmin.from('courses').select('id, name, slug').order('name'),
-    supabaseAdmin.from('units').select('id, title, course_id').eq('status', 'approved').order('order_index'),
+    supabaseAdmin.from('units').select('id, title, course_id').eq('status', 'approved').order('title'),
   ])
 
   return (

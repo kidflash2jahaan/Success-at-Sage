@@ -7,8 +7,8 @@ export default async function AdminCoursesPage() {
   const [{ data: depsData }, { data: coursesData }, { data: unitsData }, { data: materialsData }] = await Promise.all([
     supabaseAdmin.from('departments').select('id, name, color_accent'),
     supabaseAdmin.from('courses').select('id, name, department_id').order('name'),
-    supabaseAdmin.from('units').select('id, title, course_id, order_index')
-      .eq('status', 'approved').order('order_index'),
+    supabaseAdmin.from('units').select('id, title, course_id')
+      .eq('status', 'approved').order('title'),
     supabaseAdmin.from('materials').select('id, title, type, unit_id, content_type, content_json, link_url')
       .eq('status', 'approved').order('created_at'),
   ])
@@ -51,7 +51,7 @@ export default async function AdminCoursesPage() {
               key={course.id}
               courseId={course.id}
               courseName={course.name}
-              units={course.units.map((u: any) => ({ id: u.id, title: u.title, orderIndex: u.order_index }))}
+              units={course.units.map((u: any) => ({ id: u.id, title: u.title, orderIndex: 0 }))}
               initialUnitMaterials={unitMaterials}
             />
           ))}

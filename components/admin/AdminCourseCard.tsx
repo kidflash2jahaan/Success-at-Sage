@@ -1,6 +1,6 @@
 'use client'
 import { useState, useTransition } from 'react'
-import { moveUnit, updateUnitTitle, deleteUnit, createUnit, createAdminMaterial, deleteMaterial, adminEditMaterial } from '@/app/actions/admin'
+import { updateUnitTitle, deleteUnit, createUnit, createAdminMaterial, deleteMaterial, adminEditMaterial } from '@/app/actions/admin'
 
 interface Unit { id: string; title: string; orderIndex: number }
 interface Material { id: string; title: string; type: string; contentType: 'pdf' | 'richtext'; contentText: string; linkUrl: string }
@@ -30,19 +30,7 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
 
   function startEdit(unit: Unit) { setEditingId(unit.id); setEditTitle(unit.title) }
 
-  function handleMove(unitId: string, direction: 'up' | 'down') {
-    setUnits(prev => {
-      const next = [...prev]
-      const idx = next.findIndex(u => u.id === unitId)
-      const swapIdx = direction === 'up' ? idx - 1 : idx + 1
-      if (swapIdx < 0 || swapIdx >= next.length) return prev
-      ;[next[idx], next[swapIdx]] = [next[swapIdx], next[idx]]
-      return next
-    })
-    startTransition(() => moveUnit(unitId, direction))
-  }
-
-  function handleSaveTitle(unitId: string) {
+function handleSaveTitle(unitId: string) {
     if (!editTitle.trim()) return
     setUnits(prev => prev.map(u => u.id === unitId ? { ...u, title: editTitle.trim() } : u))
     setEditingId(null)
@@ -109,7 +97,7 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
       <div className="text-white font-medium mb-3">{courseName}</div>
 
       <div className="flex flex-col gap-1 mb-3">
-        {units.map((unit, idx) => {
+        {units.map((unit) => {
           const mats = unitMaterials[unit.id] ?? []
           const isExpanded = expandedUnitId === unit.id
 
@@ -117,18 +105,6 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
             <div key={unit.id}>
               {/* Unit row */}
               <div className="flex items-center gap-1 bg-white/[0.04] rounded-lg px-2 py-1.5 group">
-                {/* Reorder */}
-                <div className="flex flex-col shrink-0">
-                  <button type="button" disabled={idx === 0 || pending} onClick={() => handleMove(unit.id, 'up')}
-                    className="text-white/20 hover:text-white/60 disabled:opacity-0 disabled:pointer-events-none leading-none p-0.5 transition-colors">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" /></svg>
-                  </button>
-                  <button type="button" disabled={idx === units.length - 1 || pending} onClick={() => handleMove(unit.id, 'down')}
-                    className="text-white/20 hover:text-white/60 disabled:opacity-0 disabled:pointer-events-none leading-none p-0.5 transition-colors">
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-                  </button>
-                </div>
-
                 {/* Title / inline edit */}
                 {editingId === unit.id ? (
                   <input autoFocus value={editTitle} onChange={e => setEditTitle(e.target.value)}

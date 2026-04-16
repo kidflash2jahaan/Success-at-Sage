@@ -44,13 +44,13 @@ export async function getCourseWithUnits(slug: string) {
   if (!data) return null
   const dept = data.departments as any
   const units = ((data.units as any[]) ?? [])
+    .filter((u: any) => u.status === 'approved')
     .map((u: any) => ({
       id: u.id as string,
       title: u.title as string,
       courseId: u.course_id as string,
-      orderIndex: u.order_index as number,
     }))
-    .sort((a, b) => a.orderIndex - b.orderIndex)
+    .sort((a, b) => a.title.localeCompare(b.title))
   return {
     course: {
       id: data.id as string,
