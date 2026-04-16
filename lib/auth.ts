@@ -1,13 +1,15 @@
 import { getUser } from './supabase/server'
-import { db } from './db'
-import { users } from './db/schema'
-import { eq } from 'drizzle-orm'
+import { supabaseAdmin } from './supabase/admin'
 
 export async function getCurrentUser() {
   const authUser = await getUser()
   if (!authUser) return null
-  const [user] = await db.select().from(users).where(eq(users.id, authUser.id))
-  return user ?? null
+  const { data } = await supabaseAdmin
+    .from('users')
+    .select('*')
+    .eq('id', authUser.id)
+    .single()
+  return data ?? null
 }
 
 export async function requireUser() {

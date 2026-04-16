@@ -1,7 +1,5 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { db } from '@/lib/db'
-import { users } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -13,16 +11,16 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data.user) {
-      try {
-        const existing = await db.select().from(users).where(eq(users.id, data.user.id))
-        if (existing.length === 0) {
-          return NextResponse.redirect(`${origin}/onboarding`)
-        }
-        return NextResponse.redirect(`${origin}/dashboard`)
-      } catch (dbError) {
-        console.error('[auth/callback] DB error:', dbError)
-        return NextResponse.redirect(`${origin}/login?error=db`)
+      const { data: existing } = await supabaseAdmin
+        .from('users')
+        .select('id')
+        .eq('id', data.user.id)
+        .single()
+
+      if (!existing) {
+        return NextResponse.redirect(`${origin}/onboarding`)
       }
+      return NextResponse.redirect(`${origin}/dashboard`)
     }
 
     console.error('[auth/callback] Supabase error:', error)

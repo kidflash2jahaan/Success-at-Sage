@@ -1,7 +1,6 @@
 'use server'
 import { getUser } from '@/lib/supabase/server'
-import { db } from '@/lib/db'
-import { users } from '@/lib/db/schema'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 
 export async function completeOnboarding(formData: FormData) {
@@ -14,11 +13,11 @@ export async function completeOnboarding(formData: FormData) {
   const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim())
   const role = adminEmails.includes(authUser.email ?? '') ? 'admin' as const : 'student' as const
 
-  await db.insert(users).values({
+  await supabaseAdmin.from('users').insert({
     id: authUser.id,
     email: authUser.email!,
-    fullName,
-    graduatingYear,
+    full_name: fullName,
+    graduating_year: graduatingYear,
     role,
   })
 
