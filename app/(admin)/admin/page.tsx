@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { db } from '@/lib/db'
 import { materials, users } from '@/lib/db/schema'
 import { eq, count } from 'drizzle-orm'

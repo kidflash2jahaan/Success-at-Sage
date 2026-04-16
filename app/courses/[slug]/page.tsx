@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getCourseWithUnits, isUserEnrolled } from '@/lib/db/queries/courses'
 import { getCurrentUser } from '@/lib/auth'
 import { addCourseToSchedule, removeCourseFromSchedule } from '@/app/actions/courses'

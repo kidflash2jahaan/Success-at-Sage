@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { db } from '@/lib/db'
 import { departments, courses, units } from '@/lib/db/schema'
 import { createUnit, deleteUnit } from '@/app/actions/admin'

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getAllDepartmentsWithCourses } from '@/lib/db/queries/courses'
 import Link from 'next/link'
 

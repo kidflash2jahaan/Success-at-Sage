@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { db } from '@/lib/db'
 import { users } from '@/lib/db/schema'
 import { promoteToAdmin, demoteToStudent } from '@/app/actions/admin'

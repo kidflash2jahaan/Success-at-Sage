@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { requireUser, calculateGrade } from '@/lib/auth'
 import { getUserSubmissions } from '@/lib/db/queries/materials'
 

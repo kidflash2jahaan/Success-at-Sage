@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { requireUser } from '@/lib/auth'
 import { searchContent } from '@/lib/db/queries/materials'
 import Link from 'next/link'

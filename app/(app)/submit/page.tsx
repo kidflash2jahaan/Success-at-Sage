@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { requireUser } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { courses, units } from '@/lib/db/schema'

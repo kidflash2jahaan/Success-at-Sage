@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { db } from '@/lib/db'
 import { materials, users, units, courses } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
