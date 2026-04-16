@@ -24,7 +24,7 @@ export default function DashboardShell({ courses, userName, children }: Dashboar
   const activeCourseSlug = pathname.match(/\/courses\/([^/]+)/)?.[1]
 
   return (
-    <div className="flex flex-col h-screen bg-[#1a1a2e]">
+    <div className="flex flex-col h-screen">
       <TopNav userName={userName} onMenuClick={() => setDrawerOpen(true)} />
       <div className="flex flex-1 overflow-hidden">
         <div className="hidden md:block">

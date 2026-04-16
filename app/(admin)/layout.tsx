@@ -10,9 +10,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="flex h-screen bg-[#1a1a2e]">
-      <nav className="w-52 shrink-0 bg-[#16213e] border-r border-white/10 flex flex-col p-4 gap-1">
-        <div className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-3 px-2">Admin</div>
+    <div className="flex h-screen">
+      <nav className="glass-sidebar w-52 shrink-0 flex flex-col p-3 gap-0.5">
+        <div className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-3 px-3 pt-2">Admin</div>
         {[
           { href: '/admin', label: 'Dashboard' },
           { href: '/admin/submissions', label: 'Submissions' },
@@ -20,13 +20,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           { href: '/admin/users', label: 'Users' },
         ].map(item => (
           <Link key={item.href} href={item.href}
-            className="px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors">
+            className="px-3 py-2.5 rounded-xl text-sm text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors">
             {item.label}
           </Link>
         ))}
-        <div className="mt-auto pt-4 border-t border-white/10">
-          <Link href="/dashboard" className="px-3 py-2 rounded-lg text-sm text-purple-400 hover:text-purple-300 block">
-            ← Student View
+        <div className="mt-auto pt-4 border-t border-white/[0.06] px-1">
+          <Link href="/dashboard" className="px-3 py-2.5 rounded-xl text-sm text-violet-400 hover:text-violet-300 flex items-center gap-1.5 hover:bg-violet-500/10 transition-colors">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Student View
           </Link>
         </div>
       </nav>

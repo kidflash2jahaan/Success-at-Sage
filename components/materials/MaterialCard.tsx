@@ -29,23 +29,34 @@ export default function MaterialCard({ material, accentColor }: { material: Mate
   }
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-      <button onClick={handleOpen} className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/5 transition-colors">
+    <div className="glass rounded-xl overflow-hidden transition-all hover:border-white/[0.13]">
+      <button
+        onClick={handleOpen}
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.04] transition-colors"
+      >
         <div>
-          <div className="text-white font-medium">{material.title}</div>
-          <div className="text-white/40 text-xs mt-0.5">by {material.uploaderName} · {viewCount} views</div>
+          <div className="text-white/90 font-medium text-sm">{material.title}</div>
+          <div className="text-white/30 text-xs mt-0.5">
+            by {material.uploaderName} · {viewCount} view{viewCount !== 1 ? 's' : ''}
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs px-2 py-1 rounded-full border" style={{ color: accentColor, borderColor: `${accentColor}40` }}>
+        <div className="flex items-center gap-2.5">
+          <span
+            className="text-xs px-2 py-0.5 rounded-full border"
+            style={{ color: accentColor, borderColor: `${accentColor}35` }}
+          >
             {material.contentType === 'pdf' ? 'PDF' : 'Text'}
           </span>
-          <svg className={`w-4 h-4 text-white/40 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            className={`w-4 h-4 text-white/25 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
       </button>
       {open && (
-        <div className="border-t border-white/10">
+        <div className="border-t border-white/[0.07]">
           <MaterialViewer material={material} />
         </div>
       )}

@@ -23,52 +23,76 @@ export default async function CourseDetailPage({
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
       {user && <BackToDashboard />}
-      <div className="text-sm font-semibold uppercase tracking-wide mb-2" style={{ color: department.colorAccent }}>
-        {department.name}
-      </div>
-      <h1 className="text-3xl font-bold text-white mb-4">{course.name}</h1>
-      {course.description && <p className="text-white/60 mb-8">{course.description}</p>}
 
-      {user && (
-        <form action={enrolled
-          ? removeCourseFromSchedule.bind(null, course.id)
-          : addCourseToSchedule.bind(null, course.id)
-        } className="mb-8">
-          <button
-            type="submit"
-            className={`px-6 py-2.5 rounded-lg font-semibold transition-colors ${
-              enrolled
-                ? 'bg-white/10 hover:bg-white/20 text-white'
-                : 'text-white'
-            }`}
-            style={enrolled ? {} : { background: department.colorAccent }}
-          >
-            {enrolled ? 'Remove from Schedule' : '+ Add to My Schedule'}
-          </button>
-        </form>
-      )}
-
-      <h2 className="text-lg font-semibold text-white mb-4">Units</h2>
-      {units.length === 0 ? (
-        <p className="text-white/40">No units yet.</p>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {units.map(unit => (
-            <Link
-              key={unit.id}
-              href={user ? `/courses/${slug}/units/${unit.id}` : '/login'}
-              className="flex items-center justify-between bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl px-5 py-4 transition-colors"
-            >
-              <span className="text-white">{unit.title}</span>
-              <span className="text-white/30 text-sm">View materials →</span>
-            </Link>
-          ))}
+      {/* Header */}
+      <div className="glass rounded-2xl p-6 mb-5">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-2 h-2 rounded-full" style={{ background: department.colorAccent, boxShadow: `0 0 8px ${department.colorAccent}80` }} />
+          <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: department.colorAccent }}>
+            {department.name}
+          </span>
         </div>
-      )}
+        <h1 className="text-2xl font-bold text-white mb-3 tracking-tight leading-snug">{course.name}</h1>
+        {course.description && <p className="text-white/50 text-sm leading-relaxed">{course.description}</p>}
+
+        {user && (
+          <form action={enrolled
+            ? removeCourseFromSchedule.bind(null, course.id)
+            : addCourseToSchedule.bind(null, course.id)
+          } className="mt-5">
+            <button
+              type="submit"
+              className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all ${
+                enrolled
+                  ? 'glass text-white/70 hover:text-white hover:bg-white/[0.08]'
+                  : 'text-white hover:shadow-lg'
+              }`}
+              style={enrolled ? {} : {
+                background: department.colorAccent,
+                boxShadow: `0 0 20px ${department.colorAccent}40`,
+              }}
+            >
+              {enrolled ? 'Remove from Schedule' : '+ Add to My Schedule'}
+            </button>
+          </form>
+        )}
+      </div>
+
+      {/* Units */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold uppercase tracking-widest text-white/40">Units</h2>
+          <span className="text-xs text-white/25">{units.length}</span>
+        </div>
+        {units.length === 0 ? (
+          <div className="glass rounded-xl px-5 py-8 text-center text-white/25 text-sm">
+            No units yet.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {units.map(unit => (
+              <Link
+                key={unit.id}
+                href={user ? `/courses/${slug}/units/${unit.id}` : '/login'}
+                className="glass rounded-xl px-5 py-4 flex items-center justify-between transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
+              >
+                <span className="text-white/80 text-sm font-medium group-hover:text-white transition-colors">{unit.title}</span>
+                <span className="text-white/25 text-xs group-hover:text-white/50 transition-colors flex items-center gap-1">
+                  View
+                  <svg className="w-3 h-3 translate-x-0 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
 
       {!user && (
-        <p className="mt-6 text-white/40 text-sm">
-          <Link href="/login" className="text-purple-400 hover:text-purple-300">Sign in</Link> to view materials and add this course to your schedule.
+        <p className="mt-6 text-white/30 text-sm text-center">
+          <Link href="/login" className="text-violet-400 hover:text-violet-300 transition-colors">Sign in</Link>{' '}
+          to view materials and add this course to your schedule.
         </p>
       )}
     </div>

@@ -40,39 +40,61 @@ export default async function UnitPage({
   const approvedMaterials = await getApprovedMaterialsForUnit(id)
   const notes = approvedMaterials.filter(m => m.type === 'note')
   const tests = approvedMaterials.filter(m => m.type === 'test')
+  const accentColor = (dept as any).color_accent
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
       <BackToDashboard />
-      <div className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: (dept as any).color_accent }}>
-        <Link href={`/courses/${slug}`} className="hover:underline">{course.name}</Link>
-      </div>
-      <h1 className="text-2xl font-bold text-white mb-2">{unit.title}</h1>
-      <div className="flex items-center justify-between mb-8">
-        <p className="text-white/40 text-sm">{approvedMaterials.length} materials</p>
-        <Link href="/submit" className="text-sm text-purple-400 hover:text-purple-300">+ Submit Material</Link>
+
+      {/* Header */}
+      <div className="glass rounded-2xl p-6 mb-6">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-2 h-2 rounded-full" style={{ background: accentColor, boxShadow: `0 0 8px ${accentColor}80` }} />
+          <Link
+            href={`/courses/${slug}`}
+            className="text-xs font-semibold uppercase tracking-widest hover:opacity-80 transition-opacity"
+            style={{ color: accentColor }}
+          >
+            {course.name}
+          </Link>
+        </div>
+        <h1 className="text-2xl font-bold text-white tracking-tight mb-3">{unit.title}</h1>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-white/30">{approvedMaterials.length} material{approvedMaterials.length !== 1 ? 's' : ''}</span>
+          <Link href="/submit" className="text-sm text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Submit Material
+          </Link>
+        </div>
       </div>
 
       {notes.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/40 mb-3">Study Notes</h2>
+        <section className="mb-6">
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-3 px-1">Study Notes</h2>
           <div className="flex flex-col gap-2">
-            {notes.map(m => <MaterialCard key={m.id} material={m} accentColor={(dept as any).color_accent} />)}
+            {notes.map(m => <MaterialCard key={m.id} material={m} accentColor={accentColor} />)}
           </div>
         </section>
       )}
 
       {tests.length > 0 && (
         <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/40 mb-3">Past Tests</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-3 px-1">Past Tests</h2>
           <div className="flex flex-col gap-2">
-            {tests.map(m => <MaterialCard key={m.id} material={m} accentColor={(dept as any).color_accent} />)}
+            {tests.map(m => <MaterialCard key={m.id} material={m} accentColor={accentColor} />)}
           </div>
         </section>
       )}
 
       {approvedMaterials.length === 0 && (
-        <p className="text-white/30 text-center py-12">No materials yet. Be the first to submit!</p>
+        <div className="glass rounded-2xl px-6 py-14 text-center">
+          <p className="text-white/25 text-sm">No materials yet.</p>
+          <Link href="/submit" className="inline-flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 mt-3 transition-colors">
+            Be the first to submit →
+          </Link>
+        </div>
       )}
     </div>
   )

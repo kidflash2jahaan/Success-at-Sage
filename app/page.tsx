@@ -9,44 +9,98 @@ export default async function LandingPage() {
   if (user) redirect('/dashboard')
 
   return (
-    <div className="min-h-screen bg-[#1a1a2e] flex flex-col">
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <span className="font-bold text-white">Success at Sage</span>
-        <div className="flex items-center gap-4">
-          <Link href="/browse" className="text-sm text-white/60 hover:text-white">Browse Courses</Link>
-          <Link href="/login" className="text-sm text-white/60 hover:text-white">Sign In</Link>
-          <Link href="/signup" className="text-sm bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-lg font-medium transition-colors">
+    <div className="min-h-screen flex flex-col">
+      {/* Nav */}
+      <header className="glass-nav sticky top-0 z-20 flex items-center justify-between px-6 py-4">
+        <span className="font-bold text-white tracking-tight text-base">
+          Success at Sage
+        </span>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/browse"
+            className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+          >
+            Browse
+          </Link>
+          <Link
+            href="/login"
+            className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+          >
+            Sign In
+          </Link>
+          <Link
+            href="/signup"
+            className="text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white px-4 py-1.5 rounded-lg transition-colors"
+          >
             Get Started
           </Link>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 text-center">
-        <div className="max-w-2xl">
-          <div className="inline-block text-xs font-semibold uppercase tracking-wider text-purple-400 bg-purple-400/10 border border-purple-400/20 rounded-full px-3 py-1 mb-6">
+      {/* Hero */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 text-center relative">
+        <div className="max-w-2xl w-full">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-300 glass px-4 py-2 rounded-full mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 inline-block" />
             For Sage Hill School Students
           </div>
-          <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
+
+          {/* Headline */}
+          <h1 className="text-5xl sm:text-6xl font-bold text-white mb-5 leading-[1.1] tracking-tight">
             Study smarter.<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">
+            <span
+              style={{
+                background: 'linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
               Ace every test.
             </span>
           </h1>
-          <p className="text-xl text-white/50 mb-10">
-            Student-submitted study notes and past tests, organized by course and unit. Made by Sage Hill students, for Sage Hill students.
+
+          {/* Subtext */}
+          <p className="text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed">
+            Student-submitted study notes and past tests, organized by course and unit.
+            Made by Sage Hill students, for Sage Hill students.
           </p>
-          <div className="flex items-center justify-center gap-4">
-            <Link href="/signup" className="bg-purple-600 hover:bg-purple-500 text-white font-semibold px-8 py-3 rounded-xl text-lg transition-colors">
+
+          {/* CTAs */}
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <Link
+              href="/signup"
+              className="font-semibold text-white bg-violet-600 hover:bg-violet-500 px-7 py-3 rounded-xl text-base transition-all hover:shadow-[0_0_30px_rgba(124,58,237,0.35)]"
+            >
               Create Free Account
             </Link>
-            <Link href="/browse" className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold px-8 py-3 rounded-xl text-lg transition-colors">
+            <Link
+              href="/browse"
+              className="font-semibold text-white/80 hover:text-white glass px-7 py-3 rounded-xl text-base transition-all hover:bg-white/[0.08]"
+            >
               Browse Courses
             </Link>
+          </div>
+
+          {/* Subtle divider stat pills */}
+          <div className="flex items-center justify-center gap-6 mt-14 flex-wrap">
+            {[
+              { label: 'Courses', value: '127+' },
+              { label: 'Departments', value: '8' },
+              { label: 'Free forever', value: '✓' },
+            ].map(stat => (
+              <div key={stat.label} className="glass px-5 py-2.5 rounded-xl flex items-center gap-3">
+                <span className="text-lg font-bold text-violet-300">{stat.value}</span>
+                <span className="text-sm text-white/40">{stat.label}</span>
+              </div>
+            ))}
           </div>
         </div>
       </main>
 
-      <footer className="px-6 py-4 border-t border-white/10 text-center text-white/20 text-sm">
+      {/* Footer */}
+      <footer className="px-6 py-5 text-center text-white/20 text-xs">
         Success at Sage — A passion project for Sage Hill School
       </footer>
     </div>
