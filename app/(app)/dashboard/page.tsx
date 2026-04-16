@@ -30,9 +30,17 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-6">
-      <div className="animate-fade-up mb-6">
-        <h1 className="text-2xl font-bold text-white tracking-tight">My Courses</h1>
-        <p className="text-white/40 text-sm mt-1">{userCourses.length} course{userCourses.length !== 1 ? 's' : ''} in your schedule</p>
+      <div className="animate-fade-up mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">My Courses</h1>
+          <p className="text-white/40 text-sm mt-1">{userCourses.length} course{userCourses.length !== 1 ? 's' : ''} in your schedule</p>
+        </div>
+        <Link href="/browse" className="btn-press mt-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/30 hover:text-white glass px-3 py-2 rounded-xl transition-all hover:bg-white/[0.07]">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          Add Courses
+        </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {userCourses.map(({ course, department }, i) => (
