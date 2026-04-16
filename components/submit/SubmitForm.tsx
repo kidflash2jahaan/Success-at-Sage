@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 interface Course { id: string; name: string; slug: string }
 interface Unit { id: string; title: string; courseId: string }
 
-export default function SubmitForm({ courses, units, preselectedSlug }: { courses: Course[]; units: Unit[]; preselectedSlug?: string }) {
+export default function SubmitForm({ courses, units, preselectedSlug, preselectedUnitId }: { courses: Course[]; units: Unit[]; preselectedSlug?: string; preselectedUnitId?: string }) {
   const router = useRouter()
 
   const initialCourse = preselectedSlug ? (courses.find(c => c.slug === preselectedSlug) ?? null) : null
@@ -19,7 +19,7 @@ export default function SubmitForm({ courses, units, preselectedSlug }: { course
   const courseDropdownRef = useRef<HTMLDivElement>(null)
 
   // Unit state
-  const [selectedUnitId, setSelectedUnitId] = useState('')
+  const [selectedUnitId, setSelectedUnitId] = useState(preselectedUnitId ?? '')
   const [creatingUnit, setCreatingUnit] = useState(false)
   const [newUnitTitle, setNewUnitTitle] = useState('')
 
