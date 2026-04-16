@@ -43,3 +43,7 @@ next-env.d.ts
 
 # brainstorming visuals
 .superpowers/
+
+# claude code local
+.claude/settings.local.json
+skills-lock.json
