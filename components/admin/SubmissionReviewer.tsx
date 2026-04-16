@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { approveMaterial, rejectMaterial, adminEditMaterial } from '@/app/actions/admin'
 import MaterialViewer from '@/components/materials/MaterialViewer'
 
@@ -24,6 +24,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
   const [editContent, setEditContent] = useState(
     (item.contentJson as { text?: string } | null)?.text ?? ''
   )
+  const [pending, startTransition] = useTransition()
 
   return (
     <div className="glass rounded-xl overflow-hidden">
@@ -60,7 +61,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                   Confirm Reject
                 </button>
               </form>
-              <button onClick={() => setMode('review')} className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">
+              <button type="button" onClick={() => setMode('review')} className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">
                 Cancel
               </button>
             </div>
@@ -87,12 +88,15 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
               )}
             </div>
             <div className="flex gap-2">
-              <form action={adminEditMaterial.bind(null, item.id, editTitle, item.contentType === 'richtext' ? editContent : null)} className="flex-1">
-                <button type="submit" className="w-full bg-violet-600/80 hover:bg-violet-600 text-white text-sm font-medium py-2 rounded-lg transition-colors">
-                  Save Changes
-                </button>
-              </form>
-              <button onClick={() => setMode('review')} className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => startTransition(() => adminEditMaterial(item.id, editTitle, item.contentType === 'richtext' ? editContent : null))}
+                className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              >
+                Save Changes
+              </button>
+              <button type="button" onClick={() => setMode('review')} className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">
                 Cancel
               </button>
             </div>
@@ -106,10 +110,10 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 ✓ Approve
               </button>
             </form>
-            <button onClick={() => setMode('edit')} className="flex-1 glass hover:bg-white/[0.08] text-white/50 text-sm font-medium py-2 rounded-lg border border-white/[0.08] transition-colors">
+            <button type="button" onClick={() => setMode('edit')} className="flex-1 glass hover:bg-white/[0.08] text-white/50 text-sm font-medium py-2 rounded-lg border border-white/[0.08] transition-colors">
               Edit
             </button>
-            <button onClick={() => setMode('reject')} className="flex-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 text-sm font-medium py-2 rounded-lg border border-red-600/30 transition-colors">
+            <button type="button" onClick={() => setMode('reject')} className="flex-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 text-sm font-medium py-2 rounded-lg border border-red-600/30 transition-colors">
               ✕ Reject
             </button>
           </div>
