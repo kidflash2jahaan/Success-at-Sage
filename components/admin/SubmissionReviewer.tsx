@@ -10,6 +10,7 @@ interface SubmissionItem {
   contentType: 'pdf' | 'richtext'
   contentJson: unknown
   pdfPath: string | null
+  linkUrl: string | null
   uploaderName: string
   uploaderEmail: string
   unitTitle: string
@@ -24,6 +25,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
   const [editContent, setEditContent] = useState(
     (item.contentJson as { text?: string } | null)?.text ?? ''
   )
+  const [editLinkUrl, setEditLinkUrl] = useState(item.linkUrl ?? '')
   const [pending, startTransition] = useTransition()
 
   return (
@@ -86,13 +88,19 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                   className="glass-input w-full rounded-lg px-3 py-2 text-sm resize-y"
                 />
               )}
+              <input
+                value={editLinkUrl}
+                onChange={e => setEditLinkUrl(e.target.value)}
+                placeholder="Link URL (optional)"
+                className="glass-input w-full rounded-lg px-3 py-2 text-sm"
+              />
             </div>
             <div className="flex gap-2">
               <button
                 type="button"
                 disabled={pending}
                 onClick={() => startTransition(async () => {
-                  await adminEditMaterial(item.id, editTitle, item.contentType === 'richtext' ? editContent : null)
+                  await adminEditMaterial(item.id, editTitle, item.contentType === 'richtext' ? editContent : null, editLinkUrl)
                   setMode('review')
                 })}
                 className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"

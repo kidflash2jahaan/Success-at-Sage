@@ -11,6 +11,7 @@ interface Material {
   contentType: 'pdf' | 'richtext'
   contentJson: unknown
   pdfPath: string | null
+  linkUrl: string | null
   viewCount: number
   uploaderName: string
 }
@@ -79,6 +80,20 @@ export default function MaterialCard({
           </div>
         </div>
         <div className="flex items-center gap-2.5">
+          {material.linkUrl && (
+            <a
+              href={material.linkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              className="flex items-center gap-1 text-xs text-sky-400/70 hover:text-sky-400 px-2 py-0.5 rounded-full border border-sky-400/20 hover:border-sky-400/40 transition-colors"
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              Link
+            </a>
+          )}
           <span
             className="text-xs px-2 py-0.5 rounded-full border"
             style={{ color: accentColor, borderColor: `${accentColor}35` }}

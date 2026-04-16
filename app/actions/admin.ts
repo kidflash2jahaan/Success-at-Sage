@@ -74,6 +74,7 @@ export async function createAdminMaterial(
   title: string,
   type: 'note' | 'test',
   contentText: string,
+  linkUrl?: string,
 ) {
   const admin = await requireAdmin()
   await supabaseAdmin.from('materials').insert({
@@ -84,6 +85,7 @@ export async function createAdminMaterial(
     content_type: 'richtext',
     content_json: contentText.trim() ? { text: contentText.trim() } : null,
     pdf_path: null,
+    link_url: linkUrl?.trim() || null,
     status: 'approved',
   })
   revalidatePath('/admin/courses')
@@ -122,12 +124,13 @@ export async function updateUnitTitle(unitId: string, title: string) {
   revalidatePath('/admin/courses')
 }
 
-export async function adminEditMaterial(materialId: string, title: string, contentText: string | null) {
+export async function adminEditMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string) {
   await requireAdmin()
-  const updates: Record<string, unknown> = { title: title.trim() }
+  const updates: Record<string, unknown> = { title: title.trim(), link_url: linkUrl?.trim() || null }
   if (contentText !== null) updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
   await supabaseAdmin.from('materials').update(updates).eq('id', materialId)
   revalidatePath('/admin/submissions')
+  revalidatePath('/admin/courses')
 }
 
 export async function promoteToAdmin(userId: string) {

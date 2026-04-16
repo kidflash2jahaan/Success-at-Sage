@@ -29,6 +29,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
   const [contentType, setContentType] = useState<'pdf' | 'richtext'>('richtext')
   const [contentText, setContentText] = useState('')
   const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [linkUrl, setLinkUrl] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -104,6 +105,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         contentType,
         pdfPath,
         contentJson: contentType === 'richtext' && contentText ? { text: contentText } : undefined,
+        linkUrl: linkUrl || undefined,
       })
 
       router.push('/profile')
@@ -284,6 +286,19 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
           />
         </div>
       )}
+
+      {/* Optional link */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Link <span className="text-white/25 normal-case">(optional)</span></label>
+        <input
+          value={linkUrl}
+          onChange={e => setLinkUrl(e.target.value)}
+          type="url"
+          placeholder="https://..."
+          className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
+        />
+        <p className="text-xs text-white/25 px-1">Attach a relevant URL — a video, article, or Google Doc.</p>
+      </div>
 
       <button
         type="submit"

@@ -53,6 +53,7 @@ export async function submitMaterial(input: {
   contentType: 'pdf' | 'richtext'
   pdfPath?: string
   contentJson?: object
+  linkUrl?: string
 }) {
   const user = await requireUser()
 
@@ -68,6 +69,7 @@ export async function submitMaterial(input: {
     content_type: input.contentType,
     pdf_path: input.pdfPath ?? null,
     content_json: input.contentJson ?? null,
+    link_url: input.linkUrl?.trim() || null,
     status: 'pending',
   })
 
@@ -87,7 +89,7 @@ export async function submitMaterial(input: {
   revalidatePath('/profile')
 }
 
-export async function editMaterial(materialId: string, title: string, contentText: string | null) {
+export async function editMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string) {
   const user = await requireUser()
   const { data: material } = await supabaseAdmin
     .from('materials').select('id, uploaded_by, content_type, status').eq('id', materialId).single()
@@ -100,7 +102,7 @@ export async function editMaterial(materialId: string, title: string, contentTex
       throw new Error(`You already have ${PENDING_LIMIT} submissions pending review. Wait for those to be reviewed before resubmitting.`)
   }
 
-  const updates: Record<string, unknown> = { title: title.trim(), status: 'pending', rejection_note: null }
+  const updates: Record<string, unknown> = { title: title.trim(), status: 'pending', rejection_note: null, link_url: linkUrl?.trim() || null }
   if ((material as any).content_type === 'richtext' && contentText !== null)
     updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
   await supabaseAdmin.from('materials').update(updates).eq('id', materialId)

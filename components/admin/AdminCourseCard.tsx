@@ -3,7 +3,7 @@ import { useState, useTransition } from 'react'
 import { moveUnit, updateUnitTitle, deleteUnit, createUnit, createAdminMaterial, deleteMaterial, adminEditMaterial } from '@/app/actions/admin'
 
 interface Unit { id: string; title: string; orderIndex: number }
-interface Material { id: string; title: string; type: string; contentType: 'pdf' | 'richtext'; contentText: string }
+interface Material { id: string; title: string; type: string; contentType: 'pdf' | 'richtext'; contentText: string; linkUrl: string }
 
 interface Props {
   courseId: string
@@ -19,12 +19,13 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
   const [editTitle, setEditTitle] = useState('')
   const [newUnitTitle, setNewUnitTitle] = useState('')
   const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null)
-  const [addMat, setAddMat] = useState<{ title: string; type: 'note' | 'test'; content: string }>({ title: '', type: 'note', content: '' })
+  const [addMat, setAddMat] = useState<{ title: string; type: 'note' | 'test'; content: string; linkUrl: string }>({ title: '', type: 'note', content: '', linkUrl: '' })
   // Material view/edit state
   const [viewingMatId, setViewingMatId] = useState<string | null>(null)
   const [editingMatId, setEditingMatId] = useState<string | null>(null)
   const [editMatTitle, setEditMatTitle] = useState('')
   const [editMatContent, setEditMatContent] = useState('')
+  const [editMatLinkUrl, setEditMatLinkUrl] = useState('')
   const [pending, startTransition] = useTransition()
 
   function startEdit(unit: Unit) { setEditingId(unit.id); setEditTitle(unit.title) }
@@ -74,13 +75,13 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
   function handleAddMaterial(unitId: string) {
     if (!addMat.title.trim()) return
     const snap = { ...addMat }
-    setAddMat({ title: '', type: 'note', content: '' })
+    setAddMat({ title: '', type: 'note', content: '', linkUrl: '' })
     const tempId = `temp-${Date.now()}`
     setUnitMaterials(prev => ({
       ...prev,
-      [unitId]: [...(prev[unitId] ?? []), { id: tempId, title: snap.title.trim(), type: snap.type, contentType: 'richtext', contentText: snap.content }],
+      [unitId]: [...(prev[unitId] ?? []), { id: tempId, title: snap.title.trim(), type: snap.type, contentType: 'richtext', contentText: snap.content, linkUrl: snap.linkUrl }],
     }))
-    startTransition(() => createAdminMaterial(unitId, snap.title, snap.type, snap.content))
+    startTransition(() => createAdminMaterial(unitId, snap.title, snap.type, snap.content, snap.linkUrl))
   }
 
   function startEditMat(m: Material) {
@@ -88,6 +89,7 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
     setEditingMatId(m.id)
     setEditMatTitle(m.title)
     setEditMatContent(m.contentText)
+    setEditMatLinkUrl(m.linkUrl)
   }
 
   function handleSaveMat(unitId: string, mat: Material) {
@@ -95,11 +97,11 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
     setUnitMaterials(prev => ({
       ...prev,
       [unitId]: (prev[unitId] ?? []).map(m => m.id === mat.id
-        ? { ...m, title: editMatTitle.trim(), contentText: editMatContent }
+        ? { ...m, title: editMatTitle.trim(), contentText: editMatContent, linkUrl: editMatLinkUrl }
         : m),
     }))
     setEditingMatId(null)
-    startTransition(() => adminEditMaterial(mat.id, editMatTitle, mat.contentType === 'richtext' ? editMatContent : null))
+    startTransition(() => adminEditMaterial(mat.id, editMatTitle, mat.contentType === 'richtext' ? editMatContent : null, editMatLinkUrl))
   }
 
   return (
@@ -235,6 +237,12 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
                               className="glass-input w-full rounded-lg px-2 py-1 text-xs resize-y"
                             />
                           )}
+                          <input
+                            value={editMatLinkUrl}
+                            onChange={e => setEditMatLinkUrl(e.target.value)}
+                            placeholder="Link URL (optional)"
+                            className="glass-input w-full rounded-lg px-2 py-1 text-xs"
+                          />
                           <button type="button"
                             onClick={() => handleSaveMat(unit.id, m)}
                             disabled={!editMatTitle.trim() || pending}
@@ -265,6 +273,9 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
                       placeholder="Content (optional)..."
                       rows={3}
                       className="glass-input w-full rounded-lg px-3 py-1.5 text-xs resize-none" />
+                    <input value={addMat.linkUrl} onChange={e => setAddMat(p => ({ ...p, linkUrl: e.target.value }))}
+                      placeholder="Link URL (optional)..."
+                      className="glass-input w-full rounded-lg px-3 py-1.5 text-xs" />
                     <button type="button" onClick={() => handleAddMaterial(unit.id)}
                       disabled={!addMat.title.trim() || pending}
                       className="self-start text-xs bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white px-3 py-1.5 rounded-lg transition-colors">
