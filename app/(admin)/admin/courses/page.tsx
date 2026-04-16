@@ -1,13 +1,14 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { createUnit, deleteUnit } from '@/app/actions/admin'
+import AdminCourseCard from '@/components/admin/AdminCourseCard'
 
 export default async function AdminCoursesPage() {
   const [{ data: depsData }, { data: coursesData }, { data: unitsData }] = await Promise.all([
     supabaseAdmin.from('departments').select('id, name, color_accent'),
-    supabaseAdmin.from('courses').select('id, name, description, department_id').order('name'),
-    supabaseAdmin.from('units').select('id, title, course_id, order_index').order('order_index'),
+    supabaseAdmin.from('courses').select('id, name, department_id').order('name'),
+    supabaseAdmin.from('units').select('id, title, course_id, order_index')
+      .eq('status', 'approved').order('order_index'),
   ])
 
   const depsWithCourses = (depsData ?? []).map((d: any) => ({
@@ -27,37 +28,16 @@ export default async function AdminCoursesPage() {
         <div key={dept.id} className="mb-10">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-2.5 h-2.5 rounded-full" style={{ background: dept.color_accent }} />
-            <h2 className="text-lg font-semibold text-white">{dept.name}</h2>
+            <h2 className="text-base font-semibold text-white">{dept.name}</h2>
           </div>
-
-          {/* Existing courses */}
           {dept.courses.map((course: any) => (
-            <div key={course.id} className="mb-4 bg-white/5 border border-white/10 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-white font-medium">{course.name}</div>
-              </div>
-              <div className="flex flex-col gap-1 mb-3">
-                {course.units.map((unit: any) => (
-                  <div key={unit.id} className="flex items-center justify-between bg-white/5 rounded-lg px-3 py-2">
-                    <span className="text-white/70 text-sm">{unit.title}</span>
-                    <form action={deleteUnit.bind(null, unit.id)}>
-                      <button type="submit" className="text-red-400/60 hover:text-red-400 text-xs">Remove</button>
-                    </form>
-                  </div>
-                ))}
-              </div>
-              <form action={async (formData: FormData) => {
-                'use server'
-                const title = formData.get('title') as string
-                if (title) await createUnit(course.id, title, course.units.length + 1)
-              }} className="flex gap-2">
-                <input name="title" placeholder="New unit title..."
-                  className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500" />
-                <button type="submit" className="text-sm bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg transition-colors">Add Unit</button>
-              </form>
-            </div>
+            <AdminCourseCard
+              key={course.id}
+              courseId={course.id}
+              courseName={course.name}
+              units={course.units.map((u: any) => ({ id: u.id, title: u.title, orderIndex: u.order_index }))}
+            />
           ))}
-
         </div>
       ))}
     </div>

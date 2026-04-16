@@ -49,6 +49,18 @@ export async function submitMaterial(input: {
   revalidatePath('/profile')
 }
 
+export async function editMaterial(materialId: string, title: string, contentText: string | null) {
+  const user = await requireUser()
+  const { data: material } = await supabaseAdmin
+    .from('materials').select('id, uploaded_by, content_type').eq('id', materialId).single()
+  if (!material || (material as any).uploaded_by !== user.id) throw new Error('Not authorized')
+  const updates: Record<string, unknown> = { title: title.trim(), status: 'pending', rejection_note: null }
+  if ((material as any).content_type === 'richtext' && contentText !== null)
+    updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
+  await supabaseAdmin.from('materials').update(updates).eq('id', materialId)
+  revalidatePath('/profile')
+}
+
 export async function incrementViewCount(materialId: string) {
   await requireUser()
   await supabaseAdmin.rpc('increment_view_count', { material_id: materialId })

@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { requireUser, calculateGrade } from '@/lib/auth'
 import { getUserSubmissions } from '@/lib/db/queries/materials'
+import Link from 'next/link'
 
 export default async function ProfilePage() {
   const user = await requireUser()
@@ -37,19 +38,27 @@ export default async function ProfilePage() {
         <div className="flex flex-col gap-2">
           {submissions.map((s, i) => (
             <div key={s.id} className="animate-fade-up card-hover glass rounded-xl px-5 py-4 flex items-start justify-between gap-4 transition-all hover:bg-white/[0.06]" style={{ animationDelay: `${0.15 + i * 0.06}s` }}>
-              <div>
+              <div className="min-w-0">
                 <div className="text-white/90 font-medium text-sm">{s.title}</div>
                 <div className="text-white/30 text-xs mt-0.5">{s.courseName} · {s.unitTitle}</div>
                 {s.status === 'rejected' && s.rejectionNote && (
                   <div className="text-red-400/70 text-xs mt-1.5">Feedback: {s.rejectionNote}</div>
                 )}
               </div>
-              <span
-                className="text-xs px-2.5 py-1 rounded-full border shrink-0 capitalize font-medium"
-                style={{ color: statusColor[s.status], borderColor: `${statusColor[s.status]}35` }}
-              >
-                {s.status}
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <Link
+                  href={`/profile/edit/${s.id}`}
+                  className="text-xs text-white/25 hover:text-white/60 transition-colors"
+                >
+                  Edit
+                </Link>
+                <span
+                  className="text-xs px-2.5 py-1 rounded-full border capitalize font-medium"
+                  style={{ color: statusColor[s.status], borderColor: `${statusColor[s.status]}35` }}
+                >
+                  {s.status}
+                </span>
+              </div>
             </div>
           ))}
         </div>

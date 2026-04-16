@@ -69,6 +69,40 @@ export async function rejectUnit(unitId: string) {
   revalidatePath('/admin/submissions')
 }
 
+export async function moveUnit(unitId: string, direction: 'up' | 'down') {
+  await requireAdmin()
+  const { data: unit } = await supabaseAdmin
+    .from('units').select('id, course_id, order_index').eq('id', unitId).single()
+  if (!unit) return
+  const { data: siblings } = await supabaseAdmin
+    .from('units').select('id, order_index')
+    .eq('course_id', (unit as any).course_id).eq('status', 'approved').order('order_index')
+  if (!siblings) return
+  const idx = (siblings as any[]).findIndex(u => u.id === unitId)
+  const swapIdx = direction === 'up' ? idx - 1 : idx + 1
+  if (swapIdx < 0 || swapIdx >= siblings.length) return
+  const swap = (siblings as any[])[swapIdx]
+  await Promise.all([
+    supabaseAdmin.from('units').update({ order_index: swap.order_index }).eq('id', unitId),
+    supabaseAdmin.from('units').update({ order_index: (unit as any).order_index }).eq('id', swap.id),
+  ])
+  revalidatePath('/admin/courses')
+}
+
+export async function updateUnitTitle(unitId: string, title: string) {
+  await requireAdmin()
+  await supabaseAdmin.from('units').update({ title: title.trim() }).eq('id', unitId)
+  revalidatePath('/admin/courses')
+}
+
+export async function adminEditMaterial(materialId: string, title: string, contentText: string | null) {
+  await requireAdmin()
+  const updates: Record<string, unknown> = { title: title.trim() }
+  if (contentText !== null) updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
+  await supabaseAdmin.from('materials').update(updates).eq('id', materialId)
+  revalidatePath('/admin/submissions')
+}
+
 export async function promoteToAdmin(userId: string) {
   await requireAdmin()
   await supabaseAdmin.from('users').update({ role: 'admin' }).eq('id', userId)

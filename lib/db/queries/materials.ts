@@ -23,7 +23,7 @@ export async function getApprovedMaterialsForUnit(unitId: string) {
 export async function getUserSubmissions(userId: string) {
   const { data } = await supabaseAdmin
     .from('materials')
-    .select('id, title, type, status, rejection_note, created_at, units(title, courses(name))')
+    .select('id, title, type, status, rejection_note, content_type, content_json, created_at, units(title, courses(name))')
     .eq('uploaded_by', userId)
     .order('created_at')
   return (data ?? []).map((m: any) => ({
@@ -32,6 +32,8 @@ export async function getUserSubmissions(userId: string) {
     type: m.type as string,
     status: m.status as 'pending' | 'approved' | 'rejected',
     rejectionNote: m.rejection_note as string | null,
+    contentType: m.content_type as 'pdf' | 'richtext',
+    contentJson: m.content_json as { text?: string } | null,
     createdAt: m.created_at as string,
     unitTitle: (m.units?.title ?? '') as string,
     courseName: (m.units?.courses?.name ?? '') as string,
