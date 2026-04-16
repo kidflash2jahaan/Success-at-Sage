@@ -23,6 +23,12 @@ export default async function LandingPage() {
             Browse
           </Link>
           <Link
+            href="/leaderboard"
+            className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+          >
+            Leaderboard
+          </Link>
+          <Link
             href="/login"
             className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
           >

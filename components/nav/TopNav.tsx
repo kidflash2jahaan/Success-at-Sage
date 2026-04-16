@@ -50,6 +50,12 @@ export default function TopNav({ userName, onMenuClick }: TopNavProps) {
 
       <div className="ml-auto flex items-center gap-2">
         <Link
+          href="/leaderboard"
+          className="hidden sm:block text-sm text-white/40 hover:text-white/70 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+        >
+          Leaderboard
+        </Link>
+        <Link
           href="/submit"
           className="btn-press hidden sm:flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-medium px-3 py-1.5 rounded-lg hover:bg-violet-500/10 transition-colors"
         >
