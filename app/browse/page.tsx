@@ -18,7 +18,7 @@ export default async function BrowsePage() {
               <h2 className="text-xl font-semibold text-white">{dept.name}</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {dept.courses.map(course => (
+              {dept.courses.map((course: any) => (
                 <Link
                   key={course.id}
                   href={`/courses/${course.slug}`}

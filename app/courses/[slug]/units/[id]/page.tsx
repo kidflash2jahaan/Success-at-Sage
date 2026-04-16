@@ -25,14 +25,16 @@ export default async function UnitPage({
   const { data: course } = await supabaseAdmin
     .from('courses')
     .select('id, name, department_id')
-    .eq('id', unit.course_id)
+    .eq('id', (unit as any).course_id)
     .single()
+  if (!course) notFound()
 
   const { data: dept } = await supabaseAdmin
     .from('departments')
     .select('id, name, color_accent')
-    .eq('id', course.department_id)
+    .eq('id', (course as any).department_id)
     .single()
+  if (!dept) notFound()
 
   const approvedMaterials = await getApprovedMaterialsForUnit(id)
   const notes = approvedMaterials.filter(m => m.type === 'note')
@@ -40,7 +42,7 @@ export default async function UnitPage({
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
-      <div className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: dept.color_accent }}>
+      <div className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: (dept as any).color_accent }}>
         <Link href={`/courses/${slug}`} className="hover:underline">{course.name}</Link>
       </div>
       <h1 className="text-2xl font-bold text-white mb-2">{unit.title}</h1>
@@ -53,7 +55,7 @@ export default async function UnitPage({
         <section className="mb-8">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/40 mb-3">Study Notes</h2>
           <div className="flex flex-col gap-2">
-            {notes.map(m => <MaterialCard key={m.id} material={m} accentColor={dept.color_accent} />)}
+            {notes.map(m => <MaterialCard key={m.id} material={m} accentColor={(dept as any).color_accent} />)}
           </div>
         </section>
       )}
@@ -62,7 +64,7 @@ export default async function UnitPage({
         <section>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/40 mb-3">Past Tests</h2>
           <div className="flex flex-col gap-2">
-            {tests.map(m => <MaterialCard key={m.id} material={m} accentColor={dept.color_accent} />)}
+            {tests.map(m => <MaterialCard key={m.id} material={m} accentColor={(dept as any).color_accent} />)}
           </div>
         </section>
       )}
