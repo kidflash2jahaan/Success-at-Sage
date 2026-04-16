@@ -6,10 +6,11 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 interface TopNavProps {
   userName: string
+  isAdmin?: boolean
   onMenuClick?: () => void
 }
 
-export default function TopNav({ userName, onMenuClick }: TopNavProps) {
+export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) {
   const [query, setQuery] = useState('')
   const router = useRouter()
   const supabase = createSupabaseBrowserClient()
@@ -55,6 +56,17 @@ export default function TopNav({ userName, onMenuClick }: TopNavProps) {
         >
           Leaderboard
         </Link>
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-amber-400 hover:text-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-500/10 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            Admin
+          </Link>
+        )}
         <Link
           href="/submit"
           className="btn-press hidden sm:flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-medium px-3 py-1.5 rounded-lg hover:bg-violet-500/10 transition-colors"

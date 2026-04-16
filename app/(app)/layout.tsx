@@ -14,7 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }))
 
   return (
-    <DashboardShell courses={courses} userName={user.fullName}>
+    <DashboardShell courses={courses} userName={user.fullName} isAdmin={user.role === 'admin'}>
       {children}
     </DashboardShell>
   )
