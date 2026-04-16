@@ -43,19 +43,6 @@ export async function rejectMaterial(materialId: string, note: string) {
   revalidatePath('/admin/submissions')
 }
 
-export async function createCourse(departmentId: string, name: string, description: string) {
-  await requireAdmin()
-  const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-  await supabaseAdmin.from('courses').insert({ department_id: departmentId, name, description, slug })
-  revalidatePath('/admin/courses')
-}
-
-export async function deleteCourse(courseId: string) {
-  await requireAdmin()
-  await supabaseAdmin.from('courses').delete().eq('id', courseId)
-  revalidatePath('/admin/courses')
-}
-
 export async function createUnit(courseId: string, title: string, orderIndex: number) {
   await requireAdmin()
   await supabaseAdmin.from('units').insert({ course_id: courseId, title, order_index: orderIndex })

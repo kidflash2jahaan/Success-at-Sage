@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { createCourse, deleteCourse, createUnit, deleteUnit } from '@/app/actions/admin'
+import { createUnit, deleteUnit } from '@/app/actions/admin'
 
 export default async function AdminCoursesPage() {
   const [{ data: depsData }, { data: coursesData }, { data: unitsData }] = await Promise.all([
@@ -35,11 +35,6 @@ export default async function AdminCoursesPage() {
             <div key={course.id} className="mb-4 bg-white/5 border border-white/10 rounded-xl p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="text-white font-medium">{course.name}</div>
-                <form action={deleteCourse.bind(null, course.id)}>
-                  <button type="submit" className="text-red-400/60 hover:text-red-400 text-xs">
-                    Delete course
-                  </button>
-                </form>
               </div>
               <div className="flex flex-col gap-1 mb-3">
                 {course.units.map((unit: any) => (
@@ -63,22 +58,6 @@ export default async function AdminCoursesPage() {
             </div>
           ))}
 
-          {/* Add new course */}
-          <form action={async (formData: FormData) => {
-            'use server'
-            const name = formData.get('name') as string
-            const description = formData.get('description') as string
-            if (name) await createCourse(dept.id, name, description ?? '')
-          }} className="bg-white/3 border border-dashed border-white/10 rounded-xl p-4 flex flex-col gap-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-white/30 mb-1">Add Course to {dept.name}</p>
-            <input name="name" required placeholder="Course name"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500" />
-            <input name="description" placeholder="Description (optional)"
-              className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500" />
-            <button type="submit" className="self-end text-sm bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-lg transition-colors">
-              Add Course
-            </button>
-          </form>
         </div>
       ))}
     </div>
