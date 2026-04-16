@@ -1,15 +1,17 @@
 import { completeOnboarding } from '@/app/actions/auth'
 import { getUser } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
-import { db } from '@/lib/db'
-import { users } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
 
 export default async function OnboardingPage() {
   const authUser = await getUser()
   if (!authUser) redirect('/login')
 
-  const [existing] = await db.select().from(users).where(eq(users.id, authUser.id))
+  const { data: existing } = await supabaseAdmin
+    .from('users')
+    .select('id')
+    .eq('id', authUser.id)
+    .single()
   if (existing) redirect('/dashboard')
 
   const currentYear = new Date().getFullYear()

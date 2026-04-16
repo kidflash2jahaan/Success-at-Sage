@@ -1,12 +1,18 @@
 export const dynamic = 'force-dynamic'
 
-import { db } from '@/lib/db'
-import { users } from '@/lib/db/schema'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { promoteToAdmin, demoteToStudent } from '@/app/actions/admin'
 import { calculateGrade } from '@/lib/auth'
 
 export default async function AdminUsersPage() {
-  const allUsers = await db.select().from(users).orderBy(users.createdAt)
+  const { data } = await supabaseAdmin.from('users').select('*').order('created_at')
+  const allUsers = (data ?? []).map((u: any) => ({
+    id: u.id as string,
+    email: u.email as string,
+    fullName: u.full_name as string,
+    graduatingYear: u.graduating_year as number,
+    role: u.role as 'student' | 'admin',
+  }))
 
   return (
     <div className="p-8">

@@ -1,21 +1,23 @@
 'use server'
 import { requireUser } from '@/lib/auth'
-import { db } from '@/lib/db'
-import { userCourses } from '@/lib/db/schema'
-import { and, eq } from 'drizzle-orm'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
 export async function addCourseToSchedule(courseId: string) {
   const user = await requireUser()
-  await db.insert(userCourses).values({ userId: user.id, courseId }).onConflictDoNothing()
+  await supabaseAdmin
+    .from('user_courses')
+    .insert({ user_id: user.id, course_id: courseId })
   revalidatePath('/dashboard')
   revalidatePath('/courses')
 }
 
 export async function removeCourseFromSchedule(courseId: string) {
   const user = await requireUser()
-  await db.delete(userCourses).where(
-    and(eq(userCourses.userId, user.id), eq(userCourses.courseId, courseId))
-  )
+  await supabaseAdmin
+    .from('user_courses')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('course_id', courseId)
   revalidatePath('/dashboard')
 }

@@ -1,19 +1,20 @@
 export const dynamic = 'force-dynamic'
 
 import { requireUser } from '@/lib/auth'
-import { db } from '@/lib/db'
-import { courses, units } from '@/lib/db/schema'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import SubmitForm from '@/components/submit/SubmitForm'
 
 export default async function SubmitPage() {
   await requireUser()
-  const allCourses = await db.select().from(courses).orderBy(courses.name)
-  const allUnits = await db.select().from(units).orderBy(units.orderIndex)
+  const [{ data: coursesData }, { data: unitsData }] = await Promise.all([
+    supabaseAdmin.from('courses').select('id, name').order('name'),
+    supabaseAdmin.from('units').select('id, title, course_id').order('order_index'),
+  ])
 
   return (
     <SubmitForm
-      courses={allCourses.map(c => ({ id: c.id, name: c.name }))}
-      units={allUnits.map(u => ({ id: u.id, title: u.title, courseId: u.courseId }))}
+      courses={(coursesData ?? []).map((c: any) => ({ id: c.id, name: c.name }))}
+      units={(unitsData ?? []).map((u: any) => ({ id: u.id, title: u.title, courseId: u.course_id }))}
     />
   )
 }

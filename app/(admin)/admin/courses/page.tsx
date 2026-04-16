@@ -1,38 +1,39 @@
 export const dynamic = 'force-dynamic'
 
-import { db } from '@/lib/db'
-import { departments, courses, units } from '@/lib/db/schema'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { createUnit, deleteUnit } from '@/app/actions/admin'
 
 export default async function AdminCoursesPage() {
-  const deps = await db.select().from(departments)
-  const allCourses = await db.select().from(courses).orderBy(courses.name)
-  const allUnits = await db.select().from(units).orderBy(units.orderIndex)
+  const [{ data: depsData }, { data: coursesData }, { data: unitsData }] = await Promise.all([
+    supabaseAdmin.from('departments').select('id, name, color_accent'),
+    supabaseAdmin.from('courses').select('id, name, department_id').order('name'),
+    supabaseAdmin.from('units').select('id, title, course_id, order_index').order('order_index'),
+  ])
 
-  const depsWithCourses = deps.map(d => ({
+  const depsWithCourses = (depsData ?? []).map((d: any) => ({
     ...d,
-    courses: allCourses
-      .filter(c => c.departmentId === d.id)
-      .map(c => ({
+    courses: (coursesData ?? [])
+      .filter((c: any) => c.department_id === d.id)
+      .map((c: any) => ({
         ...c,
-        units: allUnits.filter(u => u.courseId === c.id),
+        units: (unitsData ?? []).filter((u: any) => u.course_id === c.id),
       })),
   }))
 
   return (
     <div className="p-8 max-w-3xl">
       <h1 className="text-2xl font-bold text-white mb-8">Course Management</h1>
-      {depsWithCourses.map(dept => (
+      {depsWithCourses.map((dept: any) => (
         <div key={dept.id} className="mb-8">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ background: dept.colorAccent }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: dept.color_accent }} />
             <h2 className="text-lg font-semibold text-white">{dept.name}</h2>
           </div>
-          {dept.courses.map(course => (
+          {dept.courses.map((course: any) => (
             <div key={course.id} className="mb-4 bg-white/5 border border-white/10 rounded-xl p-4">
               <div className="text-white font-medium mb-3">{course.name}</div>
               <div className="flex flex-col gap-1 mb-3">
-                {course.units.map(unit => (
+                {course.units.map((unit: any) => (
                   <div key={unit.id} className="flex items-center justify-between bg-white/5 rounded-lg px-3 py-2">
                     <span className="text-white/70 text-sm">{unit.title}</span>
                     <form action={deleteUnit.bind(null, unit.id)}>

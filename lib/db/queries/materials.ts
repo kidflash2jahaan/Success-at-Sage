@@ -1,72 +1,74 @@
-import { db } from '../index'
-import { materials, users, units, courses, departments } from '../schema'
-import { and, eq, ilike, or } from 'drizzle-orm'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export async function getApprovedMaterialsForUnit(unitId: string) {
-  return db.select({
-    id: materials.id,
-    title: materials.title,
-    type: materials.type,
-    contentType: materials.contentType,
-    contentJson: materials.contentJson,
-    pdfPath: materials.pdfPath,
-    viewCount: materials.viewCount,
-    createdAt: materials.createdAt,
-    uploaderName: users.fullName,
-  })
-    .from(materials)
-    .innerJoin(users, eq(materials.uploadedBy, users.id))
-    .where(and(eq(materials.unitId, unitId), eq(materials.status, 'approved')))
-    .orderBy(materials.createdAt)
+  const { data } = await supabaseAdmin
+    .from('materials')
+    .select('id, title, type, content_type, content_json, pdf_path, view_count, created_at, users!uploaded_by(full_name)')
+    .eq('unit_id', unitId)
+    .eq('status', 'approved')
+    .order('created_at')
+  return (data ?? []).map((m: any) => ({
+    id: m.id as string,
+    title: m.title as string,
+    type: m.type as 'note' | 'test',
+    contentType: m.content_type as 'pdf' | 'richtext',
+    contentJson: m.content_json,
+    pdfPath: m.pdf_path as string | null,
+    viewCount: m.view_count as number,
+    createdAt: m.created_at as string,
+    uploaderName: (m.users?.full_name ?? 'Unknown') as string,
+  }))
 }
 
 export async function getUserSubmissions(userId: string) {
-  return db.select({
-    id: materials.id,
-    title: materials.title,
-    type: materials.type,
-    status: materials.status,
-    rejectionNote: materials.rejectionNote,
-    createdAt: materials.createdAt,
-    unitTitle: units.title,
-    courseName: courses.name,
-  })
-    .from(materials)
-    .innerJoin(units, eq(materials.unitId, units.id))
-    .innerJoin(courses, eq(units.courseId, courses.id))
-    .where(eq(materials.uploadedBy, userId))
-    .orderBy(materials.createdAt)
+  const { data } = await supabaseAdmin
+    .from('materials')
+    .select('id, title, type, status, rejection_note, created_at, units(title, courses(name))')
+    .eq('uploaded_by', userId)
+    .order('created_at')
+  return (data ?? []).map((m: any) => ({
+    id: m.id as string,
+    title: m.title as string,
+    type: m.type as string,
+    status: m.status as 'pending' | 'approved' | 'rejected',
+    rejectionNote: m.rejection_note as string | null,
+    createdAt: m.created_at as string,
+    unitTitle: (m.units?.title ?? '') as string,
+    courseName: (m.units?.courses?.name ?? '') as string,
+  }))
 }
 
 export async function searchContent(query: string) {
   const term = `%${query}%`
-
-  const matchedCourses = await db.select({
-    id: courses.id,
-    name: courses.name,
-    slug: courses.slug,
-    departmentName: departments.name,
-    colorAccent: departments.colorAccent,
-  })
-    .from(courses)
-    .innerJoin(departments, eq(courses.departmentId, departments.id))
-    .where(ilike(courses.name, term))
-    .limit(5)
-
-  const matchedMaterials = await db.select({
-    id: materials.id,
-    title: materials.title,
-    type: materials.type,
-    unitId: materials.unitId,
-    unitTitle: units.title,
-    courseSlug: courses.slug,
-    courseName: courses.name,
-  })
-    .from(materials)
-    .innerJoin(units, eq(materials.unitId, units.id))
-    .innerJoin(courses, eq(units.courseId, courses.id))
-    .where(and(ilike(materials.title, term), eq(materials.status, 'approved')))
-    .limit(10)
-
-  return { courses: matchedCourses, materials: matchedMaterials }
+  const [{ data: matchedCourses }, { data: matchedMaterials }] = await Promise.all([
+    supabaseAdmin
+      .from('courses')
+      .select('id, name, slug, departments(name, color_accent)')
+      .ilike('name', term)
+      .limit(5),
+    supabaseAdmin
+      .from('materials')
+      .select('id, title, type, unit_id, units(title, courses(slug, name))')
+      .ilike('title', term)
+      .eq('status', 'approved')
+      .limit(10),
+  ])
+  return {
+    courses: (matchedCourses ?? []).map((c: any) => ({
+      id: c.id as string,
+      name: c.name as string,
+      slug: c.slug as string,
+      departmentName: (c.departments?.name ?? '') as string,
+      colorAccent: (c.departments?.color_accent ?? '') as string,
+    })),
+    materials: (matchedMaterials ?? []).map((m: any) => ({
+      id: m.id as string,
+      title: m.title as string,
+      type: m.type as string,
+      unitId: m.unit_id as string,
+      unitTitle: (m.units?.title ?? '') as string,
+      courseSlug: (m.units?.courses?.slug ?? '') as string,
+      courseName: (m.units?.courses?.name ?? '') as string,
+    })),
+  }
 }

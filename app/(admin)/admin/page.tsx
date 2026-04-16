@@ -1,22 +1,22 @@
 export const dynamic = 'force-dynamic'
 
-import { db } from '@/lib/db'
-import { materials, users } from '@/lib/db/schema'
-import { eq, count } from 'drizzle-orm'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export default async function AdminDashboardPage() {
-  const [pendingResult] = await db.select({ count: count() }).from(materials).where(eq(materials.status, 'pending'))
-  const [totalUsers] = await db.select({ count: count() }).from(users)
-  const [totalMaterials] = await db.select({ count: count() }).from(materials).where(eq(materials.status, 'approved'))
+  const [{ count: pendingCount }, { count: usersCount }, { count: approvedCount }] = await Promise.all([
+    supabaseAdmin.from('materials').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabaseAdmin.from('users').select('*', { count: 'exact', head: true }),
+    supabaseAdmin.from('materials').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
+  ])
 
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-white mb-8">Admin Dashboard</h1>
       <div className="grid grid-cols-3 gap-4 max-w-xl">
         {[
-          { label: 'Pending Review', value: pendingResult.count, color: '#fbbf24' },
-          { label: 'Total Users', value: totalUsers.count, color: '#60a5fa' },
-          { label: 'Approved Materials', value: totalMaterials.count, color: '#34d399' },
+          { label: 'Pending Review', value: pendingCount ?? 0, color: '#fbbf24' },
+          { label: 'Total Users', value: usersCount ?? 0, color: '#60a5fa' },
+          { label: 'Approved Materials', value: approvedCount ?? 0, color: '#34d399' },
         ].map(stat => (
           <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-5">
             <div className="text-3xl font-bold mb-1" style={{ color: stat.color }}>{stat.value}</div>

@@ -1,9 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { requireUser } from '@/lib/auth'
-import { db } from '@/lib/db'
-import { units, courses, departments } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getApprovedMaterialsForUnit } from '@/lib/db/queries/materials'
 import MaterialCard from '@/components/materials/MaterialCard'
 import Link from 'next/link'
@@ -17,19 +15,32 @@ export default async function UnitPage({
   await requireUser()
   const { slug, id } = await params
 
-  const [unit] = await db.select().from(units).where(eq(units.id, id))
+  const { data: unit } = await supabaseAdmin
+    .from('units')
+    .select('id, title, course_id')
+    .eq('id', id)
+    .single()
   if (!unit) notFound()
 
-  const [course] = await db.select().from(courses).where(eq(courses.id, unit.courseId))
-  const [dept] = await db.select().from(departments).where(eq(departments.id, course.departmentId))
-  const approvedMaterials = await getApprovedMaterialsForUnit(id)
+  const { data: course } = await supabaseAdmin
+    .from('courses')
+    .select('id, name, department_id')
+    .eq('id', unit.course_id)
+    .single()
 
+  const { data: dept } = await supabaseAdmin
+    .from('departments')
+    .select('id, name, color_accent')
+    .eq('id', course.department_id)
+    .single()
+
+  const approvedMaterials = await getApprovedMaterialsForUnit(id)
   const notes = approvedMaterials.filter(m => m.type === 'note')
   const tests = approvedMaterials.filter(m => m.type === 'test')
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10">
-      <div className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: dept.colorAccent }}>
+      <div className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: dept.color_accent }}>
         <Link href={`/courses/${slug}`} className="hover:underline">{course.name}</Link>
       </div>
       <h1 className="text-2xl font-bold text-white mb-2">{unit.title}</h1>
@@ -42,7 +53,7 @@ export default async function UnitPage({
         <section className="mb-8">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/40 mb-3">Study Notes</h2>
           <div className="flex flex-col gap-2">
-            {notes.map(m => <MaterialCard key={m.id} material={m} accentColor={dept.colorAccent} />)}
+            {notes.map(m => <MaterialCard key={m.id} material={m} accentColor={dept.color_accent} />)}
           </div>
         </section>
       )}
@@ -51,7 +62,7 @@ export default async function UnitPage({
         <section>
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/40 mb-3">Past Tests</h2>
           <div className="flex flex-col gap-2">
-            {tests.map(m => <MaterialCard key={m.id} material={m} accentColor={dept.colorAccent} />)}
+            {tests.map(m => <MaterialCard key={m.id} material={m} accentColor={dept.color_accent} />)}
           </div>
         </section>
       )}

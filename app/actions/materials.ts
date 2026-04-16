@@ -1,9 +1,7 @@
 'use server'
 import { requireUser } from '@/lib/auth'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { db } from '@/lib/db'
-import { materials } from '@/lib/db/schema'
-import { eq, sql } from 'drizzle-orm'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 
 export async function getSignedUploadUrl(fileName: string, unitId: string) {
@@ -26,14 +24,14 @@ export async function submitMaterial(input: {
   contentJson?: object
 }) {
   const user = await requireUser()
-  await db.insert(materials).values({
-    unitId: input.unitId,
-    uploadedBy: user.id,
+  await supabaseAdmin.from('materials').insert({
+    unit_id: input.unitId,
+    uploaded_by: user.id,
     title: input.title,
     type: input.type,
-    contentType: input.contentType,
-    pdfPath: input.pdfPath ?? null,
-    contentJson: input.contentJson ?? null,
+    content_type: input.contentType,
+    pdf_path: input.pdfPath ?? null,
+    content_json: input.contentJson ?? null,
     status: 'pending',
   })
   revalidatePath('/profile')
@@ -41,7 +39,5 @@ export async function submitMaterial(input: {
 
 export async function incrementViewCount(materialId: string) {
   await requireUser()
-  await db.update(materials)
-    .set({ viewCount: sql`${materials.viewCount} + 1` })
-    .where(eq(materials.id, materialId))
+  await supabaseAdmin.rpc('increment_view_count', { material_id: materialId })
 }

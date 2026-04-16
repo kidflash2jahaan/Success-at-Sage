@@ -9,7 +9,15 @@ export async function getCurrentUser() {
     .select('*')
     .eq('id', authUser.id)
     .single()
-  return data ?? null
+  if (!data) return null
+  return {
+    id: data.id as string,
+    email: data.email as string,
+    fullName: data.full_name as string,
+    graduatingYear: data.graduating_year as number,
+    role: data.role as 'student' | 'admin',
+    createdAt: data.created_at as string,
+  }
 }
 
 export async function requireUser() {
