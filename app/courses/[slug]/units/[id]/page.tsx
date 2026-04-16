@@ -85,7 +85,7 @@ export default async function UnitPage({
 
       {tests.length > 0 && (
         <section className="animate-fade-up stagger-3">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-3 px-1">Past Tests</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-3 px-1">Practice Tests</h2>
           <div className="flex flex-col gap-2">
             {tests.map((m, i) => (
               <div key={m.id} className="animate-fade-up" style={{ animationDelay: `${0.25 + i * 0.06}s` }}>

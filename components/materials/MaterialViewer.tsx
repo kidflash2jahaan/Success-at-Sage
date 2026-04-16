@@ -8,28 +8,6 @@ interface Material {
   pdfPath: string | null
 }
 
-function renderJson(node: unknown): string {
-  if (!node || typeof node !== 'object') return ''
-  const n = node as { type?: string; text?: string; content?: unknown[]; attrs?: Record<string, unknown> }
-
-  if (n.type === 'text') return n.text ?? ''
-
-  const children = (n.content ?? []).map(renderJson).join('')
-
-  switch (n.type) {
-    case 'doc': return children
-    case 'paragraph': return `<p>${children}</p>`
-    case 'heading': return `<h${n.attrs?.level ?? 1}>${children}</h${n.attrs?.level ?? 1}>`
-    case 'bulletList': return `<ul>${children}</ul>`
-    case 'orderedList': return `<ol>${children}</ol>`
-    case 'listItem': return `<li>${children}</li>`
-    case 'bold': return `<strong>${children}</strong>`
-    case 'italic': return `<em>${children}</em>`
-    case 'hardBreak': return '<br>'
-    default: return children
-  }
-}
-
 export default function MaterialViewer({ material }: { material: Material }) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 
@@ -42,12 +20,12 @@ export default function MaterialViewer({ material }: { material: Material }) {
   }, [material])
 
   if (material.contentType === 'richtext') {
-    const html = renderJson(material.contentJson)
+    const json = material.contentJson as { text?: string } | null
+    const text = json?.text ?? ''
     return (
-      <div
-        className="prose prose-invert max-w-none p-5 text-sm"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      <pre className="p-5 text-sm text-white/80 whitespace-pre-wrap leading-relaxed font-sans">
+        {text}
+      </pre>
     )
   }
 

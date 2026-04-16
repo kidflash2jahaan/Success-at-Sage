@@ -63,7 +63,7 @@ export default async function LandingPage() {
 
           {/* Subtext */}
           <p className="animate-fade-up stagger-3 text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed">
-            Student-submitted study notes and past tests, organized by course and unit.
+            Student-submitted study notes and practice tests, organized by course and unit.
             Made by Sage Hill students, for Sage Hill students.
           </p>
 

@@ -1,7 +1,6 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import { submitMaterial, getSignedUploadUrl, submitNewUnit } from '@/app/actions/materials'
-import TiptapEditor from '@/components/editor/TiptapEditor'
 import { useRouter } from 'next/navigation'
 
 interface Course { id: string; name: string; slug: string }
@@ -28,7 +27,7 @@ export default function SubmitForm({ courses, units, preselectedSlug }: { course
   const [title, setTitle] = useState('')
   const [type, setType] = useState<'note' | 'test'>('note')
   const [contentType, setContentType] = useState<'pdf' | 'richtext'>('richtext')
-  const [contentJson, setContentJson] = useState<object | null>(null)
+  const [contentText, setContentText] = useState('')
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -104,7 +103,7 @@ export default function SubmitForm({ courses, units, preselectedSlug }: { course
         type,
         contentType,
         pdfPath,
-        contentJson: contentType === 'richtext' && contentJson ? contentJson : undefined,
+        contentJson: contentType === 'richtext' && contentText ? { text: contentText } : undefined,
       })
 
       router.push('/profile')
@@ -238,7 +237,7 @@ export default function SubmitForm({ courses, units, preselectedSlug }: { course
                     ? 'bg-violet-600 border-violet-600 text-white'
                     : 'glass text-white/60 hover:text-white'
                 }`}>
-                {t === 'note' ? 'Study Note' : 'Past Test'}
+                {t === 'note' ? 'Study Note' : 'Practice Test'}
               </button>
             ))}
           </div>
@@ -263,7 +262,13 @@ export default function SubmitForm({ courses, units, preselectedSlug }: { course
       {contentType === 'richtext' && (
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Content</label>
-          <TiptapEditor onChange={json => setContentJson(json)} />
+          <textarea
+            value={contentText}
+            onChange={e => setContentText(e.target.value)}
+            placeholder="Type your notes here..."
+            rows={12}
+            className="glass-input w-full rounded-xl px-4 py-3 text-sm resize-y leading-relaxed"
+          />
         </div>
       )}
 
@@ -282,7 +287,7 @@ export default function SubmitForm({ courses, units, preselectedSlug }: { course
 
       <button
         type="submit"
-        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title}
+        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title || (contentType === 'richtext' && !contentText.trim())}
         className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
       >
         {submitting ? 'Submitting...' : 'Submit for Review'}
