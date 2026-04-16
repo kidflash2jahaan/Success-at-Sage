@@ -33,7 +33,7 @@ export default async function BrowsePage() {
                 <Link
                   key={course.id}
                   href={`/courses/${course.slug}`}
-                  className="card-hover glass-shine glass rounded-xl p-4 transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
+                  className="card-hover glass rounded-xl p-4 transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
                   style={{ animationDelay: `${di * 0.07 + ci * 0.04}s` }}
                 >
                   <div className="text-xs font-semibold uppercase tracking-widest mb-1.5" style={{ color: dept.colorAccent }}>

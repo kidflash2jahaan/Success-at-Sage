@@ -42,7 +42,7 @@ export default async function CourseDetailPage({
           } className="mt-5">
             <button
               type="submit"
-              className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all ${
+              className={`btn-press px-5 py-2 rounded-xl text-sm font-semibold transition-all ${
                 enrolled
                   ? 'glass text-white/70 hover:text-white hover:bg-white/[0.08]'
                   : 'text-white hover:shadow-lg'
@@ -74,7 +74,7 @@ export default async function CourseDetailPage({
               <Link
                 key={unit.id}
                 href={user ? `/courses/${slug}/units/${unit.id}` : '/login'}
-                className="animate-fade-up card-hover glass-shine glass rounded-xl px-5 py-4 flex items-center justify-between transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
+                className="animate-fade-up card-hover glass rounded-xl px-5 py-4 flex items-center justify-between transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
                 style={{ animationDelay: `${0.15 + i * 0.055}s` }}
               >
                 <span className="text-white/80 text-sm font-medium group-hover:text-white transition-colors">{unit.title}</span>

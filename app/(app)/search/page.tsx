@@ -35,7 +35,7 @@ export default async function SearchPage({
           <div className="flex flex-col gap-2">
             {courses.map((course, i) => (
               <Link key={course.id} href={`/courses/${course.slug}`}
-                className="animate-fade-up card-hover glass-shine glass flex items-center gap-3 rounded-xl px-4 py-3 transition-all hover:bg-white/[0.07]"
+                className="animate-fade-up card-hover glass flex items-center gap-3 rounded-xl px-4 py-3 transition-all hover:bg-white/[0.07]"
                 style={{ animationDelay: `${i * 0.06}s` }}>
                 <div className="w-2 h-2 rounded-full shrink-0" style={{ background: course.colorAccent, boxShadow: `0 0 6px ${course.colorAccent}80` }} />
                 <div>
@@ -54,7 +54,7 @@ export default async function SearchPage({
           <div className="flex flex-col gap-2">
             {materials.map((m, i) => (
               <Link key={m.id} href={`/courses/${m.courseSlug}/units/${m.unitId}`}
-                className="animate-fade-up card-hover glass-shine glass flex items-center justify-between rounded-xl px-4 py-3 transition-all hover:bg-white/[0.07]"
+                className="animate-fade-up card-hover glass flex items-center justify-between rounded-xl px-4 py-3 transition-all hover:bg-white/[0.07]"
                 style={{ animationDelay: `${0.12 + i * 0.06}s` }}>
                 <div>
                   <div className="text-white font-medium text-sm">{m.title}</div>

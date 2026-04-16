@@ -20,7 +20,7 @@ export default async function DashboardPage() {
           </div>
           <p className="text-white/60 text-sm mb-6">You haven&apos;t added any courses yet. Browse the catalog to get started.</p>
           <Link href="/browse"
-            className="inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]">
+            className="btn-press inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]">
             Browse Courses
           </Link>
         </div>
@@ -39,7 +39,7 @@ export default async function DashboardPage() {
           <Link
             key={course.id}
             href={`/courses/${course.slug}`}
-            className="animate-fade-up card-hover glass-shine glass rounded-2xl p-5 transition-all hover:bg-white/[0.07] hover:border-white/[0.14] group"
+            className="animate-fade-up card-hover glass rounded-2xl p-5 transition-all hover:bg-white/[0.07] hover:border-white/[0.14] group"
             style={{ animationDelay: `${i * 0.06}s` }}
           >
             <div className="flex items-center gap-2 mb-3">
