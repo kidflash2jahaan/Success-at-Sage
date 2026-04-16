@@ -1,7 +1,6 @@
 'use server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { db } from '@/lib/db'
-import { users } from '@/lib/db/schema'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 
 export async function signUpWithEmail(formData: FormData) {
@@ -17,13 +16,13 @@ export async function signUpWithEmail(formData: FormData) {
   const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim())
   const role = adminEmails.includes(email) ? 'admin' as const : 'student' as const
 
-  await db.insert(users).values({
-    id: data.user!.id,
+  await supabaseAdmin.from('users').insert({
+    id: data.user.id,
     email,
-    fullName,
-    graduatingYear,
+    full_name: fullName,
+    graduating_year: graduatingYear,
     role,
   })
 
-  redirect('/dashboard')
+  redirect('/signup?sent=1')
 }
