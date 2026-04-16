@@ -13,7 +13,6 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error && data.user) {
-      const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim())
       const existing = await db.select().from(users).where(eq(users.id, data.user.id))
       if (existing.length === 0) {
         return NextResponse.redirect(`${origin}/onboarding`)
