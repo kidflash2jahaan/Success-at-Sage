@@ -2,49 +2,49 @@
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 
-interface SidebarCourse {
-  id: string
-  name: string
-  slug: string
-  department: { colorAccent: string; name: string }
-}
-
 interface SidebarProps {
-  courses: SidebarCourse[]
+  courses?: unknown[]   // kept for compat, not used
   activeCourseSlug?: string
   onClose?: () => void
 }
 
-const STORAGE_KEY = 'sas_recent_slugs'
-const MAX_RECENTS = 8
+interface RecentMaterial {
+  id: string
+  title: string
+  type: 'note' | 'test'
+  courseSlug: string
+  unitId: string
+}
 
-export default function Sidebar({ courses, activeCourseSlug, onClose }: SidebarProps) {
-  const [recentSlugs, setRecentSlugs] = useState<string[]>([])
+const RECENTS_KEY = 'sas_recent_materials'
 
-  // Load recents from localStorage on mount
+export default function Sidebar({ activeCourseSlug, onClose }: SidebarProps) {
+  const [recents, setRecents] = useState<RecentMaterial[]>([])
+
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')
-      setRecentSlugs(Array.isArray(stored) ? stored : [])
-    } catch {}
+    function load() {
+      try {
+        const stored: RecentMaterial[] = JSON.parse(localStorage.getItem(RECENTS_KEY) ?? '[]')
+        setRecents(Array.isArray(stored) ? stored : [])
+      } catch {}
+    }
+    load()
+    // Refresh when MaterialCard pushes a new recent (same tab) or other tabs change storage
+    window.addEventListener('sas-recents-updated', load)
+    window.addEventListener('storage', load)
+    return () => {
+      window.removeEventListener('sas-recents-updated', load)
+      window.removeEventListener('storage', load)
+    }
   }, [])
 
-  // Push current course to recents whenever active slug changes
+  // Also re-read on path change so sidebar refreshes after navigating to a unit and opening a file
   useEffect(() => {
-    if (!activeCourseSlug) return
-    setRecentSlugs(prev => {
-      const next = [activeCourseSlug, ...prev.filter(s => s !== activeCourseSlug)].slice(0, MAX_RECENTS)
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch {}
-      return next
-    })
+    try {
+      const stored: RecentMaterial[] = JSON.parse(localStorage.getItem(RECENTS_KEY) ?? '[]')
+      setRecents(Array.isArray(stored) ? stored : [])
+    } catch {}
   }, [activeCourseSlug])
-
-  // Build display list: recents first (filtered to enrolled), then unvisited enrolled courses
-  const courseBySlug = Object.fromEntries(courses.map(c => [c.slug, c]))
-  const recentCourses = recentSlugs.map(s => courseBySlug[s]).filter(Boolean) as SidebarCourse[]
-  const visitedSlugs = new Set(recentSlugs)
-  const unvisited = courses.filter(c => !visitedSlugs.has(c.slug))
-  const displayCourses = [...recentCourses, ...unvisited]
 
   return (
     <nav className="glass-sidebar w-64 shrink-0 h-full flex flex-col overflow-y-auto">
@@ -63,25 +63,28 @@ export default function Sidebar({ courses, activeCourseSlug, onClose }: SidebarP
       </div>
 
       <div className="flex-1 py-2 px-2">
-        {displayCourses.length === 0 ? (
-          <p className="px-3 py-3 text-sm text-white/25">No courses yet.</p>
+        {recents.length === 0 ? (
+          <p className="px-3 py-3 text-xs text-white/20 leading-relaxed">
+            Files you open will appear here.
+          </p>
         ) : (
-          displayCourses.map(course => (
+          recents.map(m => (
             <Link
-              key={course.id}
-              href={`/courses/${course.slug}`}
+              key={m.id}
+              href={`/courses/${m.courseSlug}/units/${m.unitId}`}
               onClick={onClose}
-              className={`sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
-                activeCourseSlug === course.slug
-                  ? 'glass text-white'
-                  : 'text-white/50 hover:text-white hover:bg-white/[0.04]'
-              }`}
+              className="sidebar-nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all text-white/50 hover:text-white hover:bg-white/[0.04]"
             >
-              <div
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ background: course.department.colorAccent, boxShadow: `0 0 6px ${course.department.colorAccent}80` }}
-              />
-              <span className="truncate">{course.name}</span>
+              <span
+                className="shrink-0 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded"
+                style={{
+                  background: m.type === 'note' ? 'rgba(124,58,237,0.2)' : 'rgba(251,191,36,0.15)',
+                  color: m.type === 'note' ? '#a78bfa' : '#fbbf24',
+                }}
+              >
+                {m.type === 'note' ? 'Note' : 'Test'}
+              </span>
+              <span className="truncate leading-snug">{m.title}</span>
             </Link>
           ))
         )}

@@ -14,13 +14,44 @@ interface Material {
   uploaderName: string
 }
 
-export default function MaterialCard({ material, accentColor }: { material: Material; accentColor: string }) {
+const RECENTS_KEY = 'sas_recent_materials'
+const MAX_RECENTS = 10
+
+interface RecentMaterial {
+  id: string
+  title: string
+  type: 'note' | 'test'
+  courseSlug: string
+  unitId: string
+}
+
+function pushRecentMaterial(entry: RecentMaterial) {
+  try {
+    const stored: RecentMaterial[] = JSON.parse(localStorage.getItem(RECENTS_KEY) ?? '[]')
+    const next = [entry, ...stored.filter(m => m.id !== entry.id)].slice(0, MAX_RECENTS)
+    localStorage.setItem(RECENTS_KEY, JSON.stringify(next))
+    window.dispatchEvent(new CustomEvent('sas-recents-updated'))
+  } catch {}
+}
+
+export default function MaterialCard({
+  material,
+  accentColor,
+  courseSlug,
+  unitId,
+}: {
+  material: Material
+  accentColor: string
+  courseSlug: string
+  unitId: string
+}) {
   const [open, setOpen] = useState(false)
   const [viewCount, setViewCount] = useState(material.viewCount)
 
   async function handleOpen() {
     if (!open) {
       setOpen(true)
+      pushRecentMaterial({ id: material.id, title: material.title, type: material.type, courseSlug, unitId })
       await incrementViewCount(material.id)
       setViewCount(v => v + 1)
     } else {
