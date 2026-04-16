@@ -5,7 +5,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
 export default async function LandingPage() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser().catch(() => null)
   if (user) redirect('/dashboard')
 
   return (
