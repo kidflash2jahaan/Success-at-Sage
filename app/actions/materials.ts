@@ -2,7 +2,26 @@
 import { requireUser } from '@/lib/auth'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { sendAdminSubmissionEmail } from '@/lib/email/resend'
 import { revalidatePath } from 'next/cache'
+
+const PENDING_LIMIT = 3
+
+async function getPendingCount(userId: string, excludeId?: string) {
+  let query = supabaseAdmin
+    .from('materials')
+    .select('id', { count: 'exact', head: true })
+    .eq('uploaded_by', userId)
+    .eq('status', 'pending')
+  if (excludeId) query = query.neq('id', excludeId)
+  const { count } = await query
+  return count ?? 0
+}
+
+async function getAdminEmails(): Promise<string[]> {
+  const { data } = await supabaseAdmin.from('users').select('email').eq('role', 'admin')
+  return (data ?? []).map((u: any) => u.email as string)
+}
 
 export async function submitNewUnit(courseId: string, title: string): Promise<string> {
   const user = await requireUser()
@@ -36,6 +55,11 @@ export async function submitMaterial(input: {
   contentJson?: object
 }) {
   const user = await requireUser()
+
+  const pending = await getPendingCount(user.id)
+  if (pending >= PENDING_LIMIT)
+    throw new Error(`You already have ${PENDING_LIMIT} submissions pending review. Wait for those to be reviewed before submitting more.`)
+
   await supabaseAdmin.from('materials').insert({
     unit_id: input.unitId,
     uploaded_by: user.id,
@@ -46,14 +70,36 @@ export async function submitMaterial(input: {
     content_json: input.contentJson ?? null,
     status: 'pending',
   })
+
+  // Notify admins — fetch unit+course name for the email
+  const { data: unit } = await supabaseAdmin
+    .from('units').select('title, courses(name)').eq('id', input.unitId).single()
+  const [adminEmails] = await Promise.all([getAdminEmails()])
+  await sendAdminSubmissionEmail(
+    adminEmails,
+    user.fullName,
+    input.title,
+    input.type,
+    (unit as any)?.courses?.name ?? '',
+    (unit as any)?.title ?? '',
+  ).catch(() => {}) // don't fail the submission if email errors
+
   revalidatePath('/profile')
 }
 
 export async function editMaterial(materialId: string, title: string, contentText: string | null) {
   const user = await requireUser()
   const { data: material } = await supabaseAdmin
-    .from('materials').select('id, uploaded_by, content_type').eq('id', materialId).single()
+    .from('materials').select('id, uploaded_by, content_type, status').eq('id', materialId).single()
   if (!material || (material as any).uploaded_by !== user.id) throw new Error('Not authorized')
+
+  // Only check limit if this edit would move the material back to pending
+  if ((material as any).status !== 'pending') {
+    const pending = await getPendingCount(user.id)
+    if (pending >= PENDING_LIMIT)
+      throw new Error(`You already have ${PENDING_LIMIT} submissions pending review. Wait for those to be reviewed before resubmitting.`)
+  }
+
   const updates: Record<string, unknown> = { title: title.trim(), status: 'pending', rejection_note: null }
   if ((material as any).content_type === 'richtext' && contentText !== null)
     updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
