@@ -60,6 +60,12 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
 
       <div className="ml-auto flex items-center gap-2">
         <Link
+          href="/dashboard"
+          className="hidden sm:block text-sm text-white/40 hover:text-white/70 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
+        >
+          Dashboard
+        </Link>
+        <Link
           href="/trending"
           className="hidden sm:block text-sm text-white/40 hover:text-white/70 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
         >

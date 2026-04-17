@@ -17,12 +17,6 @@ export default async function LandingPage() {
         </span>
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
-            href="/browse"
-            className="hidden sm:block text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
-          >
-            Browse
-          </Link>
-          <Link
             href="/leaderboard"
             className="hidden sm:block text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
           >
@@ -82,10 +76,10 @@ export default async function LandingPage() {
               Create Free Account
             </Link>
             <Link
-              href="/browse"
+              href="/leaderboard"
               className="btn-press font-semibold text-white/80 hover:text-white glass px-7 py-3 rounded-xl text-base transition-all hover:bg-white/[0.08]"
             >
-              Browse Courses
+              Leaderboard
             </Link>
           </div>
 
