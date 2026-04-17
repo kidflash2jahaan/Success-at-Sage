@@ -20,6 +20,24 @@ export async function getApprovedMaterialsForUnit(unitId: string) {
   }))
 }
 
+export async function getTrendingMaterialsForCourse(courseId: string, limit = 5) {
+  const { data } = await supabaseAdmin
+    .from('materials')
+    .select('id, title, type, view_count, unit_id, units!inner(course_id)')
+    .eq('units.course_id', courseId)
+    .eq('status', 'approved')
+    .gt('view_count', 0)
+    .order('view_count', { ascending: false })
+    .limit(limit)
+  return (data ?? []).map((m: any) => ({
+    id: m.id as string,
+    title: m.title as string,
+    type: m.type as 'note' | 'test',
+    viewCount: m.view_count as number,
+    unitId: m.unit_id as string,
+  }))
+}
+
 export async function getUserSubmissions(userId: string) {
   const { data } = await supabaseAdmin
     .from('materials')

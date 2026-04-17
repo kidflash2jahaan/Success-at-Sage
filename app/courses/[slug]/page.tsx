@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { getCourseWithUnits, isUserEnrolled } from '@/lib/db/queries/courses'
+import { getTrendingMaterialsForCourse } from '@/lib/db/queries/materials'
 import { getCurrentUser } from '@/lib/auth'
 import { addCourseToSchedule, removeCourseFromSchedule } from '@/app/actions/courses'
 import BackToDashboard from '@/components/BackToDashboard'
@@ -17,7 +18,10 @@ export default async function CourseDetailPage({
   if (!data) notFound()
 
   const { course, department, units } = data
-  const user = await getCurrentUser()
+  const [user, trending] = await Promise.all([
+    getCurrentUser(),
+    getTrendingMaterialsForCourse(course.id, 5),
+  ])
   const enrolled = user ? await isUserEnrolled(user.id, course.id) : false
 
   return (
@@ -68,6 +72,46 @@ export default async function CourseDetailPage({
           </div>
         )}
       </div>
+
+      {/* Trending */}
+      {trending.length > 0 && (
+        <div className="animate-fade-up mb-5" style={{ animationDelay: '0.1s' }}>
+          <div className="flex items-center gap-2 mb-3">
+            <svg className="w-3.5 h-3.5 text-amber-400/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <h2 className="text-sm font-semibold uppercase tracking-widest text-white/40">Trending</h2>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            {trending.map((m, i) => (
+              <Link
+                key={m.id}
+                href={user ? `/courses/${slug}/units/${m.unitId}` : '/login'}
+                className="glass rounded-xl px-4 py-2.5 flex items-center gap-3 hover:bg-white/[0.06] hover:border-white/[0.12] transition-all group"
+              >
+                <span className="text-white/20 text-xs font-bold w-4 shrink-0 tabular-nums">{i + 1}</span>
+                <span
+                  className="shrink-0 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded"
+                  style={{
+                    background: m.type === 'note' ? 'rgba(124,58,237,0.2)' : 'rgba(251,191,36,0.15)',
+                    color: m.type === 'note' ? '#a78bfa' : '#fbbf24',
+                  }}
+                >
+                  {m.type === 'note' ? 'Note' : 'Test'}
+                </span>
+                <span className="flex-1 text-white/70 text-sm truncate group-hover:text-white transition-colors">{m.title}</span>
+                <span className="text-white/25 text-xs shrink-0 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  {m.viewCount.toLocaleString()}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Units */}
       <div>
