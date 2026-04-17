@@ -4,6 +4,11 @@ import { updateUnitTitle, deleteUnit, createUnit, createAdminMaterial, deleteMat
 import { uploadFileWithTUS } from '@/lib/storage/upload'
 import FileDropZone from '@/components/ui/FileDropZone'
 
+function fileNameFromPath(path: string) {
+  const segment = path.split('/').pop() ?? path
+  return segment.replace(/^\d+-/, '')
+}
+
 interface Unit { id: string; title: string; orderIndex: number }
 interface Material { id: string; title: string; type: string; contentText: string; linkUrl: string; attachmentPaths: string[] }
 
@@ -237,11 +242,13 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
                             )}
                             {m.attachmentPaths.length > 0 && (
                               <div className="flex flex-wrap gap-1.5 pt-1 border-t border-white/[0.05]">
-                                {m.attachmentPaths.map((p, i) => (
-                                  <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400/60 border border-emerald-500/10">
-                                    {p.split('/').pop()?.replace(/^\d+-/, '') ?? `File ${i + 1}`}
-                                  </span>
-                                ))}
+                                {[...m.attachmentPaths]
+                                  .sort((a, b) => fileNameFromPath(a).localeCompare(fileNameFromPath(b)))
+                                  .map((p) => (
+                                    <span key={p} className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400/60 border border-emerald-500/10">
+                                      {fileNameFromPath(p)}
+                                    </span>
+                                  ))}
                               </div>
                             )}
                             {m.linkUrl && (

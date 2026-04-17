@@ -68,19 +68,21 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
             <div className="px-5 py-3 border-t border-white/[0.07] flex flex-col gap-2">
               <p className="text-xs text-white/30 uppercase tracking-wider font-medium">Attachments</p>
               <div className="flex flex-wrap gap-2">
-                {item.attachmentPaths.map((path, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => openAttachment(path)}
-                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400/80 hover:text-emerald-400 border border-emerald-500/15 transition-colors"
-                  >
-                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                    </svg>
-                    {fileNameFromPath(path)}
-                  </button>
-                ))}
+                {[...item.attachmentPaths]
+                  .sort((a, b) => fileNameFromPath(a).localeCompare(fileNameFromPath(b)))
+                  .map((path) => (
+                    <button
+                      key={path}
+                      type="button"
+                      onClick={() => openAttachment(path)}
+                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400/80 hover:text-emerald-400 border border-emerald-500/15 transition-colors"
+                    >
+                      <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      </svg>
+                      {fileNameFromPath(path)}
+                    </button>
+                  ))}
               </div>
             </div>
           )}
