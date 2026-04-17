@@ -11,20 +11,20 @@ export default async function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Nav */}
-      <header className="glass-nav sticky top-0 z-20 flex items-center justify-between px-6 py-4">
-        <span className="font-bold text-white tracking-tight text-base">
+      <header className="glass-nav sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-4">
+        <span className="font-bold text-white tracking-tight text-base shrink-0">
           Success at Sage
         </span>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/browse"
-            className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+            className="hidden sm:block text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
           >
             Browse
           </Link>
           <Link
             href="/leaderboard"
-            className="text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
+            className="hidden sm:block text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
           >
             Leaderboard
           </Link>
@@ -36,7 +36,7 @@ export default async function LandingPage() {
           </Link>
           <Link
             href="/signup"
-            className="btn-press text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white px-4 py-1.5 rounded-lg transition-colors"
+            className="btn-press text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white px-4 py-1.5 rounded-lg transition-colors shrink-0"
           >
             Get Started
           </Link>
