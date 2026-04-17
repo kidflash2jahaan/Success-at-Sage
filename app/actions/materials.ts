@@ -60,6 +60,15 @@ export async function submitMaterial(input: {
   if (pending >= PENDING_LIMIT)
     throw new Error(`You already have ${PENDING_LIMIT} submissions pending review. Wait for those to be reviewed before submitting more.`)
 
+  const { data: existing } = await supabaseAdmin
+    .from('materials')
+    .select('id')
+    .eq('unit_id', input.unitId)
+    .ilike('title', input.title.trim())
+    .neq('status', 'rejected')
+    .maybeSingle()
+  if (existing) throw new Error('A submission with that title already exists in this unit.')
+
   const { error: insertError } = await supabaseAdmin.from('materials').insert({
     unit_id: input.unitId,
     uploaded_by: user.id,
