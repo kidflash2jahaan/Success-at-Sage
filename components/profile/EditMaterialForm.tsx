@@ -42,7 +42,10 @@ export default function EditMaterialForm({ id, unitId, initialTitle, initialCont
       for (const file of newFiles) {
         const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
         const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
-        if (!res.ok) throw new Error('Attachment upload failed')
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          throw new Error(`Upload failed for "${file.name}": ${(body as any).message ?? res.status}`)
+        }
         uploadedPaths.push(path)
       }
       const finalPaths = [...existingPaths, ...uploadedPaths]

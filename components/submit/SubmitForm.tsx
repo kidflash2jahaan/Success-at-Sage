@@ -89,7 +89,10 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
       for (const file of attachmentFiles) {
         const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
         const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
-        if (!res.ok) throw new Error('Attachment upload failed')
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          throw new Error(`Upload failed for "${file.name}": ${(body as any).message ?? res.status}`)
+        }
         attachmentPaths.push(path)
       }
 
