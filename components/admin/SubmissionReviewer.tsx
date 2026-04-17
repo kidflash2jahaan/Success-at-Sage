@@ -21,7 +21,9 @@ interface SubmissionItem {
   id: string
   title: string
   type: string
+  contentType: 'richtext' | 'pdf'
   contentJson: unknown
+  pdfPath: string | null
   linkUrl: string | null
   attachmentPaths: string[]
   uploaderName: string
@@ -53,7 +55,8 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
           </div>
           <div className="flex gap-2 mt-1">
             <span className="text-xs px-2 py-0.5 bg-white/10 rounded-full text-white/60 capitalize">{item.type}</span>
-            {item.attachmentPaths.length > 0 && <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full text-emerald-400/70">{item.attachmentPaths.length === 1 ? 'Attachment' : `${item.attachmentPaths.length} Attachments`}</span>}
+            {item.contentType === 'pdf' && <span className="text-xs px-2 py-0.5 bg-rose-500/10 rounded-full text-rose-400/70">PDF</span>}
+            {item.contentType !== 'pdf' && item.attachmentPaths.length > 0 && <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full text-emerald-400/70">{item.attachmentPaths.length === 1 ? 'Attachment' : `${item.attachmentPaths.length} Attachments`}</span>}
             {item.linkUrl && <span className="text-xs px-2 py-0.5 bg-sky-500/10 rounded-full text-sky-400/70">Link</span>}
           </div>
         </div>
@@ -64,7 +67,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
 
       {expanded && (
         <div className="border-t border-white/[0.07]">
-          <MaterialViewer material={{ contentJson: item.contentJson }} />
+          <MaterialViewer material={{ contentType: item.contentType, contentJson: item.contentJson, pdfPath: item.pdfPath }} />
           {item.attachmentPaths.length > 0 && (
             <div className="px-5 py-3 border-t border-white/[0.07] flex flex-col gap-2">
               <p className="text-xs text-white/30 uppercase tracking-wider font-medium">Attachments</p>

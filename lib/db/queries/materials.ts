@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 export async function getApprovedMaterialsForUnit(unitId: string) {
   const { data } = await supabaseAdmin
     .from('materials')
-    .select('id, title, type, content_json, link_url, attachment_paths, view_count, created_at, users!uploaded_by(full_name)')
+    .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, view_count, created_at, users!uploaded_by(full_name)')
     .eq('unit_id', unitId)
     .eq('status', 'approved')
     .order('created_at')
@@ -11,7 +11,9 @@ export async function getApprovedMaterialsForUnit(unitId: string) {
     id: m.id as string,
     title: m.title as string,
     type: m.type as 'note' | 'test',
+    contentType: (m.content_type ?? 'richtext') as 'richtext' | 'pdf',
     contentJson: m.content_json,
+    pdfPath: m.pdf_path as string | null,
     linkUrl: m.link_url as string | null,
     attachmentPaths: (m.attachment_paths ?? []) as string[],
     viewCount: m.view_count as number,

@@ -15,7 +15,7 @@ export default async function EditMaterialPage({
 
   const { data: material } = await supabaseAdmin
     .from('materials')
-    .select('id, title, type, content_json, link_url, attachment_paths, unit_id, uploaded_by, units(title, courses(name))')
+    .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, unit_id, uploaded_by, units(title, courses(name))')
     .eq('id', id)
     .single()
 
@@ -29,9 +29,11 @@ export default async function EditMaterialPage({
         unitId={(material as any).unit_id}
         initialTitle={(material as any).title}
         initialType={(material as any).type === 'test' ? 'test' : 'note'}
+        initialContentType={(material as any).content_type === 'pdf' ? 'pdf' : 'richtext'}
         initialContent={((material as any).content_json as { text?: string } | null)?.text ?? ''}
         initialLinkUrl={(material as any).link_url ?? ''}
         initialAttachmentPaths={(material as any).attachment_paths ?? []}
+        initialPdfPath={(material as any).pdf_path ?? null}
         unitTitle={(material as any).units?.title ?? ''}
         courseName={(material as any).units?.courses?.name ?? ''}
       />

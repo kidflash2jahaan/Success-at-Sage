@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import { submitMaterial, submitNewUnit } from '@/app/actions/materials'
-import { uploadFileWithTUS } from '@/lib/storage/upload'
+import { uploadFileWithTUS, uploadPdfWithTUS } from '@/lib/storage/upload'
 import FileDropZone from '@/components/ui/FileDropZone'
 import { useRouter } from 'next/navigation'
 
@@ -23,11 +23,13 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
   const [creatingUnit, setCreatingUnit] = useState(false)
   const [newUnitTitle, setNewUnitTitle] = useState('')
 
+  const [mode, setMode] = useState<'typed' | 'paper'>('typed')
   const [title, setTitle] = useState('')
   const [type, setType] = useState<'note' | 'test'>('note')
   const [contentText, setContentText] = useState('')
   const [linkUrl, setLinkUrl] = useState('')
   const [attachmentFiles, setAttachmentFiles] = useState<File[]>([])
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -86,20 +88,26 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         unitId = await submitNewUnit(selectedCourse.id, newUnitTitle)
       }
 
-      const attachmentPaths: string[] = []
-      for (const file of attachmentFiles) {
-        const path = await uploadFileWithTUS(file, unitId)
-        attachmentPaths.push(path)
+      if (mode === 'paper') {
+        if (!pdfFile) throw new Error('Please select a PDF file.')
+        const pdfPath = await uploadPdfWithTUS(pdfFile, unitId)
+        await submitMaterial({ unitId, title, type, contentType: 'pdf', contentText: '', pdfPath })
+      } else {
+        const attachmentPaths: string[] = []
+        for (const file of attachmentFiles) {
+          const path = await uploadFileWithTUS(file, unitId)
+          attachmentPaths.push(path)
+        }
+        await submitMaterial({
+          unitId,
+          title,
+          type,
+          contentType: 'richtext',
+          contentText,
+          linkUrl: linkUrl || undefined,
+          attachmentPaths: attachmentPaths.length ? attachmentPaths : undefined,
+        })
       }
-
-      await submitMaterial({
-        unitId,
-        title,
-        type,
-        contentText,
-        linkUrl: linkUrl || undefined,
-        attachmentPaths: attachmentPaths.length ? attachmentPaths : undefined,
-      })
 
       router.push('/profile')
     } catch (err) {
@@ -114,6 +122,18 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">Submit Study Material</h1>
         <p className="text-white/40 text-sm mt-1">Your submission will be reviewed before going live.</p>
+      </div>
+
+      {/* Mode toggle */}
+      <div className="flex gap-2 p-1 glass rounded-xl">
+        {(['typed', 'paper'] as const).map(m => (
+          <button key={m} type="button" onClick={() => setMode(m)}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+              mode === m ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
+            }`}>
+            {m === 'typed' ? '✏️ Typed' : '📄 Paper (PDF)'}
+          </button>
+        ))}
       </div>
 
       {error && (
@@ -237,36 +257,78 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Content <span className="text-white/25 normal-case">(optional)</span></label>
-        <textarea
-          value={contentText}
-          onChange={e => setContentText(e.target.value)}
-          placeholder="Type your notes here..."
-          rows={12}
-          className="glass-input w-full rounded-xl px-4 py-3 text-sm resize-y leading-relaxed"
-        />
-      </div>
+      {mode === 'typed' ? (
+        <>
+          {/* Content */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Content <span className="text-white/25 normal-case">(optional)</span></label>
+            <textarea
+              value={contentText}
+              onChange={e => setContentText(e.target.value)}
+              placeholder="Type your notes here..."
+              rows={12}
+              className="glass-input w-full rounded-xl px-4 py-3 text-sm resize-y leading-relaxed"
+            />
+          </div>
 
-      <FileDropZone files={attachmentFiles} onChange={setAttachmentFiles} />
+          <FileDropZone files={attachmentFiles} onChange={setAttachmentFiles} />
 
-      {/* Link */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Link <span className="text-white/25 normal-case">(optional)</span></label>
-        <input
-          value={linkUrl}
-          onChange={e => setLinkUrl(e.target.value)}
-          type="url"
-          placeholder="https://..."
-          className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-        />
-        <p className="text-xs text-white/25 px-1">Attach a relevant URL — a video, article, or website.</p>
-      </div>
+          {/* Link */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Link <span className="text-white/25 normal-case">(optional)</span></label>
+            <input
+              value={linkUrl}
+              onChange={e => setLinkUrl(e.target.value)}
+              type="url"
+              placeholder="https://..."
+              className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
+            />
+            <p className="text-xs text-white/25 px-1">Attach a relevant URL — a video, article, or website.</p>
+          </div>
+        </>
+      ) : (
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs font-medium text-white/50 uppercase tracking-wider">PDF File <span className="text-rose-400/60 normal-case">required</span></label>
+          <label className={`flex flex-col items-center justify-center gap-3 glass rounded-xl border-2 border-dashed transition-all cursor-pointer px-6 py-10 ${pdfFile ? 'border-rose-400/40 bg-rose-500/5' : 'border-white/10 hover:border-white/20'}`}>
+            <input
+              type="file"
+              accept="application/pdf,.pdf"
+              className="sr-only"
+              onChange={e => setPdfFile(e.target.files?.[0] ?? null)}
+            />
+            {pdfFile ? (
+              <>
+                <svg className="w-8 h-8 text-rose-400/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <div className="text-center">
+                  <p className="text-white/80 text-sm font-medium">{pdfFile.name}</p>
+                  <p className="text-white/30 text-xs mt-0.5">{(pdfFile.size / 1024 / 1024).toFixed(1)} MB · Click to change</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <svg className="w-8 h-8 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <div className="text-center">
+                  <p className="text-white/50 text-sm">Click to select a PDF</p>
+                  <p className="text-white/25 text-xs mt-0.5">Max 50 MB</p>
+                </div>
+              </>
+            )}
+          </label>
+          {pdfFile && (
+            <button type="button" onClick={() => setPdfFile(null)} className="self-start text-xs text-white/25 hover:text-red-400/70 transition-colors px-1">
+              Remove
+            </button>
+          )}
+        </div>
+      )}
 
       <button
         type="submit"
-        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title}
+        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title || (mode === 'paper' && !pdfFile)}
         className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
       >
         {submitting ? 'Submitting...' : 'Submit for Review'}

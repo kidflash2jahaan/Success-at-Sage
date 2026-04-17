@@ -50,7 +50,9 @@ export async function submitMaterial(input: {
   unitId: string
   title: string
   type: 'note' | 'test'
+  contentType: 'richtext' | 'pdf'
   contentText: string
+  pdfPath?: string
   linkUrl?: string
   attachmentPaths?: string[]
 }) {
@@ -74,11 +76,11 @@ export async function submitMaterial(input: {
     uploaded_by: user.id,
     title: input.title,
     type: input.type,
-    content_type: 'richtext',
-    pdf_path: null,
-    content_json: input.contentText.trim() ? { text: input.contentText.trim() } : null,
-    link_url: input.linkUrl?.trim() || null,
-    attachment_paths: input.attachmentPaths?.length ? input.attachmentPaths : [],
+    content_type: input.contentType,
+    pdf_path: input.pdfPath ?? null,
+    content_json: input.contentType === 'richtext' && input.contentText.trim() ? { text: input.contentText.trim() } : null,
+    link_url: input.contentType === 'richtext' ? (input.linkUrl?.trim() || null) : null,
+    attachment_paths: input.contentType === 'richtext' && input.attachmentPaths?.length ? input.attachmentPaths : [],
     status: 'pending',
   })
   if (insertError) throw new Error(insertError.message)
@@ -103,7 +105,7 @@ export async function submitMaterial(input: {
   revalidatePath('/profile')
 }
 
-export async function editMaterial(materialId: string, title: string, type: 'note' | 'test', contentText: string | null, linkUrl?: string, attachmentPaths?: string[] | null) {
+export async function editMaterial(materialId: string, title: string, type: 'note' | 'test', contentType: 'richtext' | 'pdf', contentText: string | null, pdfPath?: string | null, linkUrl?: string, attachmentPaths?: string[] | null) {
   const user = await requireUser()
   const { data: material } = await supabaseAdmin
     .from('materials').select('id, uploaded_by, status').eq('id', materialId).single()
@@ -118,13 +120,21 @@ export async function editMaterial(materialId: string, title: string, type: 'not
   const updates: Record<string, unknown> = {
     title: title.trim(),
     type,
+    content_type: contentType,
     status: 'pending',
     rejection_note: null,
-    link_url: linkUrl?.trim() || null,
   }
-  if (attachmentPaths !== undefined) updates.attachment_paths = attachmentPaths ?? []
-  if (contentText !== null)
-    updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
+  if (contentType === 'pdf') {
+    if (pdfPath !== undefined) updates.pdf_path = pdfPath
+    updates.link_url = null
+    updates.attachment_paths = []
+    updates.content_json = null
+  } else {
+    updates.pdf_path = null
+    updates.link_url = linkUrl?.trim() || null
+    if (attachmentPaths !== undefined) updates.attachment_paths = attachmentPaths ?? []
+    if (contentText !== null) updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
+  }
   await supabaseAdmin.from('materials').update(updates).eq('id', materialId)
   revalidatePath('/profile')
 }

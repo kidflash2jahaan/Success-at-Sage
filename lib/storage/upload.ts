@@ -5,18 +5,16 @@ import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 // Supabase free tier hard limit. Pro tier allows up to 5 GB.
 const PLATFORM_MAX_BYTES = 50 * 1024 * 1024 // 50 MB
 
-export async function uploadFileWithTUS(file: File, unitId: string): Promise<string> {
+async function tusUpload(file: File, path: string): Promise<string> {
   if (file.size > PLATFORM_MAX_BYTES) {
     throw new Error(
-      `"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — the maximum file size is 50 MB. Please compress the file or split it before uploading.`
+      `"${file.name}" is ${(file.size / 1024 / 1024).toFixed(1)} MB — the maximum file size is 50 MB. Please compress the file before uploading.`
     )
   }
 
   const supabase = createSupabaseBrowserClient()
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) throw new Error('Not authenticated')
-
-  const path = `attachments/${session.user.id}/${unitId}/${Date.now()}-${file.name}`
 
   return new Promise((resolve, reject) => {
     const upload = new Upload(file, {
@@ -38,7 +36,6 @@ export async function uploadFileWithTUS(file: File, unitId: string): Promise<str
       onError: (err) => {
         if (err instanceof DetailedError) {
           const body = err.originalResponse?.getBody?.() ?? ''
-          // Surface the server's message if available, otherwise fall back to the TUS error
           const serverMsg = (() => {
             try { return (JSON.parse(body) as { message?: string }).message } catch { return null }
           })()
@@ -51,4 +48,23 @@ export async function uploadFileWithTUS(file: File, unitId: string): Promise<str
     })
     upload.start()
   })
+}
+
+export async function uploadFileWithTUS(file: File, unitId: string): Promise<string> {
+  const supabase = createSupabaseBrowserClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) throw new Error('Not authenticated')
+  const path = `attachments/${session.user.id}/${unitId}/${Date.now()}-${file.name}`
+  return tusUpload(file, path)
+}
+
+export async function uploadPdfWithTUS(file: File, unitId: string): Promise<string> {
+  if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+    throw new Error('Only PDF files are accepted for paper submissions.')
+  }
+  const supabase = createSupabaseBrowserClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) throw new Error('Not authenticated')
+  const path = `pdfs/${session.user.id}/${unitId}/${Date.now()}-${file.name}`
+  return tusUpload(file, path)
 }

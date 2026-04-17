@@ -1,8 +1,16 @@
+import PdfViewer from './PdfViewer'
+
 interface Material {
+  contentType?: 'richtext' | 'pdf'
   contentJson: unknown
+  pdfPath?: string | null
 }
 
 export default function MaterialViewer({ material }: { material: Material }) {
+  if (material.contentType === 'pdf' && material.pdfPath) {
+    return <PdfViewer pdfPath={material.pdfPath} />
+  }
+
   const text = (material.contentJson as { text?: string } | null)?.text ?? ''
   return (
     <pre className="p-5 text-sm text-white/80 whitespace-pre-wrap leading-relaxed font-sans">

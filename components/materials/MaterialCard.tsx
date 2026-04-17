@@ -8,7 +8,9 @@ interface Material {
   id: string
   title: string
   type: 'note' | 'test'
+  contentType: 'richtext' | 'pdf'
   contentJson: unknown
+  pdfPath: string | null
   linkUrl: string | null
   attachmentPaths: string[]
   viewCount: number
@@ -82,7 +84,15 @@ export default function MaterialCard({
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap justify-end">
-          {[...material.attachmentPaths]
+          {material.contentType === 'pdf' && (
+            <span className="flex items-center gap-1 text-xs text-rose-400/70 px-2 py-0.5 rounded-full border border-rose-400/20">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              PDF
+            </span>
+          )}
+          {material.contentType !== 'pdf' && [...material.attachmentPaths]
             .sort((a, b) => fileNameFromPath(a).localeCompare(fileNameFromPath(b)))
             .map((path) => (
               <button
@@ -123,7 +133,7 @@ export default function MaterialCard({
       <div className={`accordion-grid${open ? ' open' : ''}`}>
         <div>
           <div className="border-t border-white/[0.07]">
-            <MaterialViewer material={material} />
+            <MaterialViewer material={{ contentType: material.contentType, contentJson: material.contentJson, pdfPath: material.pdfPath }} />
           </div>
         </div>
       </div>
