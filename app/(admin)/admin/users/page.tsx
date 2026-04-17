@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { promoteToAdmin, demoteToStudent } from '@/app/actions/admin'
 import { calculateGrade } from '@/lib/auth'
+import Link from 'next/link'
 
 export default async function AdminUsersPage() {
   const { data } = await supabaseAdmin.from('users').select('*').order('created_at')
@@ -32,6 +33,9 @@ export default async function AdminUsersPage() {
                     ? 'border-purple-500/40 text-purple-400 bg-purple-500/10'
                     : 'border-white/10 text-white/40'
                 }`}>{user.role}</span>
+                <Link href={`/admin/users/${user.id}`} className="text-xs text-white/40 hover:text-white/70 transition-colors">
+                  Edit
+                </Link>
                 {user.role === 'student' ? (
                   <form action={promoteToAdmin.bind(null, user.id)}>
                     <button type="submit" className="text-xs text-purple-400 hover:text-purple-300">Make Admin</button>

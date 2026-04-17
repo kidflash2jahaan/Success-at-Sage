@@ -140,6 +140,15 @@ export async function adminEditMaterial(materialId: string, title: string, type:
   revalidatePath('/admin/courses')
 }
 
+export async function updateUserInfo(userId: string, fullName: string, graduatingYear: number) {
+  await requireAdmin()
+  await supabaseAdmin
+    .from('users')
+    .update({ full_name: fullName.trim(), graduating_year: graduatingYear })
+    .eq('id', userId)
+  revalidatePath('/admin/users')
+}
+
 export async function promoteToAdmin(userId: string) {
   await requireAdmin()
   await supabaseAdmin.from('users').update({ role: 'admin' }).eq('id', userId)
