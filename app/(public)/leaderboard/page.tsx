@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { requireUser, calculateGrade } from '@/lib/auth'
+import { getCurrentUser, calculateGrade } from '@/lib/auth'
 import Link from 'next/link'
 
 interface LeaderEntry {
@@ -17,7 +17,7 @@ const MEDAL = ['#fbbf24', '#94a3b8', '#b87333']
 export default async function LeaderboardPage() {
   const [{ data }, user] = await Promise.all([
     supabaseAdmin.rpc('get_leaderboard'),
-    requireUser(),
+    getCurrentUser(),
   ])
 
   const entries: LeaderEntry[] = (data ?? []).map((r: any) => ({
@@ -28,7 +28,7 @@ export default async function LeaderboardPage() {
     totalViews: Number(r.total_views),
   }))
 
-  const myRank = entries.findIndex(e => e.id === user.id) + 1
+  const myRank = user ? entries.findIndex(e => e.id === user.id) + 1 : 0
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
@@ -37,7 +37,7 @@ export default async function LeaderboardPage() {
         <p className="text-white/40 text-sm">Ranked by approved submissions</p>
       </div>
 
-      {myRank > 0 && (
+      {user && myRank > 0 && (
         <div className="animate-fade-up stagger-2 glass rounded-xl px-5 py-3.5 mb-6 flex items-center justify-between">
           <span className="text-white/50 text-sm">Your rank</span>
           <div className="flex items-center gap-3">
@@ -48,10 +48,16 @@ export default async function LeaderboardPage() {
           </div>
         </div>
       )}
-      {myRank === 0 && (
+      {user && myRank === 0 && (
         <div className="animate-fade-up stagger-2 glass rounded-xl px-5 py-3.5 mb-6 flex items-center justify-between">
           <span className="text-white/40 text-sm">You haven&apos;t submitted anything approved yet.</span>
           <Link href="/submit" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">Submit something →</Link>
+        </div>
+      )}
+      {!user && (
+        <div className="animate-fade-up stagger-2 glass rounded-xl px-5 py-3.5 mb-6 flex items-center justify-between">
+          <span className="text-white/40 text-sm">Sign in to see your rank.</span>
+          <Link href="/login" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">Sign in →</Link>
         </div>
       )}
 
@@ -63,7 +69,7 @@ export default async function LeaderboardPage() {
         <div className="flex flex-col gap-2">
           {entries.map((entry, i) => {
             const rank = i + 1
-            const isMe = user.id === entry.id
+            const isMe = user?.id === entry.id
             const isMedal = rank <= 3
             const medalColor = isMedal ? MEDAL[i] : null
             const { label } = calculateGrade(entry.graduatingYear)
