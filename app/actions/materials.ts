@@ -60,7 +60,7 @@ export async function submitMaterial(input: {
   if (pending >= PENDING_LIMIT)
     throw new Error(`You already have ${PENDING_LIMIT} submissions pending review. Wait for those to be reviewed before submitting more.`)
 
-  await supabaseAdmin.from('materials').insert({
+  const { error: insertError } = await supabaseAdmin.from('materials').insert({
     unit_id: input.unitId,
     uploaded_by: user.id,
     title: input.title,
@@ -72,18 +72,24 @@ export async function submitMaterial(input: {
     attachment_paths: input.attachmentPaths?.length ? input.attachmentPaths : [],
     status: 'pending',
   })
+  if (insertError) throw new Error(insertError.message)
 
-  const { data: unit } = await supabaseAdmin
-    .from('units').select('title, courses(name)').eq('id', input.unitId).single()
-  const adminEmails = await getAdminEmails()
-  await sendAdminSubmissionEmail(
-    adminEmails,
-    user.fullName,
-    input.title,
-    input.type,
-    (unit as any)?.courses?.name ?? '',
-    (unit as any)?.title ?? '',
-  ).catch(() => {})
+  // Fire-and-forget — don't block submission on email delivery
+  ;(async () => {
+    try {
+      const { data: unit } = await supabaseAdmin
+        .from('units').select('title, courses(name)').eq('id', input.unitId).single()
+      const adminEmails = await getAdminEmails()
+      await sendAdminSubmissionEmail(
+        adminEmails,
+        user.fullName,
+        input.title,
+        input.type,
+        (unit as any)?.courses?.name ?? '',
+        (unit as any)?.title ?? '',
+      )
+    } catch {}
+  })()
 
   revalidatePath('/profile')
 }
