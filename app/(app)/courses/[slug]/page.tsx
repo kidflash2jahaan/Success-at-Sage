@@ -4,7 +4,6 @@ import { getCourseWithUnits, isUserEnrolled } from '@/lib/db/queries/courses'
 import { getTrendingMaterialsForCourse } from '@/lib/db/queries/materials'
 import { requireUser } from '@/lib/auth'
 import { addCourseToSchedule, removeCourseFromSchedule } from '@/app/actions/courses'
-import BackToDashboard from '@/components/BackToDashboard'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -26,7 +25,6 @@ export default async function CourseDetailPage({
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
-      <BackToDashboard />
 
       {/* Header */}
       <div className="animate-scale-in glass rounded-2xl p-6 mb-5">

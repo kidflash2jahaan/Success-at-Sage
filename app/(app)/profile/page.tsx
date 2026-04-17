@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic'
 
 import { requireUser, calculateGrade } from '@/lib/auth'
 import { getUserSubmissions } from '@/lib/db/queries/materials'
-import BackToDashboard from '@/components/BackToDashboard'
 import Link from 'next/link'
 
 export default async function ProfilePage() {
@@ -18,7 +17,6 @@ export default async function ProfilePage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      <BackToDashboard />
       <div className="animate-scale-in glass rounded-2xl p-6 mb-6">
         <h1 className="text-2xl font-bold text-white tracking-tight">{user.fullName}</h1>
         <p className="text-white/40 text-sm mt-1">{label} · Class of {user.graduatingYear}</p>
