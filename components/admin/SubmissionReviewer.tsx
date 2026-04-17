@@ -35,6 +35,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
   const [mode, setMode] = useState<'review' | 'reject' | 'edit'>('review')
   const [note, setNote] = useState('')
   const [editTitle, setEditTitle] = useState(item.title)
+  const [editType, setEditType] = useState<'note' | 'test'>(item.type === 'test' ? 'test' : 'note')
   const [editContent, setEditContent] = useState(
     (item.contentJson as { text?: string } | null)?.text ?? ''
   )
@@ -129,6 +130,18 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 placeholder="Title"
                 className="glass-input w-full rounded-lg px-3 py-2 text-sm"
               />
+              <div className="flex gap-2">
+                {(['note', 'test'] as const).map(t => (
+                  <button key={t} type="button" onClick={() => setEditType(t)}
+                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                      editType === t
+                        ? 'bg-violet-600 border-violet-600 text-white'
+                        : 'glass text-white/50 hover:text-white'
+                    }`}>
+                    {t === 'note' ? 'Study Note' : 'Practice Test'}
+                  </button>
+                ))}
+              </div>
               <textarea
                 value={editContent}
                 onChange={e => setEditContent(e.target.value)}
@@ -160,7 +173,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                     newPaths.push(path)
                   }
                   const allPaths = newPaths.length ? [...item.attachmentPaths, ...newPaths] : undefined
-                  await adminEditMaterial(item.id, editTitle, editContent, editLinkUrl, allPaths)
+                  await adminEditMaterial(item.id, editTitle, editType, editContent, editLinkUrl, allPaths)
                   setMode('review')
                 })}
                 className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"

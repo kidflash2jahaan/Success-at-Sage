@@ -103,7 +103,7 @@ export async function submitMaterial(input: {
   revalidatePath('/profile')
 }
 
-export async function editMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string, attachmentPaths?: string[] | null) {
+export async function editMaterial(materialId: string, title: string, type: 'note' | 'test', contentText: string | null, linkUrl?: string, attachmentPaths?: string[] | null) {
   const user = await requireUser()
   const { data: material } = await supabaseAdmin
     .from('materials').select('id, uploaded_by, status').eq('id', materialId).single()
@@ -117,6 +117,7 @@ export async function editMaterial(materialId: string, title: string, contentTex
 
   const updates: Record<string, unknown> = {
     title: title.trim(),
+    type,
     status: 'pending',
     rejection_note: null,
     link_url: linkUrl?.trim() || null,

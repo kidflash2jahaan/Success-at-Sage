@@ -126,10 +126,11 @@ export async function updateUnitTitle(unitId: string, title: string) {
   revalidatePath('/admin/courses')
 }
 
-export async function adminEditMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string, attachmentPaths?: string[]) {
+export async function adminEditMaterial(materialId: string, title: string, type: 'note' | 'test', contentText: string | null, linkUrl?: string, attachmentPaths?: string[]) {
   await requireAdmin()
   const updates: Record<string, unknown> = {
     title: title.trim(),
+    type,
     link_url: linkUrl?.trim() || null,
   }
   if (attachmentPaths !== undefined) updates.attachment_paths = attachmentPaths

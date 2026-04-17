@@ -10,6 +10,7 @@ interface Props {
   id: string
   unitId: string
   initialTitle: string
+  initialType: 'note' | 'test'
   initialContent: string
   initialLinkUrl: string
   initialAttachmentPaths: string[]
@@ -23,9 +24,10 @@ function fileNameFromPath(path: string) {
   return segment.replace(/^\d+-/, '')
 }
 
-export default function EditMaterialForm({ id, unitId, initialTitle, initialContent, initialLinkUrl, initialAttachmentPaths, unitTitle, courseName }: Props) {
+export default function EditMaterialForm({ id, unitId, initialTitle, initialType, initialContent, initialLinkUrl, initialAttachmentPaths, unitTitle, courseName }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState(initialTitle)
+  const [type, setType] = useState<'note' | 'test'>(initialType)
   const [content, setContent] = useState(initialContent)
   const [linkUrl, setLinkUrl] = useState(initialLinkUrl)
   const [existingPaths, setExistingPaths] = useState<string[]>(initialAttachmentPaths)
@@ -45,7 +47,7 @@ export default function EditMaterialForm({ id, unitId, initialTitle, initialCont
         uploadedPaths.push(path)
       }
       const finalPaths = [...existingPaths, ...uploadedPaths]
-      await editMaterial(id, title, content, linkUrl, finalPaths.length ? finalPaths : null)
+      await editMaterial(id, title, type, content, linkUrl, finalPaths.length ? finalPaths : null)
       router.push('/profile')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -84,6 +86,22 @@ export default function EditMaterialForm({ id, unitId, initialTitle, initialCont
           required
           className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
         />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Type</label>
+        <div className="flex gap-2">
+          {(['note', 'test'] as const).map(t => (
+            <button key={t} type="button" onClick={() => setType(t)}
+              className={`btn-press flex-1 py-2 rounded-xl text-sm font-medium border transition-all ${
+                type === t
+                  ? 'bg-violet-600 border-violet-600 text-white'
+                  : 'glass text-white/60 hover:text-white'
+              }`}>
+              {t === 'note' ? 'Study Note' : 'Practice Test'}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex flex-col gap-1.5">
