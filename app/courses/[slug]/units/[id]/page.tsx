@@ -43,7 +43,7 @@ export default async function UnitPage({
   const accentColor = (dept as any).color_accent
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10">
+    <div className="mx-auto px-4 py-10" style={{ maxWidth: '72rem' }}>
       <BackToDashboard />
 
       {/* Header */}
