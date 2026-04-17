@@ -50,16 +50,34 @@ export default function Sidebar({ activeCourseSlug, onClose }: SidebarProps) {
     <nav className="glass-sidebar w-64 shrink-0 h-full flex flex-col overflow-y-auto">
       <div className="px-4 py-4 border-b border-white/[0.06] flex items-center justify-between">
         <span className="text-xs font-semibold uppercase tracking-widest text-white/30">Recents</span>
-        <Link
-          href="/browse"
-          onClick={onClose}
-          className="w-6 h-6 flex items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/[0.06] transition-colors"
-          title="Browse & add courses"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-        </Link>
+        <div className="flex items-center gap-1">
+          {recents.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.removeItem(RECENTS_KEY)
+                setRecents([])
+                window.dispatchEvent(new CustomEvent('sas-recents-updated'))
+              }}
+              className="w-6 h-6 flex items-center justify-center rounded-lg text-white/20 hover:text-red-400/70 hover:bg-white/[0.06] transition-colors"
+              title="Clear recents"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+          <Link
+            href="/browse"
+            onClick={onClose}
+            className="w-6 h-6 flex items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/[0.06] transition-colors"
+            title="Browse & add courses"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </Link>
+        </div>
       </div>
 
       <div className="flex-1 py-2 px-2">
