@@ -24,5 +24,5 @@ export async function signUpWithEmail(formData: FormData) {
     role,
   })
 
-  redirect('/signup?sent=1')
+  redirect('/onboarding')
 }
