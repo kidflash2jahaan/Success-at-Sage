@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { editMaterial, getSignedAttachmentUploadUrl } from '@/app/actions/materials'
+import { editMaterial } from '@/app/actions/materials'
+import { uploadFileWithTUS } from '@/lib/storage/upload'
 import FileDropZone from '@/components/ui/FileDropZone'
 import Link from 'next/link'
 
@@ -40,12 +41,7 @@ export default function EditMaterialForm({ id, unitId, initialTitle, initialCont
     try {
       const uploadedPaths: string[] = []
       for (const file of newFiles) {
-        const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
-        const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}))
-          throw new Error(`Upload failed for "${file.name}": ${(body as any).message ?? res.status}`)
-        }
+        const path = await uploadFileWithTUS(file, unitId)
         uploadedPaths.push(path)
       }
       const finalPaths = [...existingPaths, ...uploadedPaths]

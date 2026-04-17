@@ -1,6 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { submitMaterial, submitNewUnit, getSignedAttachmentUploadUrl } from '@/app/actions/materials'
+import { submitMaterial, submitNewUnit } from '@/app/actions/materials'
+import { uploadFileWithTUS } from '@/lib/storage/upload'
 import FileDropZone from '@/components/ui/FileDropZone'
 import { useRouter } from 'next/navigation'
 
@@ -87,12 +88,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
 
       const attachmentPaths: string[] = []
       for (const file of attachmentFiles) {
-        const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
-        const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}))
-          throw new Error(`Upload failed for "${file.name}": ${(body as any).message ?? res.status}`)
-        }
+        const path = await uploadFileWithTUS(file, unitId)
         attachmentPaths.push(path)
       }
 

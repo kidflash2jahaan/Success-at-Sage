@@ -1,9 +1,21 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { approveMaterial, rejectMaterial, adminEditMaterial } from '@/app/actions/admin'
-import { getSignedAttachmentUploadUrl } from '@/app/actions/materials'
+import { uploadFileWithTUS } from '@/lib/storage/upload'
+import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import MaterialViewer from '@/components/materials/MaterialViewer'
 import FileDropZone from '@/components/ui/FileDropZone'
+
+function fileNameFromPath(path: string) {
+  const segment = path.split('/').pop() ?? path
+  return segment.replace(/^\d+-/, '')
+}
+
+async function openAttachment(path: string) {
+  const supabase = createSupabaseBrowserClient()
+  const { data } = await supabase.storage.from('materials').createSignedUrl(path, 3600)
+  if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
+}
 
 interface SubmissionItem {
   id: string
@@ -52,6 +64,39 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
       {expanded && (
         <div className="border-t border-white/[0.07]">
           <MaterialViewer material={{ contentJson: item.contentJson }} />
+          {item.attachmentPaths.length > 0 && (
+            <div className="px-5 py-3 border-t border-white/[0.07] flex flex-col gap-2">
+              <p className="text-xs text-white/30 uppercase tracking-wider font-medium">Attachments</p>
+              <div className="flex flex-wrap gap-2">
+                {item.attachmentPaths.map((path, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => openAttachment(path)}
+                    className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400/80 hover:text-emerald-400 border border-emerald-500/15 transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                    {fileNameFromPath(path)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {item.linkUrl && (
+            <div className="px-5 py-3 border-t border-white/[0.07]">
+              <p className="text-xs text-white/30 uppercase tracking-wider font-medium mb-1.5">Link</p>
+              <a
+                href={item.linkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-sky-400/70 hover:text-sky-400 underline underline-offset-2 transition-colors break-all"
+              >
+                {item.linkUrl}
+              </a>
+            </div>
+          )}
         </div>
       )}
 
@@ -109,9 +154,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 onClick={() => startTransition(async () => {
                   const newPaths: string[] = []
                   for (const file of editAttachmentFiles) {
-                    const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, item.id)
-                    const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
-                    if (!res.ok) throw new Error('Attachment upload failed')
+                    const path = await uploadFileWithTUS(file, item.id)
                     newPaths.push(path)
                   }
                   const allPaths = newPaths.length ? [...item.attachmentPaths, ...newPaths] : undefined

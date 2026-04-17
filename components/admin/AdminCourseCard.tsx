@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { updateUnitTitle, deleteUnit, createUnit, createAdminMaterial, deleteMaterial, adminEditMaterial } from '@/app/actions/admin'
-import { getSignedAttachmentUploadUrl } from '@/app/actions/materials'
+import { uploadFileWithTUS } from '@/lib/storage/upload'
 import FileDropZone from '@/components/ui/FileDropZone'
 
 interface Unit { id: string; title: string; orderIndex: number }
@@ -78,9 +78,8 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
     startTransition(async () => {
       const attachmentPaths: string[] = []
       for (const file of filesSnap) {
-        const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
-        const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
-        if (res.ok) attachmentPaths.push(path)
+        const path = await uploadFileWithTUS(file, unitId)
+        attachmentPaths.push(path)
       }
       await createAdminMaterial(unitId, snap.title, snap.type, snap.content, snap.linkUrl, attachmentPaths.length ? attachmentPaths : undefined)
     })
@@ -109,9 +108,8 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
     startTransition(async () => {
       const newPaths: string[] = []
       for (const file of filesSnap) {
-        const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
-        const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
-        if (res.ok) newPaths.push(path)
+        const path = await uploadFileWithTUS(file, unitId)
+        newPaths.push(path)
       }
       const allPaths = newPaths.length ? [...mat.attachmentPaths, ...newPaths] : undefined
       await adminEditMaterial(mat.id, editMatTitle, editMatContent, editMatLinkUrl, allPaths)
@@ -182,43 +180,76 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
                   {mats.map(m => (
                     <div key={m.id}>
                       {/* Material row */}
-                      <div className="flex items-center justify-between bg-white/[0.03] rounded-lg px-3 py-1.5 group/mat">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0"
-                            style={{
-                              background: m.type === 'note' ? 'rgba(124,58,237,0.2)' : 'rgba(251,191,36,0.15)',
-                              color: m.type === 'note' ? '#a78bfa' : '#fbbf24',
-                            }}>
-                            {m.type === 'note' ? 'Note' : 'Test'}
-                          </span>
-                          <span className="text-white/60 text-xs truncate">{m.title}</span>
-                        </div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          {m.contentText && (
+                      <div className="bg-white/[0.03] rounded-lg border border-white/[0.04] overflow-hidden group/mat">
+                        <div className="flex items-start justify-between px-3 py-2 gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setViewingMatId(viewingMatId === m.id ? null : m.id)}
+                            className="flex-1 flex flex-col gap-1 text-left min-w-0"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded shrink-0"
+                                style={{
+                                  background: m.type === 'note' ? 'rgba(124,58,237,0.2)' : 'rgba(251,191,36,0.15)',
+                                  color: m.type === 'note' ? '#a78bfa' : '#fbbf24',
+                                }}>
+                                {m.type === 'note' ? 'Note' : 'Test'}
+                              </span>
+                              <span className="text-white/75 text-xs font-medium truncate">{m.title}</span>
+                            </div>
+                            {/* Indicator row */}
+                            <div className="flex items-center gap-2 pl-0.5">
+                              {m.contentText ? (
+                                <span className="text-[10px] text-white/30 truncate max-w-[220px]">{m.contentText.slice(0, 80)}{m.contentText.length > 80 ? '…' : ''}</span>
+                              ) : (
+                                <span className="text-[10px] text-white/20 italic">No content</span>
+                              )}
+                              {m.attachmentPaths.length > 0 && (
+                                <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400/60">
+                                  {m.attachmentPaths.length} file{m.attachmentPaths.length !== 1 ? 's' : ''}
+                                </span>
+                              )}
+                              {m.linkUrl && (
+                                <span className="shrink-0 text-[10px] px-1.5 py-0.5 rounded-full bg-sky-500/10 text-sky-400/60">Link</span>
+                              )}
+                            </div>
+                          </button>
+                          <div className="flex items-center gap-1 shrink-0 pt-0.5">
                             <button type="button"
-                              onClick={() => setViewingMatId(viewingMatId === m.id ? null : m.id)}
-                              className="text-white/20 hover:text-white/60 opacity-0 group-hover/mat:opacity-100 text-xs px-1 transition-all">
-                              {viewingMatId === m.id ? 'Hide' : 'View'}
+                              onClick={() => editingMatId === m.id ? setEditingMatId(null) : startEditMat(m)}
+                              className="text-white/20 hover:text-white/60 opacity-0 group-hover/mat:opacity-100 text-xs px-1.5 py-0.5 rounded transition-all">
+                              {editingMatId === m.id ? '✕' : 'Edit'}
                             </button>
-                          )}
-                          <button type="button"
-                            onClick={() => editingMatId === m.id ? setEditingMatId(null) : startEditMat(m)}
-                            className="text-white/20 hover:text-white/60 opacity-0 group-hover/mat:opacity-100 text-xs px-1 transition-all">
-                            {editingMatId === m.id ? '✕' : 'Edit'}
-                          </button>
-                          <button type="button" onClick={() => handleDeleteMaterial(unit.id, m.id)}
-                            className="text-red-400/40 hover:text-red-400 opacity-0 group-hover/mat:opacity-100 text-xs px-1 transition-all">
-                            Delete
-                          </button>
+                            <button type="button" onClick={() => handleDeleteMaterial(unit.id, m.id)}
+                              className="text-red-400/30 hover:text-red-400 opacity-0 group-hover/mat:opacity-100 text-xs px-1.5 py-0.5 rounded transition-all">
+                              Delete
+                            </button>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* View content */}
-                      {viewingMatId === m.id && (
-                        <div className="mx-1 mb-1 bg-white/[0.02] rounded-lg px-3 py-2 text-white/50 text-xs leading-relaxed whitespace-pre-wrap border border-white/[0.05]">
-                          {m.contentText || <span className="italic text-white/20">No content.</span>}
-                        </div>
-                      )}
+                        {/* Expanded content panel */}
+                        {viewingMatId === m.id && (
+                          <div className="border-t border-white/[0.05] px-3 py-2.5 flex flex-col gap-2">
+                            {m.contentText ? (
+                              <p className="text-white/50 text-xs leading-relaxed whitespace-pre-wrap">{m.contentText}</p>
+                            ) : (
+                              <p className="text-white/20 text-xs italic">No content.</p>
+                            )}
+                            {m.attachmentPaths.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 pt-1 border-t border-white/[0.05]">
+                                {m.attachmentPaths.map((p, i) => (
+                                  <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400/60 border border-emerald-500/10">
+                                    {p.split('/').pop()?.replace(/^\d+-/, '') ?? `File ${i + 1}`}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                            {m.linkUrl && (
+                              <p className="text-[10px] text-sky-400/50 truncate border-t border-white/[0.05] pt-1">{m.linkUrl}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
 
                       {/* Inline edit form */}
                       {editingMatId === m.id && (
