@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic'
 
-import { requireUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getApprovedMaterialsForUnit } from '@/lib/db/queries/materials'
 import MaterialCard from '@/components/materials/MaterialCard'
@@ -13,7 +12,6 @@ export default async function UnitPage({
 }: {
   params: Promise<{ slug: string; id: string }>
 }) {
-  await requireUser()
   const { slug, id } = await params
 
   const { data: unit } = await supabaseAdmin
@@ -43,7 +41,7 @@ export default async function UnitPage({
   const accentColor = (dept as any).color_accent
 
   return (
-    <div className="mx-auto px-4 py-10" style={{ maxWidth: '72rem' }}>
+    <div className="max-w-4xl mx-auto px-6 py-10">
       <BackToDashboard />
 
       {/* Header */}

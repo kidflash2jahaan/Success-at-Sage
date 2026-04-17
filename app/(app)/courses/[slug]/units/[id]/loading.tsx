@@ -1,6 +1,6 @@
 export default function UnitLoading() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
+    <div className="mx-auto px-4 py-10" style={{ maxWidth: '72rem' }}>
       <div className="skeleton h-3 w-20 rounded mb-6" />
       <div className="glass rounded-2xl p-6 mb-6">
         <div className="flex items-center gap-2 mb-2">

@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { getCourseWithUnits, isUserEnrolled } from '@/lib/db/queries/courses'
 import { getTrendingMaterialsForCourse } from '@/lib/db/queries/materials'
-import { getCurrentUser } from '@/lib/auth'
+import { requireUser } from '@/lib/auth'
 import { addCourseToSchedule, removeCourseFromSchedule } from '@/app/actions/courses'
 import BackToDashboard from '@/components/BackToDashboard'
 import Link from 'next/link'
@@ -19,14 +19,14 @@ export default async function CourseDetailPage({
 
   const { course, department, units, totalMaterials } = data
   const [user, trending] = await Promise.all([
-    getCurrentUser(),
+    requireUser(),
     getTrendingMaterialsForCourse(course.id, 5),
   ])
-  const enrolled = user ? await isUserEnrolled(user.id, course.id) : false
+  const enrolled = await isUserEnrolled(user.id, course.id)
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
-      {user && <BackToDashboard />}
+    <div className="max-w-4xl mx-auto px-6 py-10">
+      <BackToDashboard />
 
       {/* Header */}
       <div className="animate-scale-in glass rounded-2xl p-6 mb-5">
@@ -39,8 +39,7 @@ export default async function CourseDetailPage({
         <h1 className="text-2xl font-bold text-white mb-3 tracking-tight leading-snug">{course.name}</h1>
         {course.description && <p className="text-white/50 text-sm leading-relaxed">{course.description}</p>}
 
-        {user && (
-          <div className="mt-5 flex items-center gap-2 flex-wrap">
+        <div className="mt-5 flex items-center gap-2 flex-wrap">
             <form action={enrolled
               ? removeCourseFromSchedule.bind(null, course.id)
               : addCourseToSchedule.bind(null, course.id)
@@ -70,7 +69,6 @@ export default async function CourseDetailPage({
               Submit Material
             </Link>
           </div>
-        )}
       </div>
 
       {/* Trending */}
@@ -86,7 +84,7 @@ export default async function CourseDetailPage({
             {trending.map((m, i) => (
               <Link
                 key={m.id}
-                href={user ? `/courses/${slug}/units/${m.unitId}` : '/login'}
+                href={`/courses/${slug}/units/${m.unitId}`}
                 className="glass rounded-xl px-4 py-2.5 flex items-center gap-3 hover:bg-white/[0.06] hover:border-white/[0.12] transition-all group"
               >
                 <span className="text-white/20 text-xs font-bold w-4 shrink-0 tabular-nums">{i + 1}</span>
@@ -123,7 +121,7 @@ export default async function CourseDetailPage({
             {units.map((unit, i) => (
               <Link
                 key={unit.id}
-                href={user ? `/courses/${slug}/units/${unit.id}` : '/login'}
+                href={`/courses/${slug}/units/${unit.id}`}
                 className="animate-fade-up card-hover glass rounded-xl px-5 py-4 flex items-center justify-between transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
                 style={{ animationDelay: `${0.15 + i * 0.055}s` }}
               >
@@ -140,12 +138,6 @@ export default async function CourseDetailPage({
         )}
       </div>
 
-      {!user && (
-        <p className="mt-6 text-white/30 text-sm text-center">
-          <Link href="/login" className="text-violet-400 hover:text-violet-300 transition-colors">Sign in</Link>{' '}
-          to view materials and add this course to your schedule.
-        </p>
-      )}
     </div>
   )
 }
