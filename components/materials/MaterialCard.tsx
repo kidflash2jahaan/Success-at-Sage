@@ -10,7 +10,7 @@ interface Material {
   type: 'note' | 'test'
   contentJson: unknown
   linkUrl: string | null
-  attachmentPath: string | null
+  attachmentPaths: string[]
   viewCount: number
   uploaderName: string
 }
@@ -76,19 +76,20 @@ export default function MaterialCard({
             by {material.uploaderName} · {viewCount} view{viewCount !== 1 ? 's' : ''}
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {material.attachmentPath && (
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          {material.attachmentPaths.map((path, i) => (
             <button
+              key={i}
               type="button"
-              onClick={async e => { e.stopPropagation(); await openAttachment(material.attachmentPath!) }}
+              onClick={async e => { e.stopPropagation(); await openAttachment(path) }}
               className="flex items-center gap-1 text-xs text-emerald-400/70 hover:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-400/20 hover:border-emerald-400/40 transition-colors"
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
-              Attachment
+              {material.attachmentPaths.length > 1 ? `File ${i + 1}` : 'Attachment'}
             </button>
-          )}
+          ))}
           {material.linkUrl && (
             <a
               href={material.linkUrl}

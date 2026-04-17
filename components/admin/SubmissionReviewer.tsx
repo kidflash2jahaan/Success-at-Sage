@@ -11,7 +11,7 @@ interface SubmissionItem {
   type: string
   contentJson: unknown
   linkUrl: string | null
-  attachmentPath: string | null
+  attachmentPaths: string[]
   uploaderName: string
   uploaderEmail: string
   unitTitle: string
@@ -27,7 +27,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
     (item.contentJson as { text?: string } | null)?.text ?? ''
   )
   const [editLinkUrl, setEditLinkUrl] = useState(item.linkUrl ?? '')
-  const [editAttachmentFile, setEditAttachmentFile] = useState<File | null>(null)
+  const [editAttachmentFiles, setEditAttachmentFiles] = useState<File[]>([])
   const [pending, startTransition] = useTransition()
 
   return (
@@ -40,7 +40,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
           </div>
           <div className="flex gap-2 mt-1">
             <span className="text-xs px-2 py-0.5 bg-white/10 rounded-full text-white/60 capitalize">{item.type}</span>
-            {item.attachmentPath && <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full text-emerald-400/70">Attachment</span>}
+            {item.attachmentPaths.length > 0 && <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full text-emerald-400/70">{item.attachmentPaths.length === 1 ? 'Attachment' : `${item.attachmentPaths.length} Attachments`}</span>}
             {item.linkUrl && <span className="text-xs px-2 py-0.5 bg-sky-500/10 rounded-full text-sky-400/70">Link</span>}
           </div>
         </div>
@@ -90,11 +90,10 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 className="glass-input w-full rounded-lg px-3 py-2 text-sm resize-y"
               />
               <div className="flex flex-col gap-1">
-                <span className="text-xs text-white/30">Attachment (optional)</span>
-                {item.attachmentPath && !editAttachmentFile && (
-                  <p className="text-xs text-emerald-400/60 px-1">Existing attachment kept — upload below to replace</p>
+                {item.attachmentPaths.length > 0 && (
+                  <p className="text-xs text-emerald-400/60 px-1">{item.attachmentPaths.length} existing attachment{item.attachmentPaths.length !== 1 ? 's' : ''} kept — upload below to add more</p>
                 )}
-                <FileDropZone file={editAttachmentFile} onChange={setEditAttachmentFile} />
+                <FileDropZone files={editAttachmentFiles} onChange={setEditAttachmentFiles} />
               </div>
               <input
                 value={editLinkUrl}
@@ -108,14 +107,15 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 type="button"
                 disabled={pending}
                 onClick={() => startTransition(async () => {
-                  let attachmentPath: string | undefined = undefined
-                  if (editAttachmentFile) {
-                    const { signedUrl, path } = await getSignedAttachmentUploadUrl(editAttachmentFile.name, item.id)
-                    const res = await fetch(signedUrl, { method: 'PUT', body: editAttachmentFile, headers: { 'Content-Type': editAttachmentFile.type || 'application/octet-stream' } })
+                  const newPaths: string[] = []
+                  for (const file of editAttachmentFiles) {
+                    const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, item.id)
+                    const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
                     if (!res.ok) throw new Error('Attachment upload failed')
-                    attachmentPath = path
+                    newPaths.push(path)
                   }
-                  await adminEditMaterial(item.id, editTitle, editContent, editLinkUrl, attachmentPath)
+                  const allPaths = newPaths.length ? [...item.attachmentPaths, ...newPaths] : undefined
+                  await adminEditMaterial(item.id, editTitle, editContent, editLinkUrl, allPaths)
                   setMode('review')
                 })}
                 className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"

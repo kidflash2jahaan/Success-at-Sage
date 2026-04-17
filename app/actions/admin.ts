@@ -75,7 +75,7 @@ export async function createAdminMaterial(
   type: 'note' | 'test',
   contentText: string,
   linkUrl?: string,
-  attachmentPath?: string,
+  attachmentPaths?: string[],
 ) {
   const admin = await requireAdmin()
   await supabaseAdmin.from('materials').insert({
@@ -87,7 +87,7 @@ export async function createAdminMaterial(
     content_json: contentText.trim() ? { text: contentText.trim() } : null,
     pdf_path: null,
     link_url: linkUrl?.trim() || null,
-    attachment_path: attachmentPath || null,
+    attachment_paths: attachmentPaths?.length ? attachmentPaths : [],
     status: 'approved',
   })
   revalidatePath('/admin/courses')
@@ -126,13 +126,13 @@ export async function updateUnitTitle(unitId: string, title: string) {
   revalidatePath('/admin/courses')
 }
 
-export async function adminEditMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string, attachmentPath?: string) {
+export async function adminEditMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string, attachmentPaths?: string[]) {
   await requireAdmin()
   const updates: Record<string, unknown> = {
     title: title.trim(),
     link_url: linkUrl?.trim() || null,
-    attachment_path: attachmentPath ?? undefined,
   }
+  if (attachmentPaths !== undefined) updates.attachment_paths = attachmentPaths
   if (contentText !== null) updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
   await supabaseAdmin.from('materials').update(updates).eq('id', materialId)
   revalidatePath('/admin/submissions')

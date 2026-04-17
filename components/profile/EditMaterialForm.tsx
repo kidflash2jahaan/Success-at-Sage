@@ -11,18 +11,24 @@ interface Props {
   initialTitle: string
   initialContent: string
   initialLinkUrl: string
-  hasAttachment: boolean
+  initialAttachmentPaths: string[]
   unitTitle: string
   courseName: string
 }
 
-export default function EditMaterialForm({ id, unitId, initialTitle, initialContent, initialLinkUrl, hasAttachment, unitTitle, courseName }: Props) {
+function fileNameFromPath(path: string) {
+  const segment = path.split('/').pop() ?? path
+  // strip leading timestamp like "1234567890-filename.pdf"
+  return segment.replace(/^\d+-/, '')
+}
+
+export default function EditMaterialForm({ id, unitId, initialTitle, initialContent, initialLinkUrl, initialAttachmentPaths, unitTitle, courseName }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState(initialTitle)
   const [content, setContent] = useState(initialContent)
   const [linkUrl, setLinkUrl] = useState(initialLinkUrl)
-  const [attachmentFile, setAttachmentFile] = useState<File | null>(null)
-  const [keepAttachment, setKeepAttachment] = useState(hasAttachment)
+  const [existingPaths, setExistingPaths] = useState<string[]>(initialAttachmentPaths)
+  const [newFiles, setNewFiles] = useState<File[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -32,16 +38,15 @@ export default function EditMaterialForm({ id, unitId, initialTitle, initialCont
     setSaving(true)
     setError('')
     try {
-      let newAttachmentPath: string | null | undefined = undefined
-      if (attachmentFile) {
-        const { signedUrl, path } = await getSignedAttachmentUploadUrl(attachmentFile.name, unitId)
-        const res = await fetch(signedUrl, { method: 'PUT', body: attachmentFile, headers: { 'Content-Type': attachmentFile.type || 'application/octet-stream' } })
+      const uploadedPaths: string[] = []
+      for (const file of newFiles) {
+        const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
+        const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
         if (!res.ok) throw new Error('Attachment upload failed')
-        newAttachmentPath = path
-      } else if (!keepAttachment) {
-        newAttachmentPath = null
+        uploadedPaths.push(path)
       }
-      await editMaterial(id, title, content, linkUrl, newAttachmentPath)
+      const finalPaths = [...existingPaths, ...uploadedPaths]
+      await editMaterial(id, title, content, linkUrl, finalPaths.length ? finalPaths : null)
       router.push('/profile')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -93,23 +98,29 @@ export default function EditMaterialForm({ id, unitId, initialTitle, initialCont
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Attachment <span className="text-white/25 normal-case">(optional)</span></label>
-        {hasAttachment && keepAttachment && !attachmentFile && (
-          <div className="flex items-center justify-between glass rounded-xl px-4 py-2.5">
-            <span className="text-xs text-emerald-400/70">Existing attachment kept</span>
-            <button type="button" onClick={() => setKeepAttachment(false)} className="text-xs text-red-400/60 hover:text-red-400 transition-colors">
-              Remove
-            </button>
+        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Attachments <span className="text-white/25 normal-case">(optional)</span></label>
+        {existingPaths.length > 0 && (
+          <div className="flex flex-col gap-1">
+            {existingPaths.map((path, i) => (
+              <div key={i} className="flex items-center gap-3 glass rounded-xl px-4 py-2.5 border border-white/[0.08]">
+                <svg className="w-4 h-4 text-emerald-400/70 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+                <span className="flex-1 text-white/60 text-sm truncate">{fileNameFromPath(path)}</span>
+                <button
+                  type="button"
+                  onClick={() => setExistingPaths(prev => prev.filter((_, j) => j !== i))}
+                  className="text-white/25 hover:text-red-400/70 transition-colors shrink-0"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
           </div>
         )}
-        {(!hasAttachment || !keepAttachment || attachmentFile) && (
-          <FileDropZone file={attachmentFile} onChange={f => { setAttachmentFile(f); if (f) setKeepAttachment(false) }} />
-        )}
-        {hasAttachment && !keepAttachment && !attachmentFile && (
-          <button type="button" onClick={() => setKeepAttachment(true)} className="text-xs text-white/30 hover:text-white/50 px-1 transition-colors text-left">
-            ← Keep existing attachment
-          </button>
-        )}
+        <FileDropZone files={newFiles} onChange={setNewFiles} label="Add attachments" />
       </div>
 
       <div className="flex flex-col gap-1.5">

@@ -5,7 +5,7 @@ import { getSignedAttachmentUploadUrl } from '@/app/actions/materials'
 import FileDropZone from '@/components/ui/FileDropZone'
 
 interface Unit { id: string; title: string; orderIndex: number }
-interface Material { id: string; title: string; type: string; contentText: string; linkUrl: string; attachmentPath: string }
+interface Material { id: string; title: string; type: string; contentText: string; linkUrl: string; attachmentPaths: string[] }
 
 interface Props {
   courseId: string
@@ -22,14 +22,14 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
   const [newUnitTitle, setNewUnitTitle] = useState('')
   const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null)
   const [addMat, setAddMat] = useState<{ title: string; type: 'note' | 'test'; content: string; linkUrl: string }>({ title: '', type: 'note', content: '', linkUrl: '' })
-  const [addAttachmentFile, setAddAttachmentFile] = useState<File | null>(null)
+  const [addAttachmentFiles, setAddAttachmentFiles] = useState<File[]>([])
   // Material view/edit state
   const [viewingMatId, setViewingMatId] = useState<string | null>(null)
   const [editingMatId, setEditingMatId] = useState<string | null>(null)
   const [editMatTitle, setEditMatTitle] = useState('')
   const [editMatContent, setEditMatContent] = useState('')
   const [editMatLinkUrl, setEditMatLinkUrl] = useState('')
-  const [editMatAttachmentFile, setEditMatAttachmentFile] = useState<File | null>(null)
+  const [editMatAttachmentFiles, setEditMatAttachmentFiles] = useState<File[]>([])
   const [pending, startTransition] = useTransition()
 
   function startEdit(unit: Unit) { setEditingId(unit.id); setEditTitle(unit.title) }
@@ -67,22 +67,22 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
   function handleAddMaterial(unitId: string) {
     if (!addMat.title.trim()) return
     const snap = { ...addMat }
-    const fileSnap = addAttachmentFile
+    const filesSnap = [...addAttachmentFiles]
     setAddMat({ title: '', type: 'note', content: '', linkUrl: '' })
-    setAddAttachmentFile(null)
+    setAddAttachmentFiles([])
     const tempId = `temp-${Date.now()}`
     setUnitMaterials(prev => ({
       ...prev,
-      [unitId]: [...(prev[unitId] ?? []), { id: tempId, title: snap.title.trim(), type: snap.type, contentText: snap.content, linkUrl: snap.linkUrl, attachmentPath: '' }],
+      [unitId]: [...(prev[unitId] ?? []), { id: tempId, title: snap.title.trim(), type: snap.type, contentText: snap.content, linkUrl: snap.linkUrl, attachmentPaths: [] }],
     }))
     startTransition(async () => {
-      let attachmentPath: string | undefined
-      if (fileSnap) {
-        const { signedUrl, path } = await getSignedAttachmentUploadUrl(fileSnap.name, unitId)
-        const res = await fetch(signedUrl, { method: 'PUT', body: fileSnap, headers: { 'Content-Type': fileSnap.type || 'application/octet-stream' } })
-        if (res.ok) attachmentPath = path
+      const attachmentPaths: string[] = []
+      for (const file of filesSnap) {
+        const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
+        const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
+        if (res.ok) attachmentPaths.push(path)
       }
-      await createAdminMaterial(unitId, snap.title, snap.type, snap.content, snap.linkUrl, attachmentPath)
+      await createAdminMaterial(unitId, snap.title, snap.type, snap.content, snap.linkUrl, attachmentPaths.length ? attachmentPaths : undefined)
     })
   }
 
@@ -92,12 +92,12 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
     setEditMatTitle(m.title)
     setEditMatContent(m.contentText)
     setEditMatLinkUrl(m.linkUrl)
-    setEditMatAttachmentFile(null)
+    setEditMatAttachmentFiles([])
   }
 
   function handleSaveMat(unitId: string, mat: Material) {
     if (!editMatTitle.trim()) return
-    const fileSnap = editMatAttachmentFile
+    const filesSnap = [...editMatAttachmentFiles]
     setUnitMaterials(prev => ({
       ...prev,
       [unitId]: (prev[unitId] ?? []).map(m => m.id === mat.id
@@ -105,15 +105,16 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
         : m),
     }))
     setEditingMatId(null)
-    setEditMatAttachmentFile(null)
+    setEditMatAttachmentFiles([])
     startTransition(async () => {
-      let attachmentPath: string | undefined
-      if (fileSnap) {
-        const { signedUrl, path } = await getSignedAttachmentUploadUrl(fileSnap.name, unitId)
-        const res = await fetch(signedUrl, { method: 'PUT', body: fileSnap, headers: { 'Content-Type': fileSnap.type || 'application/octet-stream' } })
-        if (res.ok) attachmentPath = path
+      const newPaths: string[] = []
+      for (const file of filesSnap) {
+        const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
+        const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
+        if (res.ok) newPaths.push(path)
       }
-      await adminEditMaterial(mat.id, editMatTitle, editMatContent, editMatLinkUrl, attachmentPath)
+      const allPaths = newPaths.length ? [...mat.attachmentPaths, ...newPaths] : undefined
+      await adminEditMaterial(mat.id, editMatTitle, editMatContent, editMatLinkUrl, allPaths)
     })
   }
 
@@ -237,10 +238,10 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
                             className="glass-input w-full rounded-lg px-2 py-1 text-xs resize-y"
                           />
                           <div className="flex flex-col gap-1">
-                            {m.attachmentPath && !editMatAttachmentFile && (
-                              <p className="text-xs text-emerald-400/60 px-1">Existing attachment kept — upload below to replace</p>
+                            {m.attachmentPaths.length > 0 && (
+                              <p className="text-xs text-emerald-400/60 px-1">{m.attachmentPaths.length} existing attachment{m.attachmentPaths.length !== 1 ? 's' : ''} kept — upload below to add more</p>
                             )}
-                            <FileDropZone file={editMatAttachmentFile} onChange={setEditMatAttachmentFile} label="Attachment (optional)" />
+                            <FileDropZone files={editMatAttachmentFiles} onChange={setEditMatAttachmentFiles} label="Attachments (optional)" />
                           </div>
                           <input
                             value={editMatLinkUrl}
@@ -278,7 +279,7 @@ export default function AdminCourseCard({ courseId, courseName, units: initialUn
                       placeholder="Content (optional)..."
                       rows={3}
                       className="glass-input w-full rounded-lg px-3 py-1.5 text-xs resize-none" />
-                    <FileDropZone file={addAttachmentFile} onChange={setAddAttachmentFile} label="Attachment (optional)" />
+                    <FileDropZone files={addAttachmentFiles} onChange={setAddAttachmentFiles} label="Attachments (optional)" />
                     <input value={addMat.linkUrl} onChange={e => setAddMat(p => ({ ...p, linkUrl: e.target.value }))}
                       placeholder="Link URL (optional)..."
                       className="glass-input w-full rounded-lg px-3 py-1.5 text-xs" />

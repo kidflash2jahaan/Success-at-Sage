@@ -26,7 +26,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
   const [type, setType] = useState<'note' | 'test'>('note')
   const [contentText, setContentText] = useState('')
   const [linkUrl, setLinkUrl] = useState('')
-  const [attachmentFile, setAttachmentFile] = useState<File | null>(null)
+  const [attachmentFiles, setAttachmentFiles] = useState<File[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -85,12 +85,12 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         unitId = await submitNewUnit(selectedCourse.id, newUnitTitle)
       }
 
-      let attachmentPath: string | undefined
-      if (attachmentFile) {
-        const { signedUrl, path } = await getSignedAttachmentUploadUrl(attachmentFile.name, unitId)
-        const res = await fetch(signedUrl, { method: 'PUT', body: attachmentFile, headers: { 'Content-Type': attachmentFile.type || 'application/octet-stream' } })
+      const attachmentPaths: string[] = []
+      for (const file of attachmentFiles) {
+        const { signedUrl, path } = await getSignedAttachmentUploadUrl(file.name, unitId)
+        const res = await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type || 'application/octet-stream' } })
         if (!res.ok) throw new Error('Attachment upload failed')
-        attachmentPath = path
+        attachmentPaths.push(path)
       }
 
       await submitMaterial({
@@ -99,7 +99,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         type,
         contentText,
         linkUrl: linkUrl || undefined,
-        attachmentPath,
+        attachmentPaths: attachmentPaths.length ? attachmentPaths : undefined,
       })
 
       router.push('/profile')
@@ -250,7 +250,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         />
       </div>
 
-      <FileDropZone file={attachmentFile} onChange={setAttachmentFile} />
+      <FileDropZone files={attachmentFiles} onChange={setAttachmentFiles} />
 
       {/* Link */}
       <div className="flex flex-col gap-1.5">

@@ -52,7 +52,7 @@ export async function submitMaterial(input: {
   type: 'note' | 'test'
   contentText: string
   linkUrl?: string
-  attachmentPath?: string
+  attachmentPaths?: string[]
 }) {
   const user = await requireUser()
 
@@ -69,7 +69,7 @@ export async function submitMaterial(input: {
     pdf_path: null,
     content_json: input.contentText.trim() ? { text: input.contentText.trim() } : null,
     link_url: input.linkUrl?.trim() || null,
-    attachment_path: input.attachmentPath || null,
+    attachment_paths: input.attachmentPaths?.length ? input.attachmentPaths : [],
     status: 'pending',
   })
 
@@ -88,7 +88,7 @@ export async function submitMaterial(input: {
   revalidatePath('/profile')
 }
 
-export async function editMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string, attachmentPath?: string | null) {
+export async function editMaterial(materialId: string, title: string, contentText: string | null, linkUrl?: string, attachmentPaths?: string[] | null) {
   const user = await requireUser()
   const { data: material } = await supabaseAdmin
     .from('materials').select('id, uploaded_by, status').eq('id', materialId).single()
@@ -106,7 +106,7 @@ export async function editMaterial(materialId: string, title: string, contentTex
     rejection_note: null,
     link_url: linkUrl?.trim() || null,
   }
-  if (attachmentPath !== undefined) updates.attachment_path = attachmentPath
+  if (attachmentPaths !== undefined) updates.attachment_paths = attachmentPaths ?? []
   if (contentText !== null)
     updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
   await supabaseAdmin.from('materials').update(updates).eq('id', materialId)

@@ -15,7 +15,7 @@ export default async function EditMaterialPage({
 
   const { data: material } = await supabaseAdmin
     .from('materials')
-    .select('id, title, content_json, link_url, attachment_path, unit_id, uploaded_by, units(title, courses(name))')
+    .select('id, title, content_json, link_url, attachment_paths, unit_id, uploaded_by, units(title, courses(name))')
     .eq('id', id)
     .single()
 
@@ -30,7 +30,7 @@ export default async function EditMaterialPage({
         initialTitle={(material as any).title}
         initialContent={((material as any).content_json as { text?: string } | null)?.text ?? ''}
         initialLinkUrl={(material as any).link_url ?? ''}
-        hasAttachment={!!(material as any).attachment_path}
+        initialAttachmentPaths={(material as any).attachment_paths ?? []}
         unitTitle={(material as any).units?.title ?? ''}
         courseName={(material as any).units?.courses?.name ?? ''}
       />
