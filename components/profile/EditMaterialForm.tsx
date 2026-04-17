@@ -90,12 +90,12 @@ export default function EditMaterialForm({
 
       {/* Mode toggle */}
       <div className="flex gap-2 p-1 glass rounded-xl">
-        {(['typed', 'paper'] as const).map(m => (
+        {(['paper', 'typed'] as const).map(m => (
           <button key={m} type="button" onClick={() => setMode(m)}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
               mode === m ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'
             }`}>
-            {m === 'typed' ? '✏️ Typed' : '📄 Paper (PDF)'}
+            {m === 'typed' ? 'Typed' : 'Paper (PDF)'}
           </button>
         ))}
       </div>
