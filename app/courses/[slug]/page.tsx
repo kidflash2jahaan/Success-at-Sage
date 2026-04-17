@@ -17,7 +17,7 @@ export default async function CourseDetailPage({
   const data = await getCourseWithUnits(slug)
   if (!data) notFound()
 
-  const { course, department, units } = data
+  const { course, department, units, totalMaterials } = data
   const [user, trending] = await Promise.all([
     getCurrentUser(),
     getTrendingMaterialsForCourse(course.id, 5),
@@ -117,7 +117,11 @@ export default async function CourseDetailPage({
       <div>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-sm font-semibold uppercase tracking-widest text-white/40">Units</h2>
-          <span className="text-xs text-white/25">{units.length}</span>
+          <div className="flex items-center gap-2 text-xs text-white/25">
+            <span>{units.length} unit{units.length !== 1 ? 's' : ''}</span>
+            <span className="text-white/15">·</span>
+            <span>{totalMaterials} material{totalMaterials !== 1 ? 's' : ''}</span>
+          </div>
         </div>
         {units.length === 0 ? (
           <div className="glass rounded-xl px-5 py-8 text-center text-white/25 text-sm">
@@ -133,8 +137,8 @@ export default async function CourseDetailPage({
                 style={{ animationDelay: `${0.15 + i * 0.055}s` }}
               >
                 <span className="text-white/80 text-sm font-medium group-hover:text-white transition-colors">{unit.title}</span>
-                <span className="text-white/25 text-xs group-hover:text-white/50 transition-colors flex items-center gap-1">
-                  View
+                <span className="text-white/25 text-xs group-hover:text-white/50 transition-colors flex items-center gap-2">
+                  <span>{unit.materialCount} material{unit.materialCount !== 1 ? 's' : ''}</span>
                   <svg className="w-3 h-3 translate-x-0 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>

@@ -1,9 +1,29 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export async function getAllDepartmentsWithCourses() {
-  const { data } = await supabaseAdmin
-    .from('departments')
-    .select('*, courses(*)')
+  const [{ data }, { data: unitData }, { data: materialData }] = await Promise.all([
+    supabaseAdmin.from('departments').select('*, courses(*)'),
+    supabaseAdmin.from('units').select('id, course_id').eq('status', 'approved'),
+    supabaseAdmin.from('materials').select('id, unit_id').eq('status', 'approved'),
+  ])
+
+  // Build lookup maps
+  const unitsByCourse: Record<string, Set<string>> = {}
+  for (const u of (unitData ?? []) as any[]) {
+    if (!unitsByCourse[u.course_id]) unitsByCourse[u.course_id] = new Set()
+    unitsByCourse[u.course_id].add(u.id)
+  }
+  const materialsByUnit: Record<string, number> = {}
+  for (const m of (materialData ?? []) as any[]) {
+    materialsByUnit[m.unit_id] = (materialsByUnit[m.unit_id] ?? 0) + 1
+  }
+  const materialsByCourse: Record<string, number> = {}
+  for (const [courseId, unitIds] of Object.entries(unitsByCourse)) {
+    let count = 0
+    for (const uid of unitIds) count += materialsByUnit[uid] ?? 0
+    materialsByCourse[courseId] = count
+  }
+
   return (data ?? []).map((d: any) => ({
     id: d.id as string,
     name: d.name as string,
@@ -15,6 +35,8 @@ export async function getAllDepartmentsWithCourses() {
       slug: c.slug as string,
       description: c.description as string,
       departmentId: c.department_id as string,
+      unitCount: unitsByCourse[c.id]?.size ?? 0,
+      materialCount: materialsByCourse[c.id] ?? 0,
     })),
   }))
 }
@@ -43,14 +65,30 @@ export async function getCourseWithUnits(slug: string) {
     .single()
   if (!data) return null
   const dept = data.departments as any
-  const units = ((data.units as any[]) ?? [])
-    .filter((u: any) => u.status === 'approved')
+  const approvedUnits = ((data.units as any[]) ?? []).filter((u: any) => u.status === 'approved')
+
+  // Fetch approved material counts per unit for this course
+  const unitIds = approvedUnits.map((u: any) => u.id)
+  const { data: materialData } = unitIds.length
+    ? await supabaseAdmin.from('materials').select('id, unit_id').eq('status', 'approved').in('unit_id', unitIds)
+    : { data: [] }
+
+  const materialCountByUnit: Record<string, number> = {}
+  for (const m of (materialData ?? []) as any[]) {
+    materialCountByUnit[m.unit_id] = (materialCountByUnit[m.unit_id] ?? 0) + 1
+  }
+
+  const units = approvedUnits
     .map((u: any) => ({
       id: u.id as string,
       title: u.title as string,
       courseId: u.course_id as string,
+      materialCount: materialCountByUnit[u.id] ?? 0,
     }))
     .sort((a, b) => a.title.localeCompare(b.title))
+
+  const totalMaterials = units.reduce((sum, u) => sum + u.materialCount, 0)
+
   return {
     course: {
       id: data.id as string,
@@ -66,6 +104,7 @@ export async function getCourseWithUnits(slug: string) {
       colorAccent: dept.color_accent as string,
     },
     units,
+    totalMaterials,
   }
 }
 
@@ -80,10 +119,31 @@ export async function isUserEnrolled(userId: string, courseId: string) {
 }
 
 export async function getUserCourses(userId: string) {
-  const { data } = await supabaseAdmin
-    .from('user_courses')
-    .select('courses(id, name, slug, description, department_id, departments(id, name, slug, color_accent))')
-    .eq('user_id', userId)
+  const [{ data }, { data: unitData }, { data: materialData }] = await Promise.all([
+    supabaseAdmin
+      .from('user_courses')
+      .select('courses(id, name, slug, description, department_id, departments(id, name, slug, color_accent))')
+      .eq('user_id', userId),
+    supabaseAdmin.from('units').select('id, course_id').eq('status', 'approved'),
+    supabaseAdmin.from('materials').select('id, unit_id').eq('status', 'approved'),
+  ])
+
+  const unitsByCourse: Record<string, Set<string>> = {}
+  for (const u of (unitData ?? []) as any[]) {
+    if (!unitsByCourse[u.course_id]) unitsByCourse[u.course_id] = new Set()
+    unitsByCourse[u.course_id].add(u.id)
+  }
+  const materialsByUnit: Record<string, number> = {}
+  for (const m of (materialData ?? []) as any[]) {
+    materialsByUnit[m.unit_id] = (materialsByUnit[m.unit_id] ?? 0) + 1
+  }
+  const materialsByCourse: Record<string, number> = {}
+  for (const [courseId, unitIds] of Object.entries(unitsByCourse)) {
+    let count = 0
+    for (const uid of unitIds) count += materialsByUnit[uid] ?? 0
+    materialsByCourse[courseId] = count
+  }
+
   return (data ?? []).map((row: any) => {
     const c = row.courses
     const d = c.departments
@@ -94,6 +154,8 @@ export async function getUserCourses(userId: string) {
         slug: c.slug as string,
         description: c.description as string,
         departmentId: c.department_id as string,
+        unitCount: unitsByCourse[c.id]?.size ?? 0,
+        materialCount: materialsByCourse[c.id] ?? 0,
       },
       department: {
         id: d.id as string,

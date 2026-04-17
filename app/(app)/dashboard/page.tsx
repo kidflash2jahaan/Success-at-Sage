@@ -60,11 +60,10 @@ export default async function DashboardPage() {
               </div>
             </div>
             <div className="text-white font-semibold leading-snug group-hover:text-white/90">{course.name}</div>
-            <div className="mt-3 text-xs text-white/30 group-hover:text-white/50 transition-colors flex items-center gap-1">
-              View units
-              <svg className="w-3 h-3 translate-x-0 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-[11px] text-white/25">{course.unitCount} unit{course.unitCount !== 1 ? 's' : ''}</span>
+              <span className="text-white/15 text-[11px]">·</span>
+              <span className="text-[11px] text-white/25">{course.materialCount} material{course.materialCount !== 1 ? 's' : ''}</span>
             </div>
           </Link>
         ))}

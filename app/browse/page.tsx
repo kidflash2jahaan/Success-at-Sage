@@ -39,8 +39,13 @@ export default async function BrowsePage() {
                   <div className="text-xs font-semibold uppercase tracking-widest mb-1.5" style={{ color: dept.colorAccent }}>
                     {dept.name}
                   </div>
-                  <div className="text-white/90 text-sm font-medium leading-snug group-hover:text-white transition-colors">
+                  <div className="text-white/90 text-sm font-medium leading-snug group-hover:text-white transition-colors mb-2">
                     {course.name}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-white/25">{(course as any).unitCount} unit{(course as any).unitCount !== 1 ? 's' : ''}</span>
+                    <span className="text-white/15 text-[10px]">·</span>
+                    <span className="text-[10px] text-white/25">{(course as any).materialCount} material{(course as any).materialCount !== 1 ? 's' : ''}</span>
                   </div>
                 </Link>
               ))}
