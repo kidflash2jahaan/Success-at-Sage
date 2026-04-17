@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { submitMaterial, submitNewUnit } from '@/app/actions/materials'
 import { uploadFileWithTUS, uploadPdfWithTUS } from '@/lib/storage/upload'
+import { imagesToPdf, isPdfFile } from '@/lib/utils/imagesToPdf'
 import FileDropZone from '@/components/ui/FileDropZone'
 import PdfDropZone from '@/components/ui/PdfDropZone'
 import { useRouter } from 'next/navigation'
@@ -28,7 +29,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
   const [title, setTitle] = useState('')
   const [contentText, setContentText] = useState('')
   const [attachmentFiles, setAttachmentFiles] = useState<File[]>([])
-  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [pdfFiles, setPdfFiles] = useState<File[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -88,8 +89,11 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
       }
 
       if (mode === 'paper') {
-        if (!pdfFile) throw new Error('Please select a PDF file.')
-        const pdfPath = await uploadPdfWithTUS(pdfFile, unitId)
+        if (pdfFiles.length === 0) throw new Error('Please select a PDF or photos.')
+        const fileToUpload = pdfFiles.length === 1 && isPdfFile(pdfFiles[0])
+          ? pdfFiles[0]
+          : await imagesToPdf(pdfFiles)
+        const pdfPath = await uploadPdfWithTUS(fileToUpload, unitId)
         await submitMaterial({ unitId, title, type: 'note', contentType: 'pdf', contentText: '', pdfPath })
       } else {
         const attachmentPaths: string[] = []
@@ -257,13 +261,13 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
       ) : (
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-white/50 uppercase tracking-wider">PDF File <span className="text-rose-400/60 normal-case">required</span></label>
-          <PdfDropZone file={pdfFile} onChange={setPdfFile} />
+          <PdfDropZone files={pdfFiles} onChange={setPdfFiles} />
         </div>
       )}
 
       <button
         type="submit"
-        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title || (mode === 'paper' && !pdfFile)}
+        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title || (mode === 'paper' && pdfFiles.length === 0)}
         className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
       >
         {submitting ? 'Submitting...' : 'Submit for Review'}

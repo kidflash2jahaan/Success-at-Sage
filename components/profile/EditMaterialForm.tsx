@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { editMaterial } from '@/app/actions/materials'
 import { uploadFileWithTUS, uploadPdfWithTUS } from '@/lib/storage/upload'
+import { imagesToPdf, isPdfFile } from '@/lib/utils/imagesToPdf'
 import FileDropZone from '@/components/ui/FileDropZone'
 import PdfDropZone from '@/components/ui/PdfDropZone'
 import Link from 'next/link'
@@ -35,7 +36,7 @@ export default function EditMaterialForm({
   const [content, setContent] = useState(initialContent)
   const [existingPaths, setExistingPaths] = useState<string[]>(initialAttachmentPaths)
   const [newFiles, setNewFiles] = useState<File[]>([])
-  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [pdfFiles, setPdfFiles] = useState<File[]>([])
   const [keepExistingPdf] = useState(!!initialPdfPath)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -43,12 +44,18 @@ export default function EditMaterialForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!title.trim()) return
-    if (mode === 'paper' && !pdfFile && !keepExistingPdf) return
+    if (mode === 'paper' && pdfFiles.length === 0 && !keepExistingPdf) return
     setSaving(true)
     setError('')
     try {
       if (mode === 'paper') {
-        const pdfPath = pdfFile ? await uploadPdfWithTUS(pdfFile, unitId) : initialPdfPath
+        let pdfPath = initialPdfPath
+        if (pdfFiles.length > 0) {
+          const fileToUpload = pdfFiles.length === 1 && isPdfFile(pdfFiles[0])
+            ? pdfFiles[0]
+            : await imagesToPdf(pdfFiles)
+          pdfPath = await uploadPdfWithTUS(fileToUpload, unitId)
+        }
         await editMaterial(id, title, 'note', 'pdf', null, pdfPath, undefined, null)
       } else {
         const uploadedPaths: string[] = []
@@ -151,8 +158,8 @@ export default function EditMaterialForm({
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-medium text-white/50 uppercase tracking-wider">PDF File</label>
           <PdfDropZone
-            file={pdfFile}
-            onChange={setPdfFile}
+            files={pdfFiles}
+            onChange={setPdfFiles}
             existingFileName={initialPdfPath ? fileNameFromPath(initialPdfPath) : undefined}
           />
         </div>
@@ -161,7 +168,7 @@ export default function EditMaterialForm({
       <div className="flex gap-3">
         <button
           type="submit"
-          disabled={saving || !title.trim() || (mode === 'paper' && !pdfFile && !initialPdfPath)}
+          disabled={saving || !title.trim() || (mode === 'paper' && pdfFiles.length === 0 && !initialPdfPath)}
           className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
         >
           {saving ? 'Saving...' : 'Save & Resubmit'}
