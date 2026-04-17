@@ -28,10 +28,8 @@ export default async function EditMaterialPage({
         id={(material as any).id}
         unitId={(material as any).unit_id}
         initialTitle={(material as any).title}
-        initialType={(material as any).type === 'test' ? 'test' : 'note'}
         initialContentType={(material as any).content_type === 'pdf' ? 'pdf' : 'richtext'}
         initialContent={((material as any).content_json as { text?: string } | null)?.text ?? ''}
-        initialLinkUrl={(material as any).link_url ?? ''}
         initialAttachmentPaths={(material as any).attachment_paths ?? []}
         initialPdfPath={(material as any).pdf_path ?? null}
         unitTitle={(material as any).units?.title ?? ''}

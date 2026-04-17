@@ -77,7 +77,7 @@ export default function MaterialCard({
         onClick={handleOpen}
         className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.04] transition-colors"
       >
-        <div>
+        <div className="min-w-0">
           <div className="text-white/90 font-medium text-sm">{material.title}</div>
           <div className="text-white/30 text-xs mt-0.5">
             by {material.uploaderName} · {viewCount} view{viewCount !== 1 ? 's' : ''}

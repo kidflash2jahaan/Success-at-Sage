@@ -32,12 +32,11 @@ interface SubmissionItem {
   courseName: string
 }
 
-export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
+export default function SubmissionReviewer({ item, onIgnoreUser }: { item: SubmissionItem; onIgnoreUser?: () => void }) {
   const [expanded, setExpanded] = useState(false)
   const [mode, setMode] = useState<'review' | 'reject' | 'edit'>('review')
   const [note, setNote] = useState('')
   const [editTitle, setEditTitle] = useState(item.title)
-  const [editType, setEditType] = useState<'note' | 'test'>(item.type === 'test' ? 'test' : 'note')
   const [editContent, setEditContent] = useState(
     (item.contentJson as { text?: string } | null)?.text ?? ''
   )
@@ -54,15 +53,21 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
             {item.courseName} · {item.unitTitle} · by {item.uploaderName}
           </div>
           <div className="flex gap-2 mt-1">
-            <span className="text-xs px-2 py-0.5 bg-white/10 rounded-full text-white/60 capitalize">{item.type}</span>
             {item.contentType === 'pdf' && <span className="text-xs px-2 py-0.5 bg-rose-500/10 rounded-full text-rose-400/70">PDF</span>}
             {item.contentType !== 'pdf' && item.attachmentPaths.length > 0 && <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full text-emerald-400/70">{item.attachmentPaths.length === 1 ? 'Attachment' : `${item.attachmentPaths.length} Attachments`}</span>}
             {item.linkUrl && <span className="text-xs px-2 py-0.5 bg-sky-500/10 rounded-full text-sky-400/70">Link</span>}
           </div>
         </div>
-        <button type="button" onClick={() => setExpanded(e => !e)} className="text-violet-400 hover:text-violet-300 text-sm shrink-0 transition-colors">
-          {expanded ? 'Hide' : 'Preview'}
-        </button>
+        <div className="flex items-center gap-3 shrink-0">
+          {onIgnoreUser && (
+            <button type="button" onClick={onIgnoreUser} className="text-white/20 hover:text-white/50 text-xs transition-colors" title="Hide all from this user">
+              Ignore user
+            </button>
+          )}
+          <button type="button" onClick={() => setExpanded(e => !e)} className="text-violet-400 hover:text-violet-300 text-sm transition-colors">
+            {expanded ? 'Hide' : 'Preview'}
+          </button>
+        </div>
       </div>
 
       {expanded && (
@@ -133,18 +138,6 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                 placeholder="Title"
                 className="glass-input w-full rounded-lg px-3 py-2 text-sm"
               />
-              <div className="flex gap-2">
-                {(['note', 'test'] as const).map(t => (
-                  <button key={t} type="button" onClick={() => setEditType(t)}
-                    className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                      editType === t
-                        ? 'bg-violet-600 border-violet-600 text-white'
-                        : 'glass text-white/50 hover:text-white'
-                    }`}>
-                    {t === 'note' ? 'Study Note' : 'Practice Test'}
-                  </button>
-                ))}
-              </div>
               <textarea
                 value={editContent}
                 onChange={e => setEditContent(e.target.value)}
@@ -176,7 +169,7 @@ export default function SubmissionReviewer({ item }: { item: SubmissionItem }) {
                     newPaths.push(path)
                   }
                   const allPaths = newPaths.length ? [...item.attachmentPaths, ...newPaths] : undefined
-                  await adminEditMaterial(item.id, editTitle, editType, editContent, editLinkUrl, allPaths)
+                  await adminEditMaterial(item.id, editTitle, 'note', editContent, editLinkUrl, allPaths)
                   setMode('review')
                 })}
                 className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"

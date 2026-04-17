@@ -10,10 +10,8 @@ interface Props {
   id: string
   unitId: string
   initialTitle: string
-  initialType: 'note' | 'test'
   initialContentType: 'richtext' | 'pdf'
   initialContent: string
-  initialLinkUrl: string
   initialAttachmentPaths: string[]
   initialPdfPath: string | null
   unitTitle: string
@@ -26,16 +24,14 @@ function fileNameFromPath(path: string) {
 }
 
 export default function EditMaterialForm({
-  id, unitId, initialTitle, initialType, initialContentType,
-  initialContent, initialLinkUrl, initialAttachmentPaths, initialPdfPath,
+  id, unitId, initialTitle, initialContentType,
+  initialContent, initialAttachmentPaths, initialPdfPath,
   unitTitle, courseName,
 }: Props) {
   const router = useRouter()
   const [mode, setMode] = useState<'typed' | 'paper'>(initialContentType === 'pdf' ? 'paper' : 'typed')
   const [title, setTitle] = useState(initialTitle)
-  const [type, setType] = useState<'note' | 'test'>(initialType)
   const [content, setContent] = useState(initialContent)
-  const [linkUrl, setLinkUrl] = useState(initialLinkUrl)
   const [existingPaths, setExistingPaths] = useState<string[]>(initialAttachmentPaths)
   const [newFiles, setNewFiles] = useState<File[]>([])
   const [pdfFile, setPdfFile] = useState<File | null>(null)
@@ -52,7 +48,7 @@ export default function EditMaterialForm({
     try {
       if (mode === 'paper') {
         const pdfPath = pdfFile ? await uploadPdfWithTUS(pdfFile, unitId) : initialPdfPath
-        await editMaterial(id, title, type, 'pdf', null, pdfPath, undefined, null)
+        await editMaterial(id, title, 'note', 'pdf', null, pdfPath, undefined, null)
       } else {
         const uploadedPaths: string[] = []
         for (const file of newFiles) {
@@ -60,7 +56,7 @@ export default function EditMaterialForm({
           uploadedPaths.push(path)
         }
         const finalPaths = [...existingPaths, ...uploadedPaths]
-        await editMaterial(id, title, type, 'richtext', content, null, linkUrl, finalPaths.length ? finalPaths : null)
+        await editMaterial(id, title, 'note', 'richtext', content, null, undefined, finalPaths.length ? finalPaths : null)
       }
       router.push('/profile')
     } catch (err) {
@@ -114,20 +110,6 @@ export default function EditMaterialForm({
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Type</label>
-        <div className="flex gap-2">
-          {(['note', 'test'] as const).map(t => (
-            <button key={t} type="button" onClick={() => setType(t)}
-              className={`btn-press flex-1 py-2 rounded-xl text-sm font-medium border transition-all ${
-                type === t ? 'bg-violet-600 border-violet-600 text-white' : 'glass text-white/60 hover:text-white'
-              }`}>
-              {t === 'note' ? 'Study Note' : 'Practice Test'}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {mode === 'typed' ? (
         <>
           <div className="flex flex-col gap-1.5">
@@ -163,17 +145,6 @@ export default function EditMaterialForm({
             <FileDropZone files={newFiles} onChange={setNewFiles} label="Add attachments" />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Link <span className="text-white/25 normal-case">(optional)</span></label>
-            <input
-              value={linkUrl}
-              onChange={e => setLinkUrl(e.target.value)}
-              type="url"
-              placeholder="https://..."
-              className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-            />
-            <p className="text-xs text-white/25 px-1">Attach a relevant URL — a video, article, or website.</p>
-          </div>
         </>
       ) : (
         <div className="flex flex-col gap-1.5">

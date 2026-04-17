@@ -90,15 +90,6 @@ export default async function CourseDetailPage({
                 className="glass rounded-xl px-4 py-2.5 flex items-center gap-3 hover:bg-white/[0.06] hover:border-white/[0.12] transition-all group"
               >
                 <span className="text-white/20 text-xs font-bold w-4 shrink-0 tabular-nums">{i + 1}</span>
-                <span
-                  className="shrink-0 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded"
-                  style={{
-                    background: m.type === 'note' ? 'rgba(124,58,237,0.2)' : 'rgba(251,191,36,0.15)',
-                    color: m.type === 'note' ? '#a78bfa' : '#fbbf24',
-                  }}
-                >
-                  {m.type === 'note' ? 'Note' : 'Test'}
-                </span>
                 <span className="flex-1 text-white/70 text-sm truncate group-hover:text-white transition-colors">{m.title}</span>
                 <span className="text-white/25 text-xs shrink-0 flex items-center gap-1">
                   <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">

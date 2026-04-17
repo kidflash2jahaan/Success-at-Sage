@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import SubmissionReviewer from '@/components/admin/SubmissionReviewer'
+import MaterialsReviewList from '@/components/admin/MaterialsReviewList'
 import UnitReviewer from '@/components/admin/UnitReviewer'
 
 export default async function SubmissionsPage() {
@@ -77,8 +77,8 @@ export default async function SubmissionsPage() {
           <h2 className="text-xs font-semibold uppercase tracking-widest text-white/40 mb-4">
             Materials — {pending.length}
           </h2>
-          <div className="flex flex-col gap-4 max-w-3xl">
-            {pending.map(item => <SubmissionReviewer key={item.id} item={item} />)}
+          <div className="max-w-3xl">
+            <MaterialsReviewList items={pending} />
           </div>
         </div>
       )}

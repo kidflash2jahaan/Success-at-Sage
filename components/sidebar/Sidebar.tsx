@@ -93,15 +93,6 @@ export default function Sidebar({ activeCourseSlug, onClose }: SidebarProps) {
               onClick={onClose}
               className="sidebar-nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all text-white/50 hover:text-white hover:bg-white/[0.04]"
             >
-              <span
-                className="shrink-0 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded"
-                style={{
-                  background: m.type === 'note' ? 'rgba(124,58,237,0.2)' : 'rgba(251,191,36,0.15)',
-                  color: m.type === 'note' ? '#a78bfa' : '#fbbf24',
-                }}
-              >
-                {m.type === 'note' ? 'Note' : 'Test'}
-              </span>
               <span className="truncate leading-snug">{m.title}</span>
             </Link>
           ))

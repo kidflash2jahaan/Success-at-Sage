@@ -25,9 +25,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
 
   const [mode, setMode] = useState<'typed' | 'paper'>('typed')
   const [title, setTitle] = useState('')
-  const [type, setType] = useState<'note' | 'test'>('note')
   const [contentText, setContentText] = useState('')
-  const [linkUrl, setLinkUrl] = useState('')
   const [attachmentFiles, setAttachmentFiles] = useState<File[]>([])
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -91,7 +89,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
       if (mode === 'paper') {
         if (!pdfFile) throw new Error('Please select a PDF file.')
         const pdfPath = await uploadPdfWithTUS(pdfFile, unitId)
-        await submitMaterial({ unitId, title, type, contentType: 'pdf', contentText: '', pdfPath })
+        await submitMaterial({ unitId, title, type: 'note', contentType: 'pdf', contentText: '', pdfPath })
       } else {
         const attachmentPaths: string[] = []
         for (const file of attachmentFiles) {
@@ -101,10 +99,9 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         await submitMaterial({
           unitId,
           title,
-          type,
+          type: 'note',
           contentType: 'richtext',
           contentText,
-          linkUrl: linkUrl || undefined,
           attachmentPaths: attachmentPaths.length ? attachmentPaths : undefined,
         })
       }
@@ -240,23 +237,6 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         />
       </div>
 
-      {/* Type */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Type</label>
-        <div className="flex gap-2">
-          {(['note', 'test'] as const).map(t => (
-            <button key={t} type="button" onClick={() => setType(t)}
-              className={`btn-press flex-1 py-2 rounded-xl text-sm font-medium border transition-all ${
-                type === t
-                  ? 'bg-violet-600 border-violet-600 text-white'
-                  : 'glass text-white/60 hover:text-white'
-              }`}>
-              {t === 'note' ? 'Study Note' : 'Practice Test'}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {mode === 'typed' ? (
         <>
           {/* Content */}
@@ -272,19 +252,6 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
           </div>
 
           <FileDropZone files={attachmentFiles} onChange={setAttachmentFiles} />
-
-          {/* Link */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-white/50 uppercase tracking-wider">Link <span className="text-white/25 normal-case">(optional)</span></label>
-            <input
-              value={linkUrl}
-              onChange={e => setLinkUrl(e.target.value)}
-              type="url"
-              placeholder="https://..."
-              className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-            />
-            <p className="text-xs text-white/25 px-1">Attach a relevant URL — a video, article, or website.</p>
-          </div>
         </>
       ) : (
         <div className="flex flex-col gap-1.5">
