@@ -25,7 +25,7 @@ export default function PdfViewer({ pdfPath }: { pdfPath: string }) {
   )
 
   return (
-    <div className="w-full" style={{ height: '70vh' }}>
+    <div className="w-full" style={{ height: '80vh' }}>
       <iframe
         src={`${url}#toolbar=1&navpanes=0`}
         className="w-full h-full border-0"
