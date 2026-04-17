@@ -42,7 +42,7 @@ export default function DashboardShell({ courses, userName, isAdmin, children }:
           {children}
         </main>
       </div>
-      <MobileNav isAdmin={isAdmin} />
+      <MobileNav />
     </div>
   )
 }
