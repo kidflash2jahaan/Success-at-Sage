@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import TopNav from '@/components/nav/TopNav'
 import Sidebar from '@/components/sidebar/Sidebar'
 import SidebarDrawer from '@/components/sidebar/SidebarDrawer'
+import MobileNav from '@/components/nav/MobileNav'
 
 interface Course {
   id: string
@@ -37,10 +38,11 @@ export default function DashboardShell({ courses, userName, isAdmin, children }:
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
         />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
           {children}
         </main>
       </div>
+      <MobileNav isAdmin={isAdmin} />
     </div>
   )
 }

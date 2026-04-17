@@ -26,10 +26,19 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
   }
 
   return (
-    <header className="animate-fade-in-down glass-nav h-14 flex items-center px-4 gap-4 shrink-0 sticky top-0 z-10">
+    <header
+      className="animate-fade-in-down glass-nav flex items-center px-4 gap-4 shrink-0 sticky top-0 z-10"
+      style={{ height: '56px', paddingTop: 'env(safe-area-inset-top)' }}
+    >
+      {/* Mobile: just the logo */}
+      <Link href="/dashboard" className="md:hidden font-bold text-white text-base tracking-tight">
+        Success at Sage
+      </Link>
+
+      {/* Desktop: hamburger + logo + search */}
       <button
         onClick={onMenuClick}
-        className="md:hidden text-white/50 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+        className="hidden text-white/50 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -40,7 +49,7 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
         Success at Sage
       </Link>
 
-      <form onSubmit={handleSearch} className="flex-1 max-w-md">
+      <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md">
         <input
           value={query}
           onChange={e => setQuery(e.target.value)}
