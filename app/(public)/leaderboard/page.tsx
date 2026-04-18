@@ -15,10 +15,20 @@ interface LeaderEntry {
 const MEDAL = ['#fbbf24', '#94a3b8', '#b87333']
 
 export default async function LeaderboardPage() {
-  const [{ data }, user] = await Promise.all([
-    supabaseAdmin.rpc('get_leaderboard'),
+  const [{ data: settingsData }, user] = await Promise.all([
+    supabaseAdmin.from('contest_settings').select('*').eq('id', 1).single(),
     getCurrentUser(),
   ])
+
+  const settings = settingsData as any
+  const periodStart = settings?.period_start ?? new Date().toISOString().split('T')[0]
+  const nextReset = settings?.next_reset_date ?? null
+  const prize = settings?.prize_description ?? '$25 Starbucks gift card'
+
+  const { data } = await supabaseAdmin.rpc('get_leaderboard_period', {
+    p_start: periodStart,
+    p_end: nextReset ?? new Date().toISOString().split('T')[0],
+  })
 
   const entries: LeaderEntry[] = (data ?? []).map((r: any) => ({
     id: r.id,
@@ -30,11 +40,28 @@ export default async function LeaderboardPage() {
 
   const myRank = user ? entries.findIndex(e => e.id === user.id) + 1 : 0
 
+  const resetDate = nextReset
+    ? new Date(nextReset + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : null
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
+      {/* Prize banner */}
+      <div className="animate-fade-up mb-8 glass rounded-2xl px-6 py-5 text-center border border-amber-500/20">
+        <div className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-1">Monthly Prize</div>
+        <div className="text-2xl font-bold text-white mb-1">{prize}</div>
+        {resetDate && (
+          <div className="text-white/40 text-sm">
+            Winner chosen on <span className="text-white/70 font-medium">{resetDate}</span>
+          </div>
+        )}
+      </div>
+
       <div className="animate-fade-up mb-10 text-center">
         <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Top Contributors</h1>
-        <p className="text-white/40 text-sm">Ranked by approved submissions</p>
+        <p className="text-white/40 text-sm">
+          Ranked by approved submissions this period
+        </p>
       </div>
 
       {user && myRank > 0 && (
@@ -63,7 +90,7 @@ export default async function LeaderboardPage() {
 
       {entries.length === 0 ? (
         <div className="glass rounded-2xl px-6 py-14 text-center text-white/25 text-sm">
-          No submissions yet — be the first!
+          No submissions yet this period — be the first!
         </div>
       ) : (
         <div className="flex flex-col gap-2">
@@ -99,6 +126,7 @@ export default async function LeaderboardPage() {
                       {entry.fullName}
                     </span>
                     {isMe && <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400/70">you</span>}
+                    {rank === 1 && <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400/80">leading</span>}
                   </div>
                   <div className="text-white/30 text-xs mt-0.5">{label}</div>
                 </div>

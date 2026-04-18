@@ -149,6 +149,42 @@ export async function updateUserInfo(userId: string, fullName: string, graduatin
   revalidatePath('/admin/users')
 }
 
+export async function updateContestSettings(nextResetDate: string, prizeDescription: string, periodStart: string) {
+  await requireAdmin()
+  await supabaseAdmin
+    .from('contest_settings')
+    .update({ next_reset_date: nextResetDate, prize_description: prizeDescription, period_start: periodStart })
+    .eq('id', 1)
+  revalidatePath('/admin/contest')
+  revalidatePath('/leaderboard')
+}
+
+export async function chooseContestWinner(userId: string, periodLabel: string, periodStart: string, periodEnd: string) {
+  await requireAdmin()
+  await supabaseAdmin.from('contest_winners').insert({
+    user_id: userId,
+    period_label: periodLabel,
+    period_start: periodStart,
+    period_end: periodEnd,
+  })
+  // Advance the period
+  await supabaseAdmin
+    .from('contest_settings')
+    .update({ period_start: periodEnd, next_reset_date: null })
+    .eq('id', 1)
+  revalidatePath('/admin/contest')
+  revalidatePath('/leaderboard')
+}
+
+export async function markWinnerPaid(winnerId: string) {
+  await requireAdmin()
+  await supabaseAdmin
+    .from('contest_winners')
+    .update({ paid_at: new Date().toISOString() })
+    .eq('id', winnerId)
+  revalidatePath('/admin/contest')
+}
+
 export async function promoteToAdmin(userId: string) {
   await requireAdmin()
   await supabaseAdmin.from('users').update({ role: 'admin' }).eq('id', userId)
