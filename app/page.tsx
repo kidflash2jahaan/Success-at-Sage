@@ -67,6 +67,15 @@ export default async function LandingPage() {
             Made by Sage Hill students, for Sage Hill students.
           </p>
 
+          {/* Prize badge */}
+          <div className="animate-fade-up stagger-3 flex items-center justify-center gap-2 mb-6">
+            <Link href="/leaderboard" className="inline-flex items-center gap-2 glass border border-amber-500/25 px-4 py-2 rounded-full text-sm hover:border-amber-500/50 transition-colors">
+              <span className="text-amber-400">🎁</span>
+              <span className="text-white/70">Top contributor wins a <span className="text-amber-400 font-semibold">$25 Amazon gift card</span> every month</span>
+              <span className="text-white/30 text-xs">→</span>
+            </Link>
+          </div>
+
           {/* CTAs */}
           <div className="animate-fade-up stagger-4 flex items-center justify-center gap-3 flex-wrap">
             <Link

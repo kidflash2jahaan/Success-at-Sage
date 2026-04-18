@@ -2,11 +2,19 @@ export const dynamic = 'force-dynamic'
 
 import { requireUser } from '@/lib/auth'
 import { getUserCourses } from '@/lib/db/queries/courses'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import Link from 'next/link'
 
 export default async function DashboardPage() {
   const user = await requireUser()
-  const userCourses = await getUserCourses(user.id)
+  const [userCourses, { data: contestSettings }] = await Promise.all([
+    getUserCourses(user.id),
+    supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('id', 1).single(),
+  ])
+  const prize = (contestSettings as any)?.prize_description ?? '$25 Amazon gift card'
+  const resetDate = (contestSettings as any)?.next_reset_date
+    ? new Date((contestSettings as any).next_reset_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+    : null
 
   if (userCourses.length === 0) {
     return (
@@ -30,6 +38,20 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-6">
+      {/* Contest banner */}
+      <Link href="/leaderboard" className="animate-fade-up block mb-6 glass border border-amber-500/20 hover:border-amber-500/40 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 transition-colors group">
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">🎁</span>
+          <div>
+            <div className="text-white font-semibold text-sm">Win a {prize} this month</div>
+            <div className="text-white/40 text-xs mt-0.5">
+              Submit approved notes to climb the leaderboard{resetDate ? ` · Resets ${resetDate}` : ''}
+            </div>
+          </div>
+        </div>
+        <span className="text-amber-400/60 group-hover:text-amber-400 text-sm transition-colors shrink-0">View rankings →</span>
+      </Link>
+
       <div className="animate-fade-up mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">My Courses</h1>
