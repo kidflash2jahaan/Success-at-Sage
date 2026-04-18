@@ -1,6 +1,6 @@
 'use client'
 import { useState, useTransition } from 'react'
-import { adminEditMaterial, deleteMaterial } from '@/app/actions/admin'
+import { adminEditMaterial, adminMoveMaterialToUnit, deleteMaterial } from '@/app/actions/admin'
 import { uploadFileWithTUS } from '@/lib/storage/upload'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import MaterialViewer from '@/components/materials/MaterialViewer'
@@ -28,16 +28,23 @@ interface Item {
   attachmentPaths: string[]
 }
 
-export default function ApprovedMaterialEditor({ item }: { item: Item }) {
+interface AvailableUnit {
+  id: string
+  title: string
+  courseName: string
+}
+
+export default function ApprovedMaterialEditor({ item, availableUnits = [] }: { item: Item; availableUnits?: AvailableUnit[] }) {
   const [expanded, setExpanded] = useState(false)
-  const [editing, setEditing] = useState(false)
-  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [mode, setMode] = useState<'view' | 'edit' | 'delete'>('view')
   const [editTitle, setEditTitle] = useState(item.title)
   const [editContent, setEditContent] = useState(
     (item.contentJson as { text?: string } | null)?.text ?? ''
   )
   const [editLinkUrl, setEditLinkUrl] = useState(item.linkUrl ?? '')
   const [editAttachmentFiles, setEditAttachmentFiles] = useState<File[]>([])
+  const [selectedUnitId, setSelectedUnitId] = useState('')
+  const [movePending, startMoveTransition] = useTransition()
   const [pending, startTransition] = useTransition()
 
   return (
@@ -94,25 +101,73 @@ export default function ApprovedMaterialEditor({ item }: { item: Item }) {
       )}
 
       <div className="px-5 py-3 border-t border-white/[0.07] flex flex-col gap-3">
-        {editing ? (
+        {mode === 'edit' && (
           <>
             <div className="flex flex-col gap-2">
-              <input value={editTitle} onChange={e => setEditTitle(e.target.value)} placeholder="Title"
-                className="glass-input w-full rounded-lg px-3 py-2 text-sm" />
-              <textarea value={editContent} onChange={e => setEditContent(e.target.value)}
-                placeholder="Content (optional)" rows={6}
-                className="glass-input w-full rounded-lg px-3 py-2 text-sm resize-y" />
+              <input
+                value={editTitle}
+                onChange={e => setEditTitle(e.target.value)}
+                placeholder="Title"
+                className="glass-input w-full rounded-lg px-3 py-2 text-sm"
+              />
+              <textarea
+                value={editContent}
+                onChange={e => setEditContent(e.target.value)}
+                placeholder="Content (optional)"
+                rows={6}
+                className="glass-input w-full rounded-lg px-3 py-2 text-sm resize-y"
+              />
               <div className="flex flex-col gap-1">
                 {item.attachmentPaths.length > 0 && (
                   <p className="text-xs text-emerald-400/60 px-1">{item.attachmentPaths.length} existing attachment{item.attachmentPaths.length !== 1 ? 's' : ''} kept — upload below to add more</p>
                 )}
                 <FileDropZone files={editAttachmentFiles} onChange={setEditAttachmentFiles} />
               </div>
-              <input value={editLinkUrl} onChange={e => setEditLinkUrl(e.target.value)}
-                placeholder="Link URL (optional)" className="glass-input w-full rounded-lg px-3 py-2 text-sm" />
+              <input
+                value={editLinkUrl}
+                onChange={e => setEditLinkUrl(e.target.value)}
+                placeholder="Link URL (optional)"
+                className="glass-input w-full rounded-lg px-3 py-2 text-sm"
+              />
+              {availableUnits.length > 0 && (
+                <div className="flex gap-2 pt-1 border-t border-white/[0.07]">
+                  <select
+                    value={selectedUnitId}
+                    onChange={e => setSelectedUnitId(e.target.value)}
+                    className="glass-input flex-1 rounded-lg px-3 py-2 text-sm"
+                  >
+                    <option value="">Move to unit…</option>
+                    {Object.entries(
+                      availableUnits.reduce<Record<string, AvailableUnit[]>>((acc, u) => {
+                        ;(acc[u.courseName] ??= []).push(u)
+                        return acc
+                      }, {})
+                    ).map(([course, units]) => (
+                      <optgroup key={course} label={course}>
+                        {units.map(u => (
+                          <option key={u.id} value={u.id}>{u.title}</option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    disabled={!selectedUnitId || movePending}
+                    onClick={() => startMoveTransition(async () => {
+                      await adminMoveMaterialToUnit(item.id, selectedUnitId)
+                      setSelectedUnitId('')
+                    })}
+                    className="shrink-0 px-3 py-2 rounded-lg bg-violet-600/40 hover:bg-violet-600/70 disabled:opacity-30 text-white/80 text-sm transition-colors"
+                  >
+                    {movePending ? 'Moving…' : 'Move'}
+                  </button>
+                </div>
+              )}
             </div>
             <div className="flex gap-2">
-              <button type="button" disabled={pending}
+              <button
+                type="button"
+                disabled={pending}
                 onClick={() => startTransition(async () => {
                   const newPaths: string[] = []
                   for (const file of editAttachmentFiles) {
@@ -121,39 +176,44 @@ export default function ApprovedMaterialEditor({ item }: { item: Item }) {
                   }
                   const allPaths = newPaths.length ? [...item.attachmentPaths, ...newPaths] : undefined
                   await adminEditMaterial(item.id, editTitle, 'note', editContent, editLinkUrl, allPaths)
-                  setEditing(false)
+                  setMode('view')
                   setEditAttachmentFiles([])
                 })}
-                className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors">
+                className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              >
                 {pending ? 'Saving...' : 'Save Changes'}
               </button>
-              <button type="button" onClick={() => setEditing(false)}
+              <button type="button" onClick={() => setMode('view')}
                 className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">
                 Cancel
               </button>
             </div>
           </>
-        ) : confirmDelete ? (
+        )}
+
+        {mode === 'delete' && (
           <div className="flex gap-2">
             <form action={deleteMaterial.bind(null, item.id)} className="flex-1">
               <button type="submit" className="w-full bg-red-600/80 hover:bg-red-600 text-white text-sm font-medium py-2 rounded-lg transition-colors">
                 Confirm Delete
               </button>
             </form>
-            <button type="button" onClick={() => setConfirmDelete(false)}
+            <button type="button" onClick={() => setMode('view')}
               className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">
               Cancel
             </button>
           </div>
-        ) : (
+        )}
+
+        {mode === 'view' && (
           <div className="flex gap-2">
-            <button type="button" onClick={() => setEditing(true)}
+            <button type="button" onClick={() => setMode('edit')}
               className="flex-1 glass hover:bg-white/[0.08] text-white/50 text-sm font-medium py-2 rounded-lg border border-white/[0.08] transition-colors">
               Edit
             </button>
-            <button type="button" onClick={() => setConfirmDelete(true)}
+            <button type="button" onClick={() => setMode('delete')}
               className="flex-1 bg-red-600/20 hover:bg-red-600/40 text-red-400 text-sm font-medium py-2 rounded-lg border border-red-600/30 transition-colors">
-              Delete
+              ✕ Delete
             </button>
           </div>
         )}

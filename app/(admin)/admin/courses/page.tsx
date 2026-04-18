@@ -4,11 +4,24 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import ApprovedMaterialEditor from '@/components/admin/ApprovedMaterialEditor'
 
 export default async function AdminCoursesPage() {
-  const { data } = await supabaseAdmin
-    .from('materials')
-    .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, units!unit_id(id, title, courses(name))')
-    .eq('status', 'approved')
-    .order('created_at')
+  const [{ data }, { data: unitsData }] = await Promise.all([
+    supabaseAdmin
+      .from('materials')
+      .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, units!unit_id(id, title, courses(name))')
+      .eq('status', 'approved')
+      .order('created_at'),
+    supabaseAdmin
+      .from('units')
+      .select('id, title, courses(name)')
+      .eq('status', 'approved')
+      .order('title'),
+  ])
+
+  const availableUnits = (unitsData ?? []).map((u: any) => ({
+    id: u.id as string,
+    title: u.title as string,
+    courseName: (u.courses?.name ?? '') as string,
+  }))
 
   type Row = {
     id: string; title: string; type: string; content_type: string
@@ -48,6 +61,7 @@ export default async function AdminCoursesPage() {
               {section.materials.map(m => (
                 <ApprovedMaterialEditor
                   key={m.id}
+                  availableUnits={availableUnits}
                   item={{
                     id: m.id,
                     title: m.title,
