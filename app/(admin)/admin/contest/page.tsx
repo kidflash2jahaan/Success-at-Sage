@@ -5,8 +5,9 @@ import { requireAdmin, calculateGrade } from '@/lib/auth'
 import { chooseContestWinner, markWinnerPaid, updateContestSettings } from '@/app/actions/admin'
 import { redirect } from 'next/navigation'
 
-export default async function AdminContestPage() {
+export default async function AdminContestPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
   await requireAdmin()
+  const { saved } = await searchParams
 
   const today = new Date().toISOString().split('T')[0]
   const [{ data: settingsData }, { data: winnersData }] = await Promise.all([
@@ -47,7 +48,7 @@ export default async function AdminContestPage() {
     const prize = formData.get('prizeDescription') as string
     const periodStart = formData.get('periodStart') as string
     await updateContestSettings(nextReset, prize, periodStart)
-    redirect('/admin/contest')
+    redirect('/admin/contest?saved=1')
   }
 
   async function handleMarkPaid(formData: FormData) {
@@ -60,6 +61,12 @@ export default async function AdminContestPage() {
   return (
     <div className="p-8 max-w-3xl flex flex-col gap-10">
       <h1 className="text-2xl font-bold text-white">Contest</h1>
+
+      {saved && (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm px-4 py-3 rounded-xl">
+          Settings saved successfully.
+        </div>
+      )}
 
       {/* Unpaid winners queue */}
       {unpaidWinners.length > 0 && (
