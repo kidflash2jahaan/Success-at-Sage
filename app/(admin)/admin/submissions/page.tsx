@@ -5,7 +5,7 @@ import MaterialsReviewList from '@/components/admin/MaterialsReviewList'
 import UnitReviewer from '@/components/admin/UnitReviewer'
 
 export default async function SubmissionsPage() {
-  const [{ data: materialsData }, { data: unitsData }] = await Promise.all([
+  const [{ data: materialsData }, { data: unitsData }, { data: approvedUnitsData }] = await Promise.all([
     supabaseAdmin
       .from('materials')
       .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, created_at, users!uploaded_by(full_name, email), units!unit_id(title, courses(name))')
@@ -16,6 +16,11 @@ export default async function SubmissionsPage() {
       .select('id, title, course_id, courses(name), users!submitted_by(full_name)')
       .eq('status', 'pending')
       .order('id'),
+    supabaseAdmin
+      .from('units')
+      .select('id, title, courses(name)')
+      .eq('status', 'approved')
+      .order('title'),
   ])
 
   // Count pending materials per pending unit
@@ -78,7 +83,7 @@ export default async function SubmissionsPage() {
             Materials — {pending.length}
           </h2>
           <div className="max-w-3xl">
-            <MaterialsReviewList items={pending} />
+            <MaterialsReviewList items={pending} availableUnits={(approvedUnitsData ?? []).map((u: any) => ({ id: u.id, title: u.title, courseName: u.courses?.name ?? '' }))} />
           </div>
         </div>
       )}

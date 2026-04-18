@@ -126,6 +126,18 @@ export async function updateUnitTitle(unitId: string, title: string) {
   revalidatePath('/admin/courses')
 }
 
+export async function adminUpdatePendingUnitTitle(unitId: string, title: string) {
+  await requireAdmin()
+  await supabaseAdmin.from('units').update({ title: title.trim() }).eq('id', unitId)
+  revalidatePath('/admin/submissions')
+}
+
+export async function adminMoveMaterialToUnit(materialId: string, newUnitId: string) {
+  await requireAdmin()
+  await supabaseAdmin.from('materials').update({ unit_id: newUnitId }).eq('id', materialId)
+  revalidatePath('/admin/submissions')
+}
+
 export async function adminEditMaterial(materialId: string, title: string, type: 'note' | 'test', contentText: string | null, linkUrl?: string, attachmentPaths?: string[]) {
   await requireAdmin()
   const updates: Record<string, unknown> = {

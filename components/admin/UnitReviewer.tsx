@@ -1,5 +1,6 @@
 'use client'
-import { approveUnit, rejectUnit } from '@/app/actions/admin'
+import { useState, useTransition } from 'react'
+import { approveUnit, rejectUnit, adminUpdatePendingUnitTitle } from '@/app/actions/admin'
 
 interface PendingUnit {
   id: string
@@ -10,11 +11,32 @@ interface PendingUnit {
 }
 
 export default function UnitReviewer({ unit }: { unit: PendingUnit }) {
+  const [title, setTitle] = useState(unit.title)
+  const [saved, setSaved] = useState(false)
+  const [pending, startTransition] = useTransition()
+
+  function saveTitle() {
+    if (!title.trim() || title.trim() === unit.title) return
+    startTransition(async () => {
+      await adminUpdatePendingUnitTitle(unit.id, title)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    })
+  }
+
   return (
     <div className="glass rounded-xl overflow-hidden">
       <div className="px-5 py-4 flex items-start justify-between gap-4">
-        <div>
-          <div className="text-white font-medium">{unit.title}</div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <input
+              value={title}
+              onChange={e => { setTitle(e.target.value); setSaved(false) }}
+              onBlur={saveTitle}
+              className="glass-input rounded-lg px-3 py-1.5 text-sm text-white font-medium w-full"
+            />
+            {saved && <span className="text-emerald-400 text-xs shrink-0">Saved</span>}
+          </div>
           <div className="text-white/40 text-xs mt-0.5">
             {unit.courseName} · proposed by {unit.submittedByName}
           </div>

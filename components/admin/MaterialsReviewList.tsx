@@ -17,7 +17,13 @@ interface SubmissionItem {
   courseName: string
 }
 
-export default function MaterialsReviewList({ items }: { items: SubmissionItem[] }) {
+interface AvailableUnit {
+  id: string
+  title: string
+  courseName: string
+}
+
+export default function MaterialsReviewList({ items, availableUnits = [] }: { items: SubmissionItem[], availableUnits?: AvailableUnit[] }) {
   const [ignoredUsers, setIgnoredUsers] = useState<Set<string>>(new Set())
 
   function ignoreUser(email: string) {
@@ -56,6 +62,7 @@ export default function MaterialsReviewList({ items }: { items: SubmissionItem[]
           <SubmissionReviewer
             key={item.id}
             item={item}
+            availableUnits={availableUnits}
             onIgnoreUser={() => ignoreUser(item.uploaderEmail)}
           />
         ))}
