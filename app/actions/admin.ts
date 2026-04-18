@@ -167,10 +167,14 @@ export async function chooseContestWinner(userId: string, periodLabel: string, p
     period_start: periodStart,
     period_end: periodEnd,
   })
-  // Advance the period
+  // Advance the period to next month's 1st
+  const next = new Date(periodEnd + 'T00:00:00')
+  next.setMonth(next.getMonth() + 1)
+  next.setDate(1)
+  const nextReset = next.toISOString().split('T')[0]
   await supabaseAdmin
     .from('contest_settings')
-    .update({ period_start: periodEnd, next_reset_date: null })
+    .update({ period_start: periodEnd, next_reset_date: nextReset })
     .eq('id', 1)
   revalidatePath('/admin/contest')
   revalidatePath('/leaderboard')
