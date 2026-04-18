@@ -27,11 +27,15 @@ export default function MaterialsReviewList({ items, availableUnits = [] }: { it
   const [ignoredUsers, setIgnoredUsers] = useState<Set<string>>(new Set())
 
   function ignoreUser(email: string) {
-    setIgnoredUsers(prev => new Set([...prev, email]))
+    setIgnoredUsers(prev => new Set(prev).add(email))
   }
 
   function unignoreUser(email: string) {
-    setIgnoredUsers(prev => { const s = new Set(prev); s.delete(email); return s })
+    setIgnoredUsers(prev => {
+      const next = new Set(prev)
+      next.delete(email)
+      return next
+    })
   }
 
   const visible = items.filter(i => !ignoredUsers.has(i.uploaderEmail))

@@ -23,18 +23,17 @@ export default async function SubmissionsPage() {
       .order('title'),
   ])
 
-  // Count pending materials per pending unit
   const pendingUnitIds = (unitsData ?? []).map((u: any) => u.id)
-  let materialCountsByUnit: Record<string, number> = {}
+  const materialCountsByUnit: Record<string, number> = {}
   if (pendingUnitIds.length > 0) {
     const { data: counts } = await supabaseAdmin
       .from('materials')
       .select('unit_id')
       .in('unit_id', pendingUnitIds)
       .eq('status', 'pending')
-    ;(counts ?? []).forEach((m: any) => {
+    for (const m of (counts ?? []) as { unit_id: string }[]) {
       materialCountsByUnit[m.unit_id] = (materialCountsByUnit[m.unit_id] ?? 0) + 1
-    })
+    }
   }
 
   const pendingUnits = (unitsData ?? []).map((u: any) => ({

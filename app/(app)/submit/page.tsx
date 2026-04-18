@@ -18,9 +18,10 @@ export default async function SubmitPage({
     supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('id', 1).single(),
   ])
 
-  const prize = (contestSettings as any)?.prize_description ?? '$25 Amazon gift card'
-  const resetDate = (contestSettings as any)?.next_reset_date
-    ? new Date((contestSettings as any).next_reset_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+  const settings = contestSettings as { prize_description?: string; next_reset_date?: string } | null
+  const prize = settings?.prize_description ?? '$25 Amazon gift card'
+  const resetDate = settings?.next_reset_date
+    ? new Date(settings.next_reset_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
     : null
 
   return (

@@ -20,14 +20,15 @@ export default async function LeaderboardPage() {
     getCurrentUser(),
   ])
 
-  const settings = settingsData as any
-  const periodStart = settings?.period_start ?? new Date().toISOString().split('T')[0]
+  const today = new Date().toISOString().split('T')[0]
+  const settings = settingsData as { period_start?: string; next_reset_date?: string | null; prize_description?: string } | null
+  const periodStart = settings?.period_start ?? today
   const nextReset = settings?.next_reset_date ?? null
   const prize = settings?.prize_description ?? '$25 Starbucks gift card'
 
   const { data } = await supabaseAdmin.rpc('get_leaderboard_period', {
     p_start: periodStart,
-    p_end: nextReset ?? new Date().toISOString().split('T')[0],
+    p_end: nextReset ?? today,
   })
 
   const entries: LeaderEntry[] = (data ?? []).map((r: any) => ({

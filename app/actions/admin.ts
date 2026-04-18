@@ -4,42 +4,39 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendApprovalEmail, sendRejectionEmail } from '@/lib/email/resend'
 import { revalidatePath } from 'next/cache'
 
-export async function approveMaterial(materialId: string) {
-  await requireAdmin()
+async function fetchMaterialWithUploader(materialId: string) {
   const { data: material } = await supabaseAdmin
     .from('materials')
     .select('id, title, uploaded_by')
     .eq('id', materialId)
     .single()
-  if (!material) return
-  await supabaseAdmin.from('materials').update({ status: 'approved' }).eq('id', materialId)
+  if (!material) return null
   const { data: uploader } = await supabaseAdmin
     .from('users')
     .select('email')
     .eq('id', material.uploaded_by)
     .single()
-  if (uploader) await sendApprovalEmail(uploader.email, material.title)
+  return { material, uploader }
+}
+
+export async function approveMaterial(materialId: string) {
+  await requireAdmin()
+  const result = await fetchMaterialWithUploader(materialId)
+  if (!result) return
+  await supabaseAdmin.from('materials').update({ status: 'approved' }).eq('id', materialId)
+  if (result.uploader) await sendApprovalEmail(result.uploader.email, result.material.title)
   revalidatePath('/admin/submissions')
 }
 
 export async function rejectMaterial(materialId: string, note: string) {
   await requireAdmin()
-  const { data: material } = await supabaseAdmin
-    .from('materials')
-    .select('id, title, uploaded_by')
-    .eq('id', materialId)
-    .single()
-  if (!material) return
+  const result = await fetchMaterialWithUploader(materialId)
+  if (!result) return
   await supabaseAdmin
     .from('materials')
     .update({ status: 'rejected', rejection_note: note || null })
     .eq('id', materialId)
-  const { data: uploader } = await supabaseAdmin
-    .from('users')
-    .select('email')
-    .eq('id', material.uploaded_by)
-    .single()
-  if (uploader) await sendRejectionEmail(uploader.email, material.title, note)
+  if (result.uploader) await sendRejectionEmail(result.uploader.email, result.material.title, note)
   revalidatePath('/admin/submissions')
 }
 
@@ -102,20 +99,22 @@ export async function deleteMaterial(materialId: string) {
 
 export async function moveUnit(unitId: string, direction: 'up' | 'down') {
   await requireAdmin()
-  const { data: unit } = await supabaseAdmin
+  const { data: unitData } = await supabaseAdmin
     .from('units').select('id, course_id, order_index').eq('id', unitId).single()
+  const unit = unitData as { id: string; course_id: string; order_index: number } | null
   if (!unit) return
-  const { data: siblings } = await supabaseAdmin
+  const { data: siblingsData } = await supabaseAdmin
     .from('units').select('id, order_index')
-    .eq('course_id', (unit as any).course_id).eq('status', 'approved').order('order_index')
+    .eq('course_id', unit.course_id).eq('status', 'approved').order('order_index')
+  const siblings = siblingsData as { id: string; order_index: number }[] | null
   if (!siblings) return
-  const idx = (siblings as any[]).findIndex(u => u.id === unitId)
+  const idx = siblings.findIndex(u => u.id === unitId)
   const swapIdx = direction === 'up' ? idx - 1 : idx + 1
   if (swapIdx < 0 || swapIdx >= siblings.length) return
-  const swap = (siblings as any[])[swapIdx]
+  const swap = siblings[swapIdx]
   await Promise.all([
     supabaseAdmin.from('units').update({ order_index: swap.order_index }).eq('id', unitId),
-    supabaseAdmin.from('units').update({ order_index: (unit as any).order_index }).eq('id', swap.id),
+    supabaseAdmin.from('units').update({ order_index: unit.order_index }).eq('id', swap.id),
   ])
   revalidatePath('/admin/courses')
 }

@@ -18,16 +18,31 @@ export default async function AdminContestPage({ searchParams }: { searchParams:
       .order('created_at', { ascending: false }),
   ])
 
-  const settings = (settingsData ?? { period_start: today, next_reset_date: today, prize_description: '$25 Starbucks gift card' }) as any
+  const settings = (settingsData ?? { period_start: today, next_reset_date: today, prize_description: '$25 Starbucks gift card' }) as {
+    period_start: string
+    next_reset_date: string | null
+    prize_description: string
+  }
 
   const { data: leaderDataFinal } = await supabaseAdmin.rpc('get_leaderboard_period', {
     p_start: settings.period_start,
     p_end: settings.next_reset_date ?? today,
   })
-  const winners = (winnersData ?? []) as any[]
+  const winners = (winnersData ?? []) as Array<{
+    id: string
+    users: { full_name: string; email: string } | null
+    period_label: string
+    paid_at: string | null
+  }>
   const unpaidWinners = winners.filter(w => !w.paid_at)
   const paidWinners = winners.filter(w => w.paid_at)
-  const leaders = (leaderDataFinal ?? []) as any[]
+  const leaders = (leaderDataFinal ?? []) as Array<{
+    id: string
+    full_name: string
+    graduating_year: number
+    submission_count: number
+    total_views: number
+  }>
   const currentLeader = leaders[0]
 
   const periodLabel = new Date(settings.period_start).toLocaleString('default', { month: 'long', year: 'numeric' })
@@ -74,7 +89,7 @@ export default async function AdminContestPage({ searchParams }: { searchParams:
           <h2 className="text-sm font-semibold text-amber-400 uppercase tracking-widest">
             Pending Payment ({unpaidWinners.length})
           </h2>
-          {unpaidWinners.map((w: any) => (
+          {unpaidWinners.map(w => (
             <div key={w.id} className="glass rounded-xl px-5 py-4 flex items-center justify-between border border-amber-500/20">
               <div>
                 <div className="text-white font-semibold">{w.users?.full_name}</div>
@@ -133,7 +148,7 @@ export default async function AdminContestPage({ searchParams }: { searchParams:
         {/* Top 5 */}
         {leaders.length > 1 && (
           <div className="flex flex-col gap-1.5 mt-1">
-            {leaders.slice(1, 5).map((e: any, i: number) => (
+            {leaders.slice(1, 5).map((e, i) => (
               <div key={e.id} className="glass rounded-xl px-5 py-3 flex items-center gap-3">
                 <span className="text-white/25 text-sm w-5">#{i + 2}</span>
                 <div className="flex-1">
@@ -187,7 +202,7 @@ export default async function AdminContestPage({ searchParams }: { searchParams:
       {paidWinners.length > 0 && (
         <div className="flex flex-col gap-3">
           <h2 className="text-sm font-semibold text-white/40 uppercase tracking-widest">Past Winners</h2>
-          {paidWinners.map((w: any) => (
+          {paidWinners.map(w => (
             <div key={w.id} className="glass rounded-xl px-5 py-3 flex items-center justify-between opacity-60">
               <div>
                 <span className="text-white text-sm font-medium">{w.users?.full_name}</span>
