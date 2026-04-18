@@ -3,11 +3,13 @@ export const dynamic = 'force-dynamic'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 export default async function AdminDashboardPage() {
-  const [{ count: pendingCount }, { count: usersCount }, { count: approvedCount }] = await Promise.all([
+  const [{ count: pendingMaterials }, { count: pendingUnits }, { count: usersCount }, { count: approvedCount }] = await Promise.all([
     supabaseAdmin.from('materials').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    supabaseAdmin.from('units').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
     supabaseAdmin.from('users').select('*', { count: 'exact', head: true }),
     supabaseAdmin.from('materials').select('*', { count: 'exact', head: true }).eq('status', 'approved'),
   ])
+  const pendingCount = (pendingMaterials ?? 0) + (pendingUnits ?? 0)
 
   return (
     <div className="p-8">
