@@ -5,7 +5,7 @@ import MaterialsReviewList from '@/components/admin/MaterialsReviewList'
 import UnitReviewer from '@/components/admin/UnitReviewer'
 
 export default async function SubmissionsPage() {
-  const [{ data: materialsData }, { data: unitsData }, { data: approvedUnitsData }] = await Promise.all([
+  const [{ data: materialsData }, { data: unitsData }, { data: approvedUnitsData }, { data: coursesData }] = await Promise.all([
     supabaseAdmin
       .from('materials')
       .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, created_at, users!uploaded_by(full_name, email), units!unit_id(title, courses(name))')
@@ -21,6 +21,10 @@ export default async function SubmissionsPage() {
       .select('id, title, courses(name)')
       .eq('status', 'approved')
       .order('title'),
+    supabaseAdmin
+      .from('courses')
+      .select('id, name')
+      .order('name'),
   ])
 
   const pendingUnitIds = (unitsData ?? []).map((u: any) => u.id)
@@ -82,7 +86,11 @@ export default async function SubmissionsPage() {
             Materials — {pending.length}
           </h2>
           <div className="max-w-3xl">
-            <MaterialsReviewList items={pending} availableUnits={(approvedUnitsData ?? []).map((u: any) => ({ id: u.id, title: u.title, courseName: u.courses?.name ?? '' }))} />
+            <MaterialsReviewList
+              items={pending}
+              availableUnits={(approvedUnitsData ?? []).map((u: any) => ({ id: u.id, title: u.title, courseName: u.courses?.name ?? '' }))}
+              courses={(coursesData ?? []).map((c: any) => ({ id: c.id, name: c.name }))}
+            />
           </div>
         </div>
       )}

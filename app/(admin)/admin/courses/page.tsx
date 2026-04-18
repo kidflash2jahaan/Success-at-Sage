@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import ApprovedMaterialEditor from '@/components/admin/ApprovedMaterialEditor'
 
 export default async function AdminCoursesPage() {
-  const [{ data }, { data: unitsData }] = await Promise.all([
+  const [{ data }, { data: unitsData }, { data: coursesData }] = await Promise.all([
     supabaseAdmin
       .from('materials')
       .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, units!unit_id(id, title, courses(name))')
@@ -15,6 +15,10 @@ export default async function AdminCoursesPage() {
       .select('id, title, courses(name)')
       .eq('status', 'approved')
       .order('title'),
+    supabaseAdmin
+      .from('courses')
+      .select('id, name')
+      .order('name'),
   ])
 
   const availableUnits = (unitsData ?? []).map((u: any) => ({
@@ -22,6 +26,8 @@ export default async function AdminCoursesPage() {
     title: u.title as string,
     courseName: (u.courses?.name ?? '') as string,
   }))
+
+  const courses = (coursesData ?? []).map((c: any) => ({ id: c.id as string, name: c.name as string }))
 
   type Row = {
     id: string; title: string; type: string; content_type: string
@@ -62,6 +68,7 @@ export default async function AdminCoursesPage() {
                 <ApprovedMaterialEditor
                   key={m.id}
                   availableUnits={availableUnits}
+                  courses={courses}
                   item={{
                     id: m.id,
                     title: m.title,

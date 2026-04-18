@@ -137,6 +137,27 @@ export async function adminMoveMaterialToUnit(materialId: string, newUnitId: str
   revalidatePath('/admin/submissions')
 }
 
+export async function adminCreateUnitAndMove(materialId: string, courseId: string, unitTitle: string) {
+  await requireAdmin()
+  const { data: top } = await supabaseAdmin
+    .from('units')
+    .select('order_index')
+    .eq('course_id', courseId)
+    .eq('status', 'approved')
+    .order('order_index', { ascending: false })
+    .limit(1)
+  const nextOrder = ((top?.[0] as any)?.order_index ?? 0) + 1
+  const { data: newUnit } = await supabaseAdmin
+    .from('units')
+    .insert({ course_id: courseId, title: unitTitle.trim(), order_index: nextOrder, status: 'approved' })
+    .select('id')
+    .single()
+  if (!newUnit) throw new Error('Could not create unit')
+  await supabaseAdmin.from('materials').update({ unit_id: (newUnit as any).id }).eq('id', materialId)
+  revalidatePath('/admin/submissions')
+  revalidatePath('/admin/courses')
+}
+
 export async function adminEditMaterial(materialId: string, title: string, type: 'note' | 'test', contentText: string | null, linkUrl?: string, attachmentPaths?: string[]) {
   await requireAdmin()
   const updates: Record<string, unknown> = {

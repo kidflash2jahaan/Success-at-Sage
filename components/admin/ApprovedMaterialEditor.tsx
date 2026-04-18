@@ -1,10 +1,11 @@
 'use client'
 import { useState, useTransition } from 'react'
-import { adminEditMaterial, adminMoveMaterialToUnit, deleteMaterial } from '@/app/actions/admin'
+import { adminEditMaterial, deleteMaterial } from '@/app/actions/admin'
 import { uploadFileWithTUS } from '@/lib/storage/upload'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import MaterialViewer from '@/components/materials/MaterialViewer'
 import FileDropZone from '@/components/ui/FileDropZone'
+import UnitSelectorWithCreate from './UnitSelectorWithCreate'
 
 function fileNameFromPath(path: string) {
   const segment = path.split('/').pop() ?? path
@@ -34,7 +35,12 @@ interface AvailableUnit {
   courseName: string
 }
 
-export default function ApprovedMaterialEditor({ item, availableUnits = [] }: { item: Item; availableUnits?: AvailableUnit[] }) {
+interface Course {
+  id: string
+  name: string
+}
+
+export default function ApprovedMaterialEditor({ item, availableUnits = [], courses = [] }: { item: Item; availableUnits?: AvailableUnit[]; courses?: Course[] }) {
   const [expanded, setExpanded] = useState(false)
   const [mode, setMode] = useState<'view' | 'edit' | 'delete'>('view')
   const [editTitle, setEditTitle] = useState(item.title)
@@ -43,8 +49,6 @@ export default function ApprovedMaterialEditor({ item, availableUnits = [] }: { 
   )
   const [editLinkUrl, setEditLinkUrl] = useState(item.linkUrl ?? '')
   const [editAttachmentFiles, setEditAttachmentFiles] = useState<File[]>([])
-  const [selectedUnitId, setSelectedUnitId] = useState('')
-  const [movePending, startMoveTransition] = useTransition()
   const [pending, startTransition] = useTransition()
 
   return (
@@ -129,40 +133,11 @@ export default function ApprovedMaterialEditor({ item, availableUnits = [] }: { 
                 placeholder="Link URL (optional)"
                 className="glass-input w-full rounded-lg px-3 py-2 text-sm"
               />
-              {availableUnits.length > 0 && (
-                <div className="flex gap-2 pt-1 border-t border-white/[0.07]">
-                  <select
-                    value={selectedUnitId}
-                    onChange={e => setSelectedUnitId(e.target.value)}
-                    className="glass-input flex-1 rounded-lg px-3 py-2 text-sm"
-                  >
-                    <option value="">Move to unit…</option>
-                    {Object.entries(
-                      availableUnits.reduce<Record<string, AvailableUnit[]>>((acc, u) => {
-                        ;(acc[u.courseName] ??= []).push(u)
-                        return acc
-                      }, {})
-                    ).map(([course, units]) => (
-                      <optgroup key={course} label={course}>
-                        {units.map(u => (
-                          <option key={u.id} value={u.id}>{u.title}</option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    disabled={!selectedUnitId || movePending}
-                    onClick={() => startMoveTransition(async () => {
-                      await adminMoveMaterialToUnit(item.id, selectedUnitId)
-                      setSelectedUnitId('')
-                    })}
-                    className="shrink-0 px-3 py-2 rounded-lg bg-violet-600/40 hover:bg-violet-600/70 disabled:opacity-30 text-white/80 text-sm transition-colors"
-                  >
-                    {movePending ? 'Moving…' : 'Move'}
-                  </button>
-                </div>
-              )}
+              <UnitSelectorWithCreate
+                materialId={item.id}
+                availableUnits={availableUnits}
+                courses={courses}
+              />
             </div>
             <div className="flex gap-2">
               <button
