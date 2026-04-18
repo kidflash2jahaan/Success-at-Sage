@@ -65,8 +65,8 @@ export default function MaterialCard({
   async function handleOpen() {
     if (!open) {
       pushRecentMaterial({ id: material.id, title: material.title, type: material.type, courseSlug, unitId })
-      await incrementViewCount(material.id)
-      setViewCount(v => v + 1)
+      const isNewView = await incrementViewCount(material.id)
+      if (isNewView) setViewCount(v => v + 1)
     }
     setOpen(o => !o)
   }

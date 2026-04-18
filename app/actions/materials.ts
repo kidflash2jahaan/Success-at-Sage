@@ -116,7 +116,8 @@ export async function editMaterial(materialId: string, title: string, type: 'not
   revalidatePath('/profile')
 }
 
-export async function incrementViewCount(materialId: string) {
+export async function incrementViewCount(materialId: string): Promise<boolean> {
   await requireUser()
-  await supabaseAdmin.rpc('increment_view_count', { material_id: materialId })
+  const { data } = await supabaseAdmin.rpc('increment_view_count', { material_id: materialId })
+  return data === true
 }
