@@ -36,56 +36,33 @@ export default async function AdminCoursesPage() {
     units: { id: string; title: string; courses: { name: string } | null } | null
   }
 
-  const grouped: Record<string, { courseName: string; unitTitle: string; materials: Row[] }> = {}
-  for (const m of (data ?? []) as unknown as Row[]) {
-    const key = m.units?.id ?? 'unknown'
-    if (!grouped[key]) grouped[key] = {
-      courseName: m.units?.courses?.name ?? '',
-      unitTitle: m.units?.title ?? '',
-      materials: [],
-    }
-    grouped[key].materials.push(m)
-  }
-
-  const sections = Object.entries(grouped).sort(([, a], [, b]) =>
-    a.courseName.localeCompare(b.courseName) || a.unitTitle.localeCompare(b.unitTitle)
-  )
+  const materials = (data ?? []) as unknown as Row[]
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold text-white mb-2">Approved Materials</h1>
-      <p className="text-white/40 mb-8">{(data ?? []).length} materials across {sections.length} units</p>
+      <h1 className="text-2xl font-bold text-white mb-2">All Materials</h1>
+      <p className="text-white/40 mb-8">{materials.length} approved</p>
 
-      <div className="flex flex-col gap-8 max-w-3xl">
-        {sections.map(([unitId, section]) => (
-          <div key={unitId}>
-            <div className="mb-3">
-              <div className="text-xs font-semibold uppercase tracking-widest text-white/30">{section.courseName}</div>
-              <div className="text-white font-medium mt-0.5">{section.unitTitle}</div>
-            </div>
-            <div className="flex flex-col gap-3">
-              {section.materials.map(m => (
-                <ApprovedMaterialEditor
-                  key={m.id}
-                  availableUnits={availableUnits}
-                  courses={courses}
-                  item={{
-                    id: m.id,
-                    title: m.title,
-                    type: m.type,
-                    contentType: (m.content_type ?? 'richtext') as 'richtext' | 'pdf',
-                    contentJson: m.content_json,
-                    pdfPath: m.pdf_path,
-                    linkUrl: m.link_url,
-                    attachmentPaths: m.attachment_paths ?? [],
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+      <div className="flex flex-col gap-3 max-w-3xl">
+        {materials.map(m => (
+          <ApprovedMaterialEditor
+            key={m.id}
+            availableUnits={availableUnits}
+            courses={courses}
+            item={{
+              id: m.id,
+              title: m.title,
+              type: m.type,
+              contentType: (m.content_type ?? 'richtext') as 'richtext' | 'pdf',
+              contentJson: m.content_json,
+              pdfPath: m.pdf_path,
+              linkUrl: m.link_url,
+              attachmentPaths: m.attachment_paths ?? [],
+            }}
+          />
         ))}
 
-        {sections.length === 0 && (
+        {materials.length === 0 && (
           <p className="text-white/30">No approved materials yet.</p>
         )}
       </div>
