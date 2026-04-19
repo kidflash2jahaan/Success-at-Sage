@@ -10,7 +10,7 @@ export default async function SubmissionsPage() {
       .from('materials')
       .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, created_at, users!uploaded_by(full_name, email), units!unit_id(title, courses(name))')
       .eq('status', 'pending')
-      .order('created_at'),
+      .order('created_at', { ascending: false }),
     supabaseAdmin
       .from('units')
       .select('id, title, course_id, courses(name), users!submitted_by(full_name)')

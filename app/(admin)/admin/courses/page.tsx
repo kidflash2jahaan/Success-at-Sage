@@ -9,7 +9,7 @@ export default async function AdminCoursesPage() {
       .from('materials')
       .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, units!unit_id(id, title, courses(name))')
       .eq('status', 'approved')
-      .order('created_at'),
+      .order('created_at', { ascending: false }),
     supabaseAdmin
       .from('units')
       .select('id, title, courses(name)')
