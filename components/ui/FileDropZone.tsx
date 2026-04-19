@@ -83,8 +83,8 @@ export default function FileDropZone({ files, onChange, label = 'Attachments' }:
         onClick={() => inputRef.current?.click()}
         className="cursor-pointer rounded-xl px-4 py-5 flex items-center justify-center gap-2.5 transition-all border-2 border-dashed select-none"
         style={{
-          borderColor: dragging ? 'rgba(167,139,250,0.5)' : 'rgba(255,255,255,0.07)',
-          background: dragging ? 'rgba(124,58,237,0.08)' : 'transparent',
+          borderColor: dragging ? 'rgba(75,107,56,0.5)' : 'rgba(255,255,255,0.07)',
+          background: dragging ? 'rgba(75,107,56,0.08)' : 'transparent',
         }}
       >
         <svg className="w-5 h-5 text-white/20 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -92,7 +92,7 @@ export default function FileDropZone({ files, onChange, label = 'Attachments' }:
         </svg>
         <span className="text-white/35 text-sm">
           {files.length > 0 ? 'Add another file' : 'Drop files or '}
-          {files.length === 0 && <span className="text-violet-400">browse</span>}
+          {files.length === 0 && <span className="text-sage-400">browse</span>}
         </span>
       </div>
 

@@ -26,7 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
         ))}
         <div className="mt-auto pt-4 border-t border-white/[0.06] px-1">
-          <Link href="/dashboard" className="px-3 py-2.5 rounded-xl text-sm text-violet-400 hover:text-violet-300 flex items-center gap-1.5 hover:bg-violet-500/10 transition-colors">
+          <Link href="/dashboard" className="px-3 py-2.5 rounded-xl text-sm text-sage-400 hover:text-sage-300 flex items-center gap-1.5 hover:bg-sage-500/10 transition-colors">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>

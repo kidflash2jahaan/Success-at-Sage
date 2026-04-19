@@ -166,7 +166,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
             <div
               ref={courseDropdownRef}
               className="absolute z-20 w-full mt-1.5 rounded-xl overflow-hidden border border-white/[0.1]"
-              style={{ maxHeight: '220px', overflowY: 'auto', background: '#0d0f24' }}
+              style={{ maxHeight: '220px', overflowY: 'auto', background: '#080f08' }}
             >
               {filteredCourses.map(course => (
                 <button
@@ -181,7 +181,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
             </div>
           )}
           {courseDropdownOpen && courseQuery.length > 0 && filteredCourses.length === 0 && (
-            <div ref={courseDropdownRef} className="absolute z-20 w-full mt-1.5 rounded-xl px-4 py-3 text-sm text-white/30 border border-white/[0.1]" style={{ background: '#0d0f24' }}>
+            <div ref={courseDropdownRef} className="absolute z-20 w-full mt-1.5 rounded-xl px-4 py-3 text-sm text-white/30 border border-white/[0.1]" style={{ background: '#080f08' }}>
               No courses found
             </div>
           )}
@@ -196,7 +196,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
             <button
               type="button"
               onClick={() => { setCreatingUnit(v => !v); setSelectedUnitId(''); setNewUnitTitle('') }}
-              className="text-xs text-violet-400 hover:text-violet-300 transition-colors"
+              className="text-xs text-sage-400 hover:text-sage-300 transition-colors"
             >
               {creatingUnit ? '← Select existing unit' : '+ Create new unit'}
             </button>
@@ -268,7 +268,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
       <button
         type="submit"
         disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title || (mode === 'paper' && pdfFiles.length === 0)}
-        className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
+        className="btn-press bg-sage-600 hover:bg-sage-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3 text-sm transition-all hover:shadow-[0_0_24px_rgba(75,107,56,0.4)]"
       >
         {submitting ? 'Submitting...' : 'Submit for Review'}
       </button>

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #06060f;
+  --background: #060d06;
   --foreground: #ffffff;
 }
 
@@ -10,6 +10,11 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-outfit), sans-serif;
   --font-mono: var(--font-geist-mono);
+  --color-sage-300: #9dc47a;
+  --color-sage-400: #7aab5e;
+  --color-sage-500: #5f9148;
+  --color-sage-600: #4B6B38;
+  --color-sage-700: #3a5229;
 }
 
 body {
@@ -34,7 +39,7 @@ body {
 
 * { box-sizing: border-box; }
 
-select option { background: #0d0f24; color: white; }
+select option { background: #080f08; color: white; }
 
 /* ─── Blob animations ─── */
 @keyframes blob-1 {
@@ -81,9 +86,9 @@ select option { background: #0d0f24; color: white; }
   to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes pulse-ring {
-  0%   { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
-  70%  { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(75, 107, 56, 0.4); }
+  70%  { box-shadow: 0 0 0 8px rgba(75, 107, 56, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(75, 107, 56, 0); }
 }
 
 /* ─── Animation utility classes ─── */
@@ -202,8 +207,8 @@ select option { background: #0d0f24; color: white; }
 }
 .glass-input:focus {
   outline: none;
-  border-color: rgba(124, 58, 237, 0.6);
+  border-color: rgba(75, 107, 56, 0.6);
   background: rgba(255, 255, 255, 0.06);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 0 3px rgba(75, 107, 56, 0.15);
 }
 .glass-input::placeholder { color: rgba(255, 255, 255, 0.22); }

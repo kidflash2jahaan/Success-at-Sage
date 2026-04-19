@@ -79,13 +79,13 @@ export default async function LeaderboardPage() {
       {user && myRank === 0 && (
         <div className="animate-fade-up stagger-2 glass rounded-xl px-5 py-3.5 mb-6 flex items-center justify-between">
           <span className="text-white/40 text-sm">You haven&apos;t submitted anything approved yet.</span>
-          <Link href="/submit" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">Submit something →</Link>
+          <Link href="/submit" className="text-xs text-sage-400 hover:text-sage-300 transition-colors">Submit something →</Link>
         </div>
       )}
       {!user && (
         <div className="animate-fade-up stagger-2 glass rounded-xl px-5 py-3.5 mb-6 flex items-center justify-between">
           <span className="text-white/40 text-sm">Sign in to see your rank.</span>
-          <Link href="/login" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">Sign in →</Link>
+          <Link href="/login" className="text-xs text-sage-400 hover:text-sage-300 transition-colors">Sign in →</Link>
         </div>
       )}
 
@@ -108,7 +108,7 @@ export default async function LeaderboardPage() {
                 className="animate-fade-up glass rounded-xl px-5 py-4 flex items-center gap-4 transition-all hover:bg-white/[0.06]"
                 style={{
                   animationDelay: `${0.05 + i * 0.045}s`,
-                  ...(isMe ? { borderColor: 'rgba(124,58,237,0.35)' } : {}),
+                  ...(isMe ? { borderColor: 'rgba(75,107,56,0.35)' } : {}),
                 }}
               >
                 <div className="w-8 shrink-0 text-center">
@@ -123,10 +123,10 @@ export default async function LeaderboardPage() {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={`font-semibold text-sm truncate ${isMe ? 'text-violet-300' : 'text-white/90'}`}>
+                    <span className={`font-semibold text-sm truncate ${isMe ? 'text-sage-300' : 'text-white/90'}`}>
                       {entry.fullName}
                     </span>
-                    {isMe && <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400/70">you</span>}
+                    {isMe && <span className="text-[10px] font-bold uppercase tracking-wider text-sage-400/70">you</span>}
                     {rank === 1 && <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400/80">leading</span>}
                   </div>
                   <div className="text-white/30 text-xs mt-0.5">{label}</div>

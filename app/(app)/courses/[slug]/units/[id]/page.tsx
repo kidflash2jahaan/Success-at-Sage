@@ -57,7 +57,7 @@ export default async function UnitPage({
         <h1 className="text-2xl font-bold text-white tracking-tight mb-3">{unit.title}</h1>
         <div className="flex items-center justify-between">
           <span className="text-sm text-white/30">{approvedMaterials.length} material{approvedMaterials.length !== 1 ? 's' : ''}</span>
-          <Link href={`/submit?course=${slug}&unit=${id}`} className="btn-press text-sm text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1">
+          <Link href={`/submit?course=${slug}&unit=${id}`} className="btn-press text-sm text-sage-400 hover:text-sage-300 transition-colors flex items-center gap-1">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
@@ -95,7 +95,7 @@ export default async function UnitPage({
       {approvedMaterials.length === 0 && (
         <div className="glass rounded-2xl px-6 py-14 text-center">
           <p className="text-white/25 text-sm">No materials yet.</p>
-          <Link href={`/submit?course=${slug}&unit=${id}`} className="inline-flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 mt-3 transition-colors">
+          <Link href={`/submit?course=${slug}&unit=${id}`} className="inline-flex items-center gap-1.5 text-sm text-sage-400 hover:text-sage-300 mt-3 transition-colors">
             Be the first to submit →
           </Link>
         </div>
