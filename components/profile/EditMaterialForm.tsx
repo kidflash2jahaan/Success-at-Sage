@@ -169,7 +169,7 @@ export default function EditMaterialForm({
         <button
           type="submit"
           disabled={saving || !title.trim() || (mode === 'paper' && pdfFiles.length === 0 && !initialPdfPath)}
-          className="btn-press bg-sage-600 hover:bg-sage-500 disabled:opacity-40 text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(75,107,56,0.4)]"
+          className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
         >
           {saving ? 'Saving...' : 'Save & Resubmit'}
         </button>

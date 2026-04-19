@@ -39,7 +39,7 @@ export default async function PublicLayout({ children }: { children: React.React
           </Link>
           <Link
             href="/signup"
-            className="text-sm bg-sage-600 hover:bg-sage-500 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"
+            className="text-sm bg-violet-600 hover:bg-violet-500 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"
           >
             Get started
           </Link>

@@ -90,7 +90,7 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
         )}
         <Link
           href="/submit"
-          className="btn-press hidden sm:flex items-center gap-1.5 text-sm text-sage-400 hover:text-sage-300 font-medium px-3 py-1.5 rounded-lg hover:bg-sage-500/10 transition-colors"
+          className="btn-press hidden sm:flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-medium px-3 py-1.5 rounded-lg hover:bg-violet-500/10 transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

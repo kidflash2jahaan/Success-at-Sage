@@ -30,7 +30,7 @@ export default async function AdminUsersPage() {
               <div className="flex items-center gap-3">
                 <span className={`text-xs px-2 py-0.5 rounded-full border ${
                   user.role === 'admin'
-                    ? 'border-sage-500/40 text-sage-400 bg-sage-500/10'
+                    ? 'border-purple-500/40 text-purple-400 bg-purple-500/10'
                     : 'border-white/10 text-white/40'
                 }`}>{user.role}</span>
                 <Link href={`/admin/users/${user.id}`} className="text-xs text-white/40 hover:text-white/70 transition-colors">
@@ -38,7 +38,7 @@ export default async function AdminUsersPage() {
                 </Link>
                 {user.role === 'student' ? (
                   <form action={promoteToAdmin.bind(null, user.id)}>
-                    <button type="submit" className="text-xs text-sage-400 hover:text-sage-300">Make Admin</button>
+                    <button type="submit" className="text-xs text-purple-400 hover:text-purple-300">Make Admin</button>
                   </form>
                 ) : (
                   <form action={demoteToStudent.bind(null, user.id)}>

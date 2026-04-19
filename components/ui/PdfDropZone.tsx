@@ -134,7 +134,7 @@ export default function PdfDropZone({ files, onChange, existingFileName }: Props
             target="_blank"
             rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
-            className="text-sage-400/70 hover:text-sage-300 underline underline-offset-2 transition-colors"
+            className="text-violet-400/70 hover:text-violet-300 underline underline-offset-2 transition-colors"
           >
             Genius Scan
           </a>

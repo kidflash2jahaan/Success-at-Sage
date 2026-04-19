@@ -38,7 +38,7 @@ export default function TiptapEditor({ onChange, initialContent }: TiptapEditorP
             type="button"
             onClick={btn.action}
             className={`px-2 py-1 rounded text-sm font-medium transition-colors ${
-              btn.active ? 'bg-sage-600 text-white' : 'text-white/50 hover:text-white hover:bg-white/10'
+              btn.active ? 'bg-purple-600 text-white' : 'text-white/50 hover:text-white hover:bg-white/10'
             }`}
           >
             {btn.label}

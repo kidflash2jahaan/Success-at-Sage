@@ -13,9 +13,9 @@ function SignupForm() {
         <div className="text-center mb-8">
           <div
             className="inline-flex items-center justify-center w-12 h-12 rounded-2xl glass mb-4"
-            style={{ background: 'linear-gradient(135deg, rgba(75,107,56,0.3), rgba(37,99,235,0.3))' }}
+            style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(37,99,235,0.3))' }}
           >
-            <svg className="w-6 h-6 text-sage-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-6 h-6 text-violet-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
@@ -47,7 +47,7 @@ function SignupForm() {
               </select>
             </div>
             <button type="submit"
-              className="btn-press mt-2 w-full bg-sage-600 hover:bg-sage-500 text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(75,107,56,0.4)]">
+              className="btn-press mt-2 w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]">
               Create Account
             </button>
           </form>
@@ -55,7 +55,7 @@ function SignupForm() {
 
         <p className="text-center text-white/30 text-sm mt-5">
           Already have an account?{' '}
-          <Link href="/login" className="text-sage-400 hover:text-sage-300 transition-colors">Sign in</Link>
+          <Link href="/login" className="text-violet-400 hover:text-violet-300 transition-colors">Sign in</Link>
         </p>
       </div>
     </div>

@@ -25,7 +25,7 @@ const tabs = [
     href: '/submit',
     label: 'Submit',
     icon: (_active: boolean) => (
-      <div className="w-12 h-12 rounded-2xl bg-sage-600 flex items-center justify-center -mt-5" style={{ boxShadow: '0 0 20px rgba(75,107,56,0.5)' }}>
+      <div className="w-12 h-12 rounded-2xl bg-violet-600 flex items-center justify-center -mt-5" style={{ boxShadow: '0 0 20px rgba(124,58,237,0.5)' }}>
         <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
         </svg>
@@ -68,7 +68,7 @@ export default function MobileNav() {
             key={tab.href}
             href={tab.href}
             className={`flex flex-col items-center gap-0.5 min-w-0 flex-1 transition-colors ${
-              isSubmit ? 'pb-1' : active ? 'text-sage-400' : 'text-white/30'
+              isSubmit ? 'pb-1' : active ? 'text-violet-400' : 'text-white/30'
             }`}
           >
             {tab.icon(active)}

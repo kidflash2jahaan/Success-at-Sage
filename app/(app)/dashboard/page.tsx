@@ -22,14 +22,14 @@ export default async function DashboardPage() {
       <div className="flex flex-col items-center justify-center h-full gap-5 text-center p-8">
         <div className="glass rounded-2xl p-10 max-w-sm w-full">
           <div className="w-12 h-12 rounded-2xl glass mx-auto mb-5 flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, rgba(75,107,56,0.25), rgba(37,99,235,0.25))' }}>
-            <svg className="w-6 h-6 text-sage-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.25), rgba(37,99,235,0.25))' }}>
+            <svg className="w-6 h-6 text-violet-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
           <p className="text-white/60 text-sm mb-6">You haven&apos;t added any courses yet. Browse the catalog to get started.</p>
           <Link href="/browse"
-            className="btn-press inline-flex items-center gap-2 bg-sage-600 hover:bg-sage-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all hover:shadow-[0_0_24px_rgba(75,107,56,0.4)]">
+            className="btn-press inline-flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-semibold px-5 py-2.5 rounded-xl text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]">
             Browse Courses
           </Link>
         </div>

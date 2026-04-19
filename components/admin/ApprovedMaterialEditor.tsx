@@ -66,7 +66,7 @@ export default function ApprovedMaterialEditor({ item, availableUnits = [], cour
             {item.linkUrl && <span className="text-xs px-2 py-0.5 bg-sky-500/10 rounded-full text-sky-400/70">Link</span>}
           </div>
         </div>
-        <button type="button" onClick={() => setExpanded(e => !e)} className="text-sage-400 hover:text-sage-300 text-sm transition-colors shrink-0">
+        <button type="button" onClick={() => setExpanded(e => !e)} className="text-violet-400 hover:text-violet-300 text-sm transition-colors shrink-0">
           {expanded ? 'Hide' : 'Preview'}
         </button>
       </div>
@@ -154,7 +154,7 @@ export default function ApprovedMaterialEditor({ item, availableUnits = [], cour
                   setMode('view')
                   setEditAttachmentFiles([])
                 })}
-                className="flex-1 bg-sage-600/80 hover:bg-sage-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+                className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"
               >
                 {pending ? 'Saving...' : 'Save Changes'}
               </button>

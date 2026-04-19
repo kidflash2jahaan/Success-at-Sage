@@ -133,7 +133,7 @@ export default async function AdminContestPage({ searchParams }: { searchParams:
               <input type="hidden" name="periodEnd" value={settings.next_reset_date ?? ''} />
               <button
                 type="submit"
-                className="text-sm bg-sage-600 hover:bg-sage-500 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+                className="text-sm bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg transition-colors font-medium"
               >
                 Choose as Winner
               </button>
@@ -192,7 +192,7 @@ export default async function AdminContestPage({ searchParams }: { searchParams:
               className="glass-input rounded-xl px-4 py-2.5 text-sm text-white"
             />
           </div>
-          <button type="submit" className="bg-sage-600 hover:bg-sage-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">
+          <button type="submit" className="bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">
             Save Settings
           </button>
         </form>

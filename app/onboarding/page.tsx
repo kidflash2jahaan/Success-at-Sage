@@ -49,7 +49,7 @@ export default async function OnboardingPage() {
             </div>
             <button
               type="submit"
-              className="btn-press mt-2 w-full bg-sage-600 hover:bg-sage-500 text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(75,107,56,0.4)]"
+              className="btn-press mt-2 w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
             >
               Get Started
             </button>

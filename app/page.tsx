@@ -30,7 +30,7 @@ export default async function LandingPage() {
           </Link>
           <Link
             href="/signup"
-            className="btn-press text-sm font-semibold bg-sage-600 hover:bg-sage-500 text-white px-4 py-1.5 rounded-lg transition-colors shrink-0"
+            className="btn-press text-sm font-semibold bg-violet-600 hover:bg-violet-500 text-white px-4 py-1.5 rounded-lg transition-colors shrink-0"
           >
             Get Started
           </Link>
@@ -41,8 +41,8 @@ export default async function LandingPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-4 text-center relative">
         <div className="max-w-2xl w-full">
           {/* Badge */}
-          <div className="animate-fade-in-down inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-sage-300 glass px-4 py-2 rounded-full mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-sage-400 inline-block" />
+          <div className="animate-fade-in-down inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-300 glass px-4 py-2 rounded-full mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 inline-block" />
             For Sage Hill School Students
           </div>
 
@@ -80,7 +80,7 @@ export default async function LandingPage() {
           <div className="animate-fade-up stagger-4 flex items-center justify-center gap-3 flex-wrap">
             <Link
               href="/signup"
-              className="btn-press btn-glow font-semibold text-white bg-sage-600 hover:bg-sage-500 px-7 py-3 rounded-xl text-base transition-all hover:shadow-[0_0_30px_rgba(75,107,56,0.35)]"
+              className="btn-press btn-glow font-semibold text-white bg-violet-600 hover:bg-violet-500 px-7 py-3 rounded-xl text-base transition-all hover:shadow-[0_0_30px_rgba(124,58,237,0.35)]"
             >
               Create Free Account
             </Link>
@@ -100,7 +100,7 @@ export default async function LandingPage() {
               { label: 'Free forever', value: '✓' },
             ].map(stat => (
               <div key={stat.label} className="glass px-5 py-2.5 rounded-xl flex items-center gap-3">
-                <span className="text-lg font-bold text-sage-300">{stat.value}</span>
+                <span className="text-lg font-bold text-violet-300">{stat.value}</span>
                 <span className="text-sm text-white/40">{stat.label}</span>
               </div>
             ))}

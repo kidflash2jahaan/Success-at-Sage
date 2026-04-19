@@ -68,7 +68,7 @@ export default async function EditUserPage({ params }: { params: Promise<{ id: s
 
         <button
           type="submit"
-          className="mt-2 bg-sage-600 hover:bg-sage-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
+          className="mt-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
         >
           Save Changes
         </button>

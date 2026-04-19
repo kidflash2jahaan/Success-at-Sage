@@ -66,7 +66,7 @@ export default function UnitSelectorWithCreate({
               await adminMoveMaterialToUnit(materialId, selectedUnitId)
               setSelectedUnitId('')
             })}
-            className="shrink-0 px-3 py-2 rounded-lg bg-sage-600/40 hover:bg-sage-600/70 disabled:opacity-30 text-white/80 text-sm transition-colors"
+            className="shrink-0 px-3 py-2 rounded-lg bg-violet-600/40 hover:bg-violet-600/70 disabled:opacity-30 text-white/80 text-sm transition-colors"
           >
             {movePending ? 'Moving…' : 'Move'}
           </button>
@@ -109,7 +109,7 @@ export default function UnitSelectorWithCreate({
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-sage-500/10 border border-sage-500/20">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-500/20">
               <span className="text-sm text-white/70 flex-1 truncate">{selectedCourse.name}</span>
               <button type="button" onClick={() => setSelectedCourse(null)} className="text-white/30 hover:text-white/60 text-xs transition-colors">
                 ✕
@@ -131,7 +131,7 @@ export default function UnitSelectorWithCreate({
                 await adminCreateUnitAndMove(materialId, selectedCourse!.id, newUnitTitle)
                 resetCreate()
               })}
-              className="flex-1 bg-sage-600/80 hover:bg-sage-600 disabled:opacity-30 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-30 text-white text-sm font-medium py-2 rounded-lg transition-colors"
             >
               {createPending ? 'Creating…' : 'Create & Move'}
             </button>
