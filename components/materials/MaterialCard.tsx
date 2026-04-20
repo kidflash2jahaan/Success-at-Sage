@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
-import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 import { incrementViewCount } from '@/app/actions/materials'
+import { fileNameFromPath, openAttachment } from '@/lib/utils/attachments'
 import MaterialViewer from './MaterialViewer'
 
 interface Material {
@@ -35,17 +35,6 @@ function pushRecentMaterial(entry: RecentMaterial) {
     localStorage.setItem(RECENTS_KEY, JSON.stringify(next))
     window.dispatchEvent(new CustomEvent('sas-recents-updated'))
   } catch {}
-}
-
-function fileNameFromPath(path: string) {
-  const segment = path.split('/').pop() ?? path
-  return segment.replace(/^\d+-/, '')
-}
-
-async function openAttachment(path: string) {
-  const supabase = createSupabaseBrowserClient()
-  const { data } = await supabase.storage.from('materials').createSignedUrl(path, 3600)
-  if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
 }
 
 export default function MaterialCard({

@@ -41,22 +41,6 @@ export async function getAllDepartmentsWithCourses() {
   }))
 }
 
-export async function getCourseBySlug(slug: string) {
-  const { data } = await supabaseAdmin
-    .from('courses')
-    .select('*')
-    .eq('slug', slug)
-    .single()
-  if (!data) return null
-  return {
-    id: data.id as string,
-    name: data.name as string,
-    slug: data.slug as string,
-    description: data.description as string,
-    departmentId: data.department_id as string,
-  }
-}
-
 export async function getCourseWithUnits(slug: string) {
   const { data } = await supabaseAdmin
     .from('courses')

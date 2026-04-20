@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { editMaterial } from '@/app/actions/materials'
 import { uploadFileWithTUS, uploadPdfWithTUS } from '@/lib/storage/upload'
 import { imagesToPdf, isPdfFile } from '@/lib/utils/imagesToPdf'
+import { fileNameFromPath } from '@/lib/utils/attachments'
 import FileDropZone from '@/components/ui/FileDropZone'
 import PdfDropZone from '@/components/ui/PdfDropZone'
 import Link from 'next/link'
@@ -18,11 +19,6 @@ interface Props {
   initialPdfPath: string | null
   unitTitle: string
   courseName: string
-}
-
-function fileNameFromPath(path: string) {
-  const segment = path.split('/').pop() ?? path
-  return segment.replace(/^\d+-/, '')
 }
 
 export default function EditMaterialForm({

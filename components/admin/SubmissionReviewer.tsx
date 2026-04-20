@@ -2,21 +2,10 @@
 import { useState, useTransition } from 'react'
 import { approveMaterial, rejectMaterial, adminEditMaterial } from '@/app/actions/admin'
 import { uploadFileWithTUS } from '@/lib/storage/upload'
-import { createSupabaseBrowserClient } from '@/lib/supabase/client'
+import { fileNameFromPath, openAttachment } from '@/lib/utils/attachments'
 import MaterialViewer from '@/components/materials/MaterialViewer'
 import FileDropZone from '@/components/ui/FileDropZone'
 import UnitSelectorWithCreate from './UnitSelectorWithCreate'
-
-function fileNameFromPath(path: string) {
-  const segment = path.split('/').pop() ?? path
-  return segment.replace(/^\d+-/, '')
-}
-
-async function openAttachment(path: string) {
-  const supabase = createSupabaseBrowserClient()
-  const { data } = await supabase.storage.from('materials').createSignedUrl(path, 3600)
-  if (data?.signedUrl) window.open(data.signedUrl, '_blank', 'noopener,noreferrer')
-}
 
 interface SubmissionItem {
   id: string

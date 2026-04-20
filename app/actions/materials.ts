@@ -1,6 +1,5 @@
 'use server'
 import { requireUser } from '@/lib/auth'
-import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { sendAdminSubmissionEmail } from '@/lib/email/resend'
 import { revalidatePath } from 'next/cache'
@@ -8,17 +7,6 @@ import { revalidatePath } from 'next/cache'
 async function getAdminEmails(): Promise<string[]> {
   const { data } = await supabaseAdmin.from('users').select('email').eq('role', 'admin')
   return (data ?? []).map((u: any) => u.email as string)
-}
-
-export async function getSignedAttachmentUploadUrl(fileName: string, unitId: string) {
-  const user = await requireUser()
-  const supabase = await createSupabaseServerClient()
-  const path = `attachments/${user.id}/${unitId}/${Date.now()}-${fileName}`
-  const { data, error } = await supabase.storage
-    .from('materials')
-    .createSignedUploadUrl(path)
-  if (error || !data) throw new Error('Could not create upload URL')
-  return { signedUrl: data.signedUrl, path }
 }
 
 export async function submitNewUnit(courseId: string, title: string): Promise<string> {
@@ -71,9 +59,10 @@ export async function submitMaterial(input: {
   // Fire-and-forget — don't block submission on email delivery
   ;(async () => {
     try {
-      const { data: unit } = await supabaseAdmin
-        .from('units').select('title, courses(name)').eq('id', input.unitId).single()
-      const adminEmails = await getAdminEmails()
+      const [{ data: unit }, adminEmails] = await Promise.all([
+        supabaseAdmin.from('units').select('title, courses(name)').eq('id', input.unitId).single(),
+        getAdminEmails(),
+      ])
       await sendAdminSubmissionEmail(
         adminEmails,
         user.fullName,

@@ -40,18 +40,6 @@ export async function rejectMaterial(materialId: string, note: string) {
   revalidatePath('/admin/submissions')
 }
 
-export async function createUnit(courseId: string, title: string, orderIndex: number) {
-  await requireAdmin()
-  await supabaseAdmin.from('units').insert({ course_id: courseId, title, order_index: orderIndex })
-  revalidatePath('/admin/courses')
-}
-
-export async function deleteUnit(unitId: string) {
-  await requireAdmin()
-  await supabaseAdmin.from('units').delete().eq('id', unitId)
-  revalidatePath('/admin/courses')
-}
-
 export async function approveUnit(unitId: string) {
   await requireAdmin()
   await supabaseAdmin.from('units').update({ status: 'approved' }).eq('id', unitId)
@@ -66,63 +54,11 @@ export async function rejectUnit(unitId: string) {
   revalidatePath('/admin/submissions')
 }
 
-export async function createAdminMaterial(
-  unitId: string,
-  title: string,
-  type: 'note' | 'test',
-  contentText: string,
-  linkUrl?: string,
-  attachmentPaths?: string[],
-) {
-  const admin = await requireAdmin()
-  await supabaseAdmin.from('materials').insert({
-    unit_id: unitId,
-    uploaded_by: admin.id,
-    title: title.trim(),
-    type,
-    content_type: 'richtext',
-    content_json: contentText.trim() ? { text: contentText.trim() } : null,
-    pdf_path: null,
-    link_url: linkUrl?.trim() || null,
-    attachment_paths: attachmentPaths?.length ? attachmentPaths : [],
-    status: 'approved',
-  })
-  revalidatePath('/admin/courses')
-}
-
 export async function deleteMaterial(materialId: string) {
   await requireAdmin()
   await supabaseAdmin.from('materials').delete().eq('id', materialId)
   revalidatePath('/admin/courses')
   revalidatePath('/admin/submissions')
-}
-
-export async function moveUnit(unitId: string, direction: 'up' | 'down') {
-  await requireAdmin()
-  const { data: unitData } = await supabaseAdmin
-    .from('units').select('id, course_id, order_index').eq('id', unitId).single()
-  const unit = unitData as { id: string; course_id: string; order_index: number } | null
-  if (!unit) return
-  const { data: siblingsData } = await supabaseAdmin
-    .from('units').select('id, order_index')
-    .eq('course_id', unit.course_id).eq('status', 'approved').order('order_index')
-  const siblings = siblingsData as { id: string; order_index: number }[] | null
-  if (!siblings) return
-  const idx = siblings.findIndex(u => u.id === unitId)
-  const swapIdx = direction === 'up' ? idx - 1 : idx + 1
-  if (swapIdx < 0 || swapIdx >= siblings.length) return
-  const swap = siblings[swapIdx]
-  await Promise.all([
-    supabaseAdmin.from('units').update({ order_index: swap.order_index }).eq('id', unitId),
-    supabaseAdmin.from('units').update({ order_index: unit.order_index }).eq('id', swap.id),
-  ])
-  revalidatePath('/admin/courses')
-}
-
-export async function updateUnitTitle(unitId: string, title: string) {
-  await requireAdmin()
-  await supabaseAdmin.from('units').update({ title: title.trim() }).eq('id', unitId)
-  revalidatePath('/admin/courses')
 }
 
 export async function adminUpdatePendingUnitTitle(unitId: string, title: string) {

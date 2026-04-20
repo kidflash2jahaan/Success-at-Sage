@@ -10,9 +10,3 @@ export async function signInWithEmail(formData: FormData) {
   if (error) redirect('/login?error=invalid')
   redirect('/dashboard')
 }
-
-export async function signOut() {
-  const supabase = await createSupabaseServerClient()
-  await supabase.auth.signOut()
-  redirect('/')
-}
