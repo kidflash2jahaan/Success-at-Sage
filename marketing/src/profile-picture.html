@@ -62,28 +62,34 @@
     filter: blur(90px);
   }
 
-  /* Hero wordmark — stacked and centered */
+  /* Hero wordmark — stacked and centered.
+     line-height: 1.2 is deliberate — with background-clip: text on the
+     gradient line below, anything outside the line-box (like the "g"
+     descender) has no background rectangle to sample, so it renders
+     transparent. 1.2 gives the descender its own row of pixels to fill. */
   .hero {
     position: relative;
     z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Give the "g" descender generous headroom so it never clips. */
-    line-height: 1.02;
+    line-height: 1.2;
     padding: 0 80px;
   }
   .hero .success {
-    font-size: 250px;
+    font-size: 220px;
     font-weight: 800;
     letter-spacing: -0.04em;
     color: var(--text);
     text-shadow: 0 8px 48px rgba(167, 139, 250, 0.25);
   }
   .hero .at-sage {
-    font-size: 250px;
+    font-size: 220px;
     font-weight: 800;
     letter-spacing: -0.04em;
+    /* Extra bottom padding extends the gradient background box past the
+       line-box so the "g" descender actually has pixels to clip against. */
+    padding-bottom: 0.12em;
     background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 25%, #60a5fa 55%, #34d399 100%);
     -webkit-background-clip: text;
     background-clip: text;
