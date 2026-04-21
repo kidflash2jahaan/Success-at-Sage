@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin, calculateGrade } from '@/lib/auth'
 import { chooseContestWinner, markWinnerPaid, updateContestSettings } from '@/app/actions/admin'
 import { redirect } from 'next/navigation'
+import MarketingAssets from './MarketingAssets'
 
 export default async function AdminContestPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
   await requireAdmin()
@@ -197,6 +198,9 @@ export default async function AdminContestPage({ searchParams }: { searchParams:
           </button>
         </form>
       </div>
+
+      {/* Marketing assets */}
+      <MarketingAssets />
 
       {/* Past winners */}
       {paidWinners.length > 0 && (

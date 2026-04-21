@@ -244,48 +244,68 @@ Thanks,
 
 ---
 
-## 11. Asset index (what you have in this folder)
+## 11. Asset index (where things live now)
+
+Two kinds of assets, two different workflows:
+
+**Static** — the Instagram profile picture. Rendered once from HTML and
+doesn't change month-to-month.
 
 ```
 marketing/
-├── instagram/
-│   ├── profile-picture.png       → Instagram profile photo (1080x1080)
-│   ├── ig-01-launch.png          → Launch announcement feed post
-│   ├── ig-02-leaderboard.png     → Leaderboard update template (swap names/counts each time)
-│   └── ig-03-winner.png          → Winner reveal template (end of month)
-├── posters/
-│   ├── poster-stall.pdf          → Letter portrait, print this for bathroom stalls
-│   ├── poster-stall-preview.png  → Preview of stall poster
-│   ├── poster-door.pdf           → Letter landscape, print for classroom doors
-│   └── poster-door-preview.png   → Preview of door poster
-├── src/                          → Editable HTML/CSS + QR code source
-│   ├── _shared.css               → Brand palette (matches app/globals.css)
-│   ├── profile-picture.html
-│   ├── ig-01-launch.html
-│   ├── ig-02-leaderboard.html    → Edit this before each leaderboard post
-│   ├── ig-03-winner.html         → Edit this at end of month
-│   ├── poster-stall.html
-│   ├── poster-door.html
-│   ├── qr.png                    → QR code → https://successatsage.com
-│   └── qr.svg                    → Vector version
-└── copy/
-    └── README.md                 → This file
+└── src/
+    ├── _shared.css               → Brand palette (matches app/globals.css)
+    └── profile-picture.html      → Source for the profile picture
+
+public/brand/
+├── profile-picture.png           → Rendered output (1080×1080) — served as /brand/profile-picture.png
+├── qr.png                        → QR code → https://successatsage.com
+└── qr.svg                        → Vector version
+
+marketing/copy/
+└── README.md                     → This file
 ```
 
-### How to re-render after editing HTML
+**Dynamic** — IG posts and printable posters are now generated on demand
+from live contest data (prize, period, leaderboard standings, winners).
+They live behind admin-only routes under `/og/*`:
 
-Run the render script from the project root:
+| Route | Size | Purpose |
+|---|---|---|
+| `/og/ig-launch` | 1080×1080 | Feed post announcing the prize |
+| `/og/ig-leaderboard` | 1080×1080 | Current top 3 this month |
+| `/og/ig-winner` | 1080×1080 | Paid winner reveal (falls back to current leader) |
+| `/og/poster-stall` | 816×1056 | Bathroom stall, letter portrait |
+| `/og/poster-door` | 1056×816 | Classroom door, letter landscape |
+
+Each route takes `?download=1` to force a download instead of inline display.
+
+### How to generate the dynamic assets
+
+1. Go to `/admin/contest` (you have to be signed in as admin).
+2. Set the prize, period start, and next reset date in **Settings**.
+3. Scroll to **Marketing Assets** and click **Generate Assets**.
+4. Preview each card — if something looks off, fix the underlying data
+   (e.g. fix a misspelled winner name) and click **Regenerate**.
+5. Click **Download** on each card you need.
+
+This setup means posts always match reality — the leaderboard post shows
+real current standings, the winner post pulls the most recent paid
+winner, etc. No more editing HTML templates.
+
+### How to re-render the profile picture
+
+Only needed if you edit `marketing/src/profile-picture.html`:
 
 ```bash
-node marketing/render.mjs          # re-render everything
-node marketing/render.mjs ig       # just the Instagram posts
-node marketing/render.mjs posters  # just the posters (previews + PDFs)
+node marketing/render.mjs
 ```
 
-The script uses headless Chrome to rasterize each HTML source into the
-correct output. It renders ~87px taller than needed and crops the bottom
-off — without that compensation, Chrome's headless viewport leaves a strip
-of white below the body. Requires `pngjs` (already in `devDependencies`).
+The script uses headless Chrome to rasterize the HTML, writing the output
+to `public/brand/profile-picture.png`. It renders ~87px taller than needed
+and crops the bottom off — without that compensation, Chrome's headless
+viewport leaves a strip of white below the body. Requires `pngjs` (already
+in `devDependencies`).
 
 ---
 

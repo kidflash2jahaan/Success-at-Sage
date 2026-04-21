@@ -5,13 +5,17 @@
 <title>Success at Sage — profile picture</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 <style>
   :root {
     --bg: #06060f;
-    --violet: #a78bfa;
-    --blue: #60a5fa;
-    --green: #34d399;
+    --bg-2: #0a0a1f;
+    --violet-400: #a78bfa;
+    --blue-400: #60a5fa;
+    --green-400: #34d399;
+    --amber-400: #fbbf24;
+    --amber-500: #f59e0b;
+    --text: #ffffff;
   }
   html, body { margin: 0; padding: 0; background: transparent; }
   body {
@@ -24,73 +28,183 @@
     position: relative;
     width: 1080px;
     height: 1080px;
-    /* Base radial so Instagram's circle crop looks intentional */
     background:
-      radial-gradient(circle at 30% 20%, rgba(167, 139, 250, 0.35), transparent 55%),
+      radial-gradient(circle at 30% 20%, rgba(167, 139, 250, 0.40), transparent 55%),
       radial-gradient(circle at 75% 80%, rgba(52, 211, 153, 0.22), transparent 55%),
-      radial-gradient(circle at 85% 25%, rgba(96, 165, 250, 0.25), transparent 50%),
+      radial-gradient(circle at 85% 25%, rgba(96, 165, 250, 0.28), transparent 50%),
       linear-gradient(135deg, #0a0a1f 0%, #06060f 100%);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
-  /* Subtle grid texture for depth */
   .grid {
     position: absolute; inset: 0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
     background-size: 90px 90px;
-    mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 75%);
+    mask-image: radial-gradient(circle at 50% 50%, black 42%, transparent 78%);
   }
-  .mark {
+  .glow {
     position: absolute;
-    inset: 0;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 780px;
+    height: 780px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.45) 0%, transparent 58%);
+    filter: blur(90px);
+  }
+  /* Top eyebrow wordmark */
+  .eyebrow {
+    position: relative;
+    z-index: 3;
     display: flex;
     align-items: center;
+    gap: 20px;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    color: var(--amber-400);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+  }
+  .eyebrow .tick {
+    width: 50px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--amber-400));
+  }
+  .eyebrow .tick.right {
+    background: linear-gradient(90deg, var(--amber-400), transparent);
+  }
+
+  /* Main mark: giant stylized S with ascent indicator */
+  .mark {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
     justify-content: center;
-    flex-direction: column;
   }
   .monogram {
-    font-size: 640px;
+    font-size: 720px;
     font-weight: 900;
-    line-height: 0.85;
+    line-height: 0.82;
     letter-spacing: -0.06em;
+    background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 25%, #60a5fa 55%, #34d399 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-stroke: 0;
+    position: relative;
+  }
+  /* Amber ascent mark (triangle) — visual rhyme with "climbing the leaderboard" */
+  .ascent {
+    position: absolute;
+    top: 48px;
+    right: -40px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ascent .caret {
+    width: 0; height: 0;
+    border-left: 26px solid transparent;
+    border-right: 26px solid transparent;
+    border-bottom: 40px solid var(--amber-400);
+    filter: drop-shadow(0 0 18px rgba(251, 191, 36, 0.7));
+  }
+  .ascent .count {
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--amber-400);
+    letter-spacing: -0.01em;
+  }
+
+  /* Wordmark stack beneath the S */
+  .wordmark {
+    position: relative;
+    z-index: 3;
+    margin-top: 32px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    font-size: 76px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    color: var(--text);
+  }
+  .wordmark .sep {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--amber-400);
+    box-shadow: 0 0 24px rgba(251, 191, 36, 0.8);
+  }
+  .wordmark .gradient {
     background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 0 120px rgba(124, 58, 237, 0.25);
-    position: relative;
-    transform: translateY(-12px);
   }
-  /* The gradient blur glow behind the S */
-  .glow {
-    position: absolute;
-    width: 680px;
-    height: 680px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(124, 58, 237, 0.35) 0%, transparent 60%);
-    filter: blur(80px);
-    z-index: 0;
-  }
-  .sub {
+
+  /* Bottom tagline */
+  .tagline {
     position: relative;
-    z-index: 2;
-    margin-top: 24px;
-    font-size: 64px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: rgba(255, 255, 255, 0.85);
+    z-index: 3;
+    margin-top: 36px;
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    color: rgba(255, 255, 255, 0.45);
     text-transform: uppercase;
   }
+
+  /* Corner ornaments — tiny crosshair marks for an "emblem" feel */
+  .corner {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border: 2px solid rgba(255, 255, 255, 0.14);
+    z-index: 2;
+  }
+  .corner.tl { top: 56px; left: 56px; border-right: 0; border-bottom: 0; }
+  .corner.tr { top: 56px; right: 56px; border-left: 0; border-bottom: 0; }
+  .corner.bl { bottom: 56px; left: 56px; border-right: 0; border-top: 0; }
+  .corner.br { bottom: 56px; right: 56px; border-left: 0; border-top: 0; }
 </style>
 </head>
 <body>
   <div class="card">
     <div class="grid"></div>
-    <div class="mark">
-      <div class="glow"></div>
-      <div class="monogram" style="z-index: 2;">S</div>
+    <div class="glow"></div>
+
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+
+    <div class="eyebrow">
+      <span class="tick"></span>
+      <span>Top&nbsp;of&nbsp;the&nbsp;Class</span>
+      <span class="tick right"></span>
     </div>
+
+    <div class="mark">
+      <div class="monogram">S</div>
+      <div class="ascent">
+        <span class="caret"></span>
+        <span class="count">#1</span>
+      </div>
+    </div>
+
+    <div class="wordmark">
+      <span>Success</span>
+      <span class="sep"></span>
+      <span class="gradient">at Sage</span>
+    </div>
+
+    <div class="tagline">Sage&nbsp;Hill · Est&nbsp;MMXXVI</div>
   </div>
 </body>
 </html>
