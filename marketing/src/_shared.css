@@ -1,0 +1,83 @@
+/* Shared brand CSS for all marketing assets.
+ * Matches app/globals.css exactly — same palette, fonts, glass treatment.
+ */
+:root {
+  --bg: #06060f;
+  --bg-2: #0a0a1f;
+  --violet-600: #7c3aed;
+  --violet-500: #8b5cf6;
+  --violet-400: #a78bfa;
+  --violet-300: #c4b5fd;
+  --blue-400: #60a5fa;
+  --green-400: #34d399;
+  --amber-400: #fbbf24;
+  --amber-500: #f59e0b;
+  --text: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.55);
+  --text-faint: rgba(255, 255, 255, 0.28);
+  --glass-bg: rgba(8, 10, 30, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: transparent; }
+body {
+  font-family: "Outfit", -apple-system, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--text);
+}
+
+.brand-bg {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(167, 139, 250, 0.28), transparent 55%),
+    radial-gradient(circle at 85% 85%, rgba(52, 211, 153, 0.18), transparent 55%),
+    radial-gradient(circle at 85% 15%, rgba(96, 165, 250, 0.20), transparent 55%),
+    linear-gradient(135deg, var(--bg-2) 0%, var(--bg) 100%);
+}
+
+.brand-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 85%);
+  pointer-events: none;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--violet-300);
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  padding: 12px 24px;
+  border-radius: 999px;
+}
+.pill-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--violet-400);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.8);
+}
+.pill-amber { color: var(--amber-400); border-color: rgba(251, 191, 36, 0.3); }
+.pill-amber .pill-dot { background: var(--amber-400); box-shadow: 0 0 12px rgba(251, 191, 36, 0.8); }

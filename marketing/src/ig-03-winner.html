@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Winner reveal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="_shared.css" />
+<style>
+  body { width: 1080px; height: 1080px; }
+  .canvas {
+    position: relative;
+    width: 1080px; height: 1080px;
+    overflow: hidden;
+    padding: 80px;
+    display: flex; flex-direction: column;
+  }
+  .top-row {
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 2;
+  }
+  .wordmark {
+    font-size: 28px; font-weight: 700;
+    color: var(--text);
+  }
+  .wordmark .dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet-400), var(--blue-400));
+    margin-right: 10px; vertical-align: middle; transform: translateY(-2px);
+  }
+  .hero {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    z-index: 2; position: relative;
+  }
+  .kicker {
+    font-size: 22px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--amber-400);
+    margin-bottom: 26px;
+  }
+  .kicker .trophy {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--amber-400);
+    box-shadow: 0 0 14px rgba(251, 191, 36, 0.9);
+    margin-right: 12px;
+    vertical-align: middle;
+    transform: translateY(-2px);
+  }
+  .name {
+    font-size: 168px; font-weight: 900;
+    letter-spacing: -0.04em; line-height: 0.95;
+    margin-bottom: 36px;
+  }
+  .won-row {
+    display: flex; align-items: baseline; gap: 24px;
+    margin-bottom: 56px;
+  }
+  .won-label {
+    font-size: 44px; font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: -0.01em;
+  }
+  .won-amount {
+    font-size: 120px; font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    max-width: 760px;
+  }
+  .stat {
+    padding: 28px 32px;
+    border-radius: 22px;
+  }
+  .stat-value {
+    font-size: 68px; font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1;
+    margin-bottom: 10px;
+  }
+  .stat-label {
+    font-size: 22px; font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+
+  .bottom-row {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    z-index: 2;
+  }
+  .message {
+    font-size: 26px; font-weight: 600;
+    color: var(--text-dim);
+    max-width: 620px;
+    line-height: 1.4;
+  }
+  .message b { color: var(--text); }
+  .url {
+    font-family: "Geist Mono", monospace;
+    font-size: 28px; font-weight: 500;
+    color: var(--text);
+    text-align: right;
+  }
+  .url .arrow { color: var(--violet-400); margin-right: 10px; }
+
+  /* Warm amber glow behind the name */
+  .glow {
+    position: absolute;
+    width: 900px; height: 900px;
+    left: -10%; top: 20%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.18) 0%, transparent 55%);
+    filter: blur(50px);
+    z-index: 0;
+  }
+</style>
+</head>
+<body class="brand-bg">
+  <div class="canvas">
+    <div class="brand-grid"></div>
+    <div class="glow"></div>
+
+    <div class="top-row">
+      <div class="wordmark"><span class="dot"></span>Success at Sage</div>
+      <div class="pill pill-amber"><span class="pill-dot"></span>Winner · May 2026</div>
+    </div>
+
+    <div class="hero">
+      <div class="kicker"><span class="trophy"></span>Congrats to</div>
+      <div class="name gradient-text">[Name Here]</div>
+      <div class="won-row">
+        <span class="won-label">won</span>
+        <span class="won-amount" style="color: var(--amber-400);">$50</span>
+      </div>
+      <div class="stats">
+        <div class="stat glass">
+          <div class="stat-value">00</div>
+          <div class="stat-label">approved uploads</div>
+        </div>
+        <div class="stat glass">
+          <div class="stat-value">00k+</div>
+          <div class="stat-label">views earned</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-row">
+      <div class="message">
+        <b>June contest starts now.</b><br />
+        New leaderboard, new prize. Upload your finals notes before the school year ends.
+      </div>
+      <div class="url"><span class="arrow">→</span>successatsage.com</div>
+    </div>
+  </div>
+</body>
+</html>

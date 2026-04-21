@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Bathroom stall poster — portrait letter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="_shared.css" />
+<style>
+  @page { size: letter portrait; margin: 0; }
+  html, body { width: 8.5in; height: 11in; }
+  body {
+    width: 8.5in; height: 11in;
+    /* Use CSS in-px for consistent scaling while keeping page at letter size */
+    zoom: 1;
+  }
+  .poster {
+    position: relative;
+    width: 8.5in; height: 11in;
+    padding: 0.55in 0.6in;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 2;
+  }
+  .wordmark {
+    font-size: 28px; font-weight: 700; letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .wordmark .dot {
+    display: inline-block; width: 11px; height: 11px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--violet-400), var(--blue-400));
+    margin-right: 10px; vertical-align: middle; transform: translateY(-2px);
+  }
+  .tag {
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--amber-400);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    padding: 8px 14px; border-radius: 999px;
+  }
+
+  .hero {
+    margin-top: 0.35in;
+    z-index: 2;
+  }
+  .pre {
+    font-size: 20px; font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    margin-bottom: 14px;
+  }
+  .amount {
+    font-size: 200px; font-weight: 900;
+    letter-spacing: -0.06em; line-height: 0.9;
+    margin-bottom: 4px;
+  }
+  .headline {
+    font-size: 56px; font-weight: 800;
+    letter-spacing: -0.025em; line-height: 1;
+    margin-bottom: 22px;
+  }
+  .sub {
+    font-size: 22px; font-weight: 500;
+    color: var(--text-dim);
+    line-height: 1.4;
+    max-width: 5.8in;
+  }
+  .sub b { color: var(--text); font-weight: 700; }
+
+  .qr-block {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    align-items: center;
+    padding: 28px;
+    border-radius: 28px;
+    z-index: 2;
+  }
+  .qr-wrap {
+    width: 2.3in; height: 2.3in;
+    padding: 16px;
+    background: white;
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qr-wrap img { width: 100%; height: 100%; display: block; }
+  .qr-text { display: flex; flex-direction: column; gap: 8px; }
+  .scan-label {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--violet-300);
+  }
+  .scan-head {
+    font-size: 36px; font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .url {
+    font-family: "Geist Mono", monospace;
+    font-size: 18px; font-weight: 500;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+  .url .arrow { color: var(--violet-400); margin-right: 6px; }
+
+  .footer {
+    margin-top: 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 14px; color: var(--text-faint);
+    letter-spacing: 0.04em;
+    z-index: 2;
+  }
+  .deadline b { color: var(--text); }
+
+  .glow-a {
+    position: absolute;
+    width: 7in; height: 7in;
+    left: -2in; top: 1.5in;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.25) 0%, transparent 60%);
+    filter: blur(40px);
+    z-index: 0;
+  }
+  .glow-b {
+    position: absolute;
+    width: 6in; height: 6in;
+    right: -1.5in; bottom: 1in;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(52, 211, 153, 0.18) 0%, transparent 60%);
+    filter: blur(40px);
+    z-index: 0;
+  }
+</style>
+</head>
+<body class="brand-bg">
+  <div class="poster">
+    <div class="brand-grid"></div>
+    <div class="glow-a"></div>
+    <div class="glow-b"></div>
+
+    <div class="header">
+      <div class="wordmark"><span class="dot"></span>Success at Sage</div>
+      <div class="tag">Ends May 31</div>
+    </div>
+
+    <div class="hero">
+      <div class="pre">Top note-uploader this month wins</div>
+      <div class="amount gradient-text">$50</div>
+      <div class="headline">Amazon gift card.</div>
+      <div class="sub">
+        Upload your <b>AP&nbsp;review notes</b>, finals study guides, or practice tests.
+        Every approved submission ranks you on the leaderboard.
+        <br /><br />
+        <b>Competition so far: zero.</b> Easy money if you move first.
+      </div>
+    </div>
+
+    <div class="qr-block glass">
+      <div class="qr-wrap"><img src="qr.png" alt="QR to successatsage.com" /></div>
+      <div class="qr-text">
+        <div class="scan-label">Scan to join</div>
+        <div class="scan-head">Upload one thing.<br/>Be #1 today.</div>
+        <div class="url"><span class="arrow">→</span>successatsage.com</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>Made by Sage Hill students, for Sage Hill students</div>
+      <div class="deadline">Contest ends <b>May 31, 2026</b></div>
+    </div>
+  </div>
+</body>
+</html>
