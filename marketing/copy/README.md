@@ -44,7 +44,7 @@ $50 for the top note-uploader this month. Scroll.
 
 Students at Sage Hill: there's a new study notes platform — built by us, for us. Upload your AP review notes, finals study guides, practice tests. Everything goes through admin approval before publishing, so it stays legit (no cheating — just studying).
 
-Top contributor on May 31st wins $50. Right now? Zero uploads. Zero competition. Whoever moves first, leads.
+Top contributor on June 1st wins $50. Right now? Zero uploads. Zero competition. Whoever moves first, leads.
 
 Link in bio · successatsage.com
 
@@ -64,7 +64,7 @@ May leaderboard, [date].
 
 [Name] is leading with [N] uploads. [Name] is right behind at [N]. Spot #4 is still empty — that's free $50 waiting for someone to claim it.
 
-Deadline May 31. Upload something today and you could be #1 tomorrow.
+Deadline June 1. Upload something today and you could be #1 tomorrow.
 
 Link in bio · successatsage.com
 ```
@@ -72,7 +72,7 @@ Link in bio · successatsage.com
 **Variant for empty/slow days:**
 
 ```
-Week 1 leaderboard: nobody's really trying yet. Prize is still $50. Deadline is still May 31. An AP review packet uploaded right now locks in first place until someone beats you.
+Week 1 leaderboard: nobody's really trying yet. Prize is still $50. Deadline is still June 1. An AP review packet uploaded right now locks in first place until someone beats you.
 
 Link in bio.
 ```
@@ -110,7 +110,7 @@ Keep stories short — 1 sentence each. Post 3–4 per drop.
 
 1. `just finished an AP? your notes are worthless to you now. upload them for $50.`
 2. *[leaderboard screenshot]* — "swipe up to see"
-3. `9 uploads = currently #1. beat that before May 31 = you win.`
+3. `9 uploads = currently #1. beat that before June 1 = you win.`
 
 ### Story set: finals week (May 18–29)
 
@@ -131,7 +131,7 @@ Keep stories short — 1 sentence each. Post 3–4 per drop.
 
 ```
 hey [name] — real quick: i built a study notes site for sage hill.
-top contributor by may 31 wins $50 (amazon). right now literally no one has uploaded anything, so like 3 uploads = you win.
+top contributor by june 1 wins $50 (amazon). right now literally no one has uploaded anything, so like 3 uploads = you win.
 
 thought of you because you take good notes in [class]. takes 2 min, admin approves it, done.
 
@@ -141,7 +141,7 @@ successatsage.com — lmk if you have questions
 **Short follow-up after 2 days if no response:**
 
 ```
-leaderboard is still empty btw. may 31 deadline
+leaderboard is still empty btw. june 1 deadline
 ```
 
 ---
@@ -179,7 +179,7 @@ Make this list before Monday. Fill in 20 names.
 >
 > Second: **Mr. Campeau has approved this to launch.** So it's legit.
 >
-> Last thing — for May only, the top contributor on the leaderboard by **May 31st wins a $50 Amazon gift card**. Right now literally nobody has uploaded anything, so if you scan this QR code and upload your AP notes after you take your exams, you could win $50 for notes you were going to throw out anyway.
+> Last thing — for May only, the top contributor on the leaderboard by **June 1st wins a $50 Amazon gift card**. Right now literally nobody has uploaded anything, so if you scan this QR code and upload your AP notes after you take your exams, you could win $50 for notes you were going to throw out anyway.
 >
 > QR code is on posters around campus. Or just go to **successatsage.com** on your phone.
 >
@@ -204,7 +204,7 @@ A few things I want to be upfront about:
 
 2. The site is Sage-Hill-only: students sign in with their @sagehillschool.org email. It isn't open to the public.
 
-3. I'm running a contest to seed the first month of content: the top note-uploader by May 31st wins a $50 Amazon gift card, funded out of my own pocket. I think the AP-exam / finals timing is the ideal launch window because it's when the notes students already have are most valuable to share.
+3. I'm running a contest to seed the first month of content: the top note-uploader by June 1st wins a $50 Amazon gift card, funded out of my own pocket. I think the AP-exam / finals timing is the ideal launch window because it's when the notes students already have are most valuable to share.
 
 I'd love 10 minutes before Monday to show you how the admin approval works so you can see exactly how the cheating-prevention piece functions. Do you have any time this week?
 
