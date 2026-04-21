@@ -85,23 +85,34 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
     try {
       let unitId = selectedUnitId
       if (creatingUnit) {
-        unitId = await submitNewUnit(selectedCourse.id, newUnitTitle)
+        const unitResult = await submitNewUnit(selectedCourse.id, newUnitTitle)
+        if (!unitResult.ok) {
+          setError(unitResult.error)
+          setSubmitting(false)
+          return
+        }
+        unitId = unitResult.data.unitId
       }
 
+      let result
       if (mode === 'paper') {
-        if (pdfFiles.length === 0) throw new Error('Please select a PDF or photos.')
+        if (pdfFiles.length === 0) {
+          setError('Please select a PDF or photos.')
+          setSubmitting(false)
+          return
+        }
         const fileToUpload = pdfFiles.length === 1 && isPdfFile(pdfFiles[0])
           ? pdfFiles[0]
           : await imagesToPdf(pdfFiles)
         const pdfPath = await uploadPdfWithTUS(fileToUpload, unitId)
-        await submitMaterial({ unitId, title, type: 'note', contentType: 'pdf', contentText: '', pdfPath })
+        result = await submitMaterial({ unitId, title, type: 'note', contentType: 'pdf', contentText: '', pdfPath })
       } else {
         const attachmentPaths: string[] = []
         for (const file of attachmentFiles) {
           const path = await uploadFileWithTUS(file, unitId)
           attachmentPaths.push(path)
         }
-        await submitMaterial({
+        result = await submitMaterial({
           unitId,
           title,
           type: 'note',
@@ -111,10 +122,15 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         })
       }
 
+      if (!result.ok) {
+        setError(result.error)
+        setSubmitting(false)
+        return
+      }
+
       router.push('/profile')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
-    } finally {
       setSubmitting(false)
     }
   }

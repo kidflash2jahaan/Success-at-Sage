@@ -44,6 +44,7 @@ export default function EditMaterialForm({
     setSaving(true)
     setError('')
     try {
+      let result
       if (mode === 'paper') {
         let pdfPath = initialPdfPath
         if (pdfFiles.length > 0) {
@@ -52,7 +53,7 @@ export default function EditMaterialForm({
             : await imagesToPdf(pdfFiles)
           pdfPath = await uploadPdfWithTUS(fileToUpload, unitId)
         }
-        await editMaterial(id, title, 'note', 'pdf', null, pdfPath, undefined, null)
+        result = await editMaterial(id, title, 'note', 'pdf', null, pdfPath, undefined, null)
       } else {
         const uploadedPaths: string[] = []
         for (const file of newFiles) {
@@ -60,7 +61,12 @@ export default function EditMaterialForm({
           uploadedPaths.push(path)
         }
         const finalPaths = [...existingPaths, ...uploadedPaths]
-        await editMaterial(id, title, 'note', 'richtext', content, null, undefined, finalPaths.length ? finalPaths : null)
+        result = await editMaterial(id, title, 'note', 'richtext', content, null, undefined, finalPaths.length ? finalPaths : null)
+      }
+      if (!result.ok) {
+        setError(result.error)
+        setSaving(false)
+        return
       }
       router.push('/profile')
     } catch (err) {

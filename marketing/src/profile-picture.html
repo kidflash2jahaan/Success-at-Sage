@@ -51,12 +51,13 @@
     position: absolute;
     left: 50%; top: 50%;
     transform: translate(-50%, -50%);
-    width: 780px;
-    height: 780px;
+    width: 820px;
+    height: 820px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(124, 58, 237, 0.45) 0%, transparent 58%);
     filter: blur(90px);
   }
+
   /* Top eyebrow wordmark */
   .eyebrow {
     position: relative;
@@ -69,7 +70,7 @@
     letter-spacing: 0.32em;
     color: var(--amber-400);
     text-transform: uppercase;
-    margin-bottom: 40px;
+    margin-bottom: 80px;
   }
   .eyebrow .tick {
     width: 50px; height: 2px;
@@ -79,84 +80,64 @@
     background: linear-gradient(90deg, var(--amber-400), transparent);
   }
 
-  /* Main mark: giant stylized S with ascent indicator */
-  .mark {
+  /* Hero wordmark — stacked */
+  .hero {
     position: relative;
     z-index: 3;
     display: flex;
-    align-items: flex-start;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    line-height: 0.88;
   }
-  .monogram {
-    font-size: 720px;
+  .hero .success {
+    font-size: 228px;
     font-weight: 900;
-    line-height: 0.82;
-    letter-spacing: -0.06em;
+    letter-spacing: -0.045em;
+    color: var(--text);
+    text-shadow: 0 8px 48px rgba(167, 139, 250, 0.25);
+  }
+  .hero .at-sage {
+    font-size: 228px;
+    font-weight: 900;
+    letter-spacing: -0.045em;
     background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 25%, #60a5fa 55%, #34d399 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    -webkit-text-stroke: 0;
-    position: relative;
-  }
-  /* Amber ascent mark (triangle) — visual rhyme with "climbing the leaderboard" */
-  .ascent {
-    position: absolute;
-    top: 48px;
-    right: -40px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .ascent .caret {
-    width: 0; height: 0;
-    border-left: 26px solid transparent;
-    border-right: 26px solid transparent;
-    border-bottom: 40px solid var(--amber-400);
-    filter: drop-shadow(0 0 18px rgba(251, 191, 36, 0.7));
-  }
-  .ascent .count {
-    font-size: 34px;
-    font-weight: 800;
-    color: var(--amber-400);
-    letter-spacing: -0.01em;
   }
 
-  /* Wordmark stack beneath the S */
-  .wordmark {
+  /* Divider rule with amber dot */
+  .rule {
     position: relative;
     z-index: 3;
-    margin-top: 32px;
+    margin-top: 72px;
     display: flex;
     align-items: center;
-    gap: 22px;
-    font-size: 76px;
-    font-weight: 800;
-    letter-spacing: -0.015em;
-    color: var(--text);
+    gap: 18px;
   }
-  .wordmark .sep {
+  .rule .line {
+    width: 90px; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35));
+  }
+  .rule .line.right {
+    background: linear-gradient(90deg, rgba(255,255,255,0.35), transparent);
+  }
+  .rule .dot {
     width: 12px; height: 12px;
     border-radius: 50%;
     background: var(--amber-400);
     box-shadow: 0 0 24px rgba(251, 191, 36, 0.8);
-  }
-  .wordmark .gradient {
-    background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
   }
 
   /* Bottom tagline */
   .tagline {
     position: relative;
     z-index: 3;
-    margin-top: 36px;
+    margin-top: 28px;
     font-size: 26px;
     font-weight: 600;
     letter-spacing: 0.32em;
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(255, 255, 255, 0.55);
     text-transform: uppercase;
   }
 
@@ -190,18 +171,15 @@
       <span class="tick right"></span>
     </div>
 
-    <div class="mark">
-      <div class="monogram">S</div>
-      <div class="ascent">
-        <span class="caret"></span>
-        <span class="count">#1</span>
-      </div>
+    <div class="hero">
+      <div class="success">Success</div>
+      <div class="at-sage">at&nbsp;Sage</div>
     </div>
 
-    <div class="wordmark">
-      <span>Success</span>
-      <span class="sep"></span>
-      <span class="gradient">at Sage</span>
+    <div class="rule">
+      <span class="line"></span>
+      <span class="dot"></span>
+      <span class="line right"></span>
     </div>
 
     <div class="tagline">Sage&nbsp;Hill · Est&nbsp;MMXXVI</div>
