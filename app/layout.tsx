@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import { Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import BlobBackground from "@/components/BlobBackground";
 import "./globals.css";
 
@@ -47,6 +49,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <BlobBackground />
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
