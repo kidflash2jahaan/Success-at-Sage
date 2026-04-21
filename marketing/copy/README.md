@@ -88,7 +88,7 @@ $50 paid to [Name] — top contributor for May with [N] uploads and [N]k+ views 
 
 Thanks for seeding the site with real notes. Everyone who looked something up for finals this month used what you built.
 
-June contest is live. New leaderboard, new $25 prize. Upload your finals notes before school ends and win the only contest running over summer.
+June contest is live. New leaderboard, new $50 prize. Upload your finals notes before school ends and win the only contest running over summer.
 
 Link in bio · successatsage.com
 ```

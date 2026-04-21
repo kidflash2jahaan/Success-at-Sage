@@ -1,6 +1,7 @@
 import { completeOnboarding } from '@/app/actions/auth'
 import { getUser } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getGraduatingYearOptions } from '@/lib/grade'
 import { redirect } from 'next/navigation'
 
 export default async function OnboardingPage() {
@@ -14,8 +15,7 @@ export default async function OnboardingPage() {
     .single()
   if (existing) redirect('/dashboard')
 
-  const currentYear = new Date().getFullYear()
-  const years = [currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4]
+  const years = getGraduatingYearOptions()
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -42,8 +42,8 @@ export default async function OnboardingPage() {
                 required
                 className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
               >
-                {years.map(y => (
-                  <option key={y} value={y}>{y}</option>
+                {years.map(({ year, label }) => (
+                  <option key={year} value={year}>{year} — {label}</option>
                 ))}
               </select>
             </div>

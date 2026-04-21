@@ -2,6 +2,8 @@ import { getUser } from './supabase/server'
 import { supabaseAdmin } from './supabase/admin'
 import { redirect } from 'next/navigation'
 
+export { calculateGrade } from './grade'
+
 export async function getCurrentUser() {
   const authUser = await getUser()
   if (!authUser) return null
@@ -33,10 +35,3 @@ export async function requireAdmin() {
   return user
 }
 
-export function calculateGrade(graduatingYear: number): { grade: number; label: string } {
-  const now = new Date()
-  const schoolYear = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1
-  const grade = 12 - (graduatingYear - schoolYear - 1)
-  const labels: Record<number, string> = { 9: 'Freshman', 10: 'Sophomore', 11: 'Junior', 12: 'Senior' }
-  return { grade, label: labels[grade] ?? `Grade ${grade}` }
-}

@@ -1,5 +1,6 @@
 'use client'
 import { signUpWithEmail } from '@/app/actions/signup'
+import { getGraduatingYearOptions } from '@/lib/grade'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -12,8 +13,7 @@ const ERRORS: Record<string, string> = {
 function SignupForm() {
   const params = useSearchParams()
   const errorMessage = ERRORS[params.get('error') ?? '']
-  const currentYear = new Date().getFullYear()
-  const years = [currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4]
+  const years = getGraduatingYearOptions()
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -60,7 +60,9 @@ function SignupForm() {
             <div>
               <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Graduating Year</label>
               <select name="graduatingYear" required className="glass-input w-full rounded-xl px-4 py-2.5 text-sm">
-                {years.map(y => <option key={y} value={y}>{y}</option>)}
+                {years.map(({ year, label }) => (
+                  <option key={year} value={year}>{year} — {label}</option>
+                ))}
               </select>
             </div>
             <button type="submit"

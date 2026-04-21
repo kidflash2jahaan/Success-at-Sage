@@ -2,11 +2,16 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 
 export default async function LandingPage() {
-  const user = await getCurrentUser().catch(() => null)
+  const [user, { data: settingsData }] = await Promise.all([
+    getCurrentUser().catch(() => null),
+    supabaseAdmin.from('contest_settings').select('prize_description').eq('id', 1).single(),
+  ])
   if (user) redirect('/dashboard')
+  const prize = (settingsData as { prize_description?: string } | null)?.prize_description ?? '$50 Amazon gift card'
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -71,7 +76,7 @@ export default async function LandingPage() {
           <div className="animate-fade-up stagger-3 flex items-center justify-center gap-2 mb-6">
             <Link href="/leaderboard" className="inline-flex items-center gap-2 glass border border-amber-500/25 px-4 py-2 rounded-full text-sm hover:border-amber-500/50 transition-colors">
               <span className="text-amber-400">🎁</span>
-              <span className="text-white/70">Top contributor wins a <span className="text-amber-400 font-semibold">$25 Amazon gift card</span> every month</span>
+              <span className="text-white/70">Top contributor wins a <span className="text-amber-400 font-semibold">{prize}</span> every month</span>
               <span className="text-white/30 text-xs">→</span>
             </Link>
           </div>

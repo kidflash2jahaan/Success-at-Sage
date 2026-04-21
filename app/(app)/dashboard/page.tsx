@@ -12,7 +12,7 @@ export default async function DashboardPage() {
     supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('id', 1).single(),
   ])
   const settings = contestSettings as { prize_description?: string; next_reset_date?: string } | null
-  const prize = settings?.prize_description ?? '$25 Amazon gift card'
+  const prize = settings?.prize_description ?? '$50 Amazon gift card'
   const resetDate = settings?.next_reset_date
     ? new Date(settings.next_reset_date + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
     : null

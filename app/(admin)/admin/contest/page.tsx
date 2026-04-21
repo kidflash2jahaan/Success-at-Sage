@@ -19,7 +19,7 @@ export default async function AdminContestPage({ searchParams }: { searchParams:
       .order('created_at', { ascending: false }),
   ])
 
-  const settings = (settingsData ?? { period_start: today, next_reset_date: today, prize_description: '$25 Starbucks gift card' }) as {
+  const settings = (settingsData ?? { period_start: today, next_reset_date: today, prize_description: '$50 Amazon gift card' }) as {
     period_start: string
     next_reset_date: string | null
     prize_description: string
