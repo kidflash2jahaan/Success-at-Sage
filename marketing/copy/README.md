@@ -274,22 +274,18 @@ marketing/
 
 ### How to re-render after editing HTML
 
+Run the render script from the project root:
+
 ```bash
-cd marketing
-
-# PNG (Instagram post, 1080x1080)
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --headless --disable-gpu --hide-scrollbars --virtual-time-budget=2000 \
-  --screenshot=instagram/ig-02-leaderboard.png \
-  --window-size=1080,1080 \
-  "file://$(pwd)/src/ig-02-leaderboard.html"
-
-# PDF (poster)
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
-  --headless --disable-gpu --hide-scrollbars --virtual-time-budget=2000 \
-  --no-pdf-header-footer --print-to-pdf=posters/poster-stall.pdf \
-  "file://$(pwd)/src/poster-stall.html"
+node marketing/render.mjs          # re-render everything
+node marketing/render.mjs ig       # just the Instagram posts
+node marketing/render.mjs posters  # just the posters (previews + PDFs)
 ```
+
+The script uses headless Chrome to rasterize each HTML source into the
+correct output. It renders ~87px taller than needed and crops the bottom
+off — without that compensation, Chrome's headless viewport leaves a strip
+of white below the body. Requires `pngjs` (already in `devDependencies`).
 
 ---
 
