@@ -2,8 +2,16 @@
 import { signUpWithEmail } from '@/app/actions/signup'
 import Link from 'next/link'
 import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+
+const ERRORS: Record<string, string> = {
+  taken: 'An account with that email already exists.',
+  domain: 'Signups are restricted to @sagehillschool.org email addresses.',
+}
 
 function SignupForm() {
+  const params = useSearchParams()
+  const errorMessage = ERRORS[params.get('error') ?? '']
   const currentYear = new Date().getFullYear()
   const years = [currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4]
 
@@ -22,6 +30,15 @@ function SignupForm() {
           <h1 className="text-2xl font-bold text-white tracking-tight">Create your account</h1>
           <p className="text-white/40 text-sm mt-1">Join Success at Sage</p>
         </div>
+
+        {errorMessage && (
+          <div
+            role="alert"
+            className="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-200"
+          >
+            {errorMessage}
+          </div>
+        )}
 
         <div className="glass rounded-2xl p-7">
           <form action={signUpWithEmail} className="flex flex-col gap-4">

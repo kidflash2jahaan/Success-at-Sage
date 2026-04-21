@@ -1,8 +1,18 @@
 'use client'
 import { signInWithEmail } from '@/app/actions/login'
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 
-export default function LoginPage() {
+const ERRORS: Record<string, string> = {
+  invalid: 'Incorrect email or password.',
+  auth: 'We couldn\u2019t complete that sign-in. Please try again.',
+}
+
+function LoginForm() {
+  const params = useSearchParams()
+  const errorMessage = ERRORS[params.get('error') ?? '']
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="animate-scale-in w-full max-w-sm">
@@ -18,6 +28,15 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-white tracking-tight">Welcome back</h1>
           <p className="text-white/40 text-sm mt-1">Sign in to Success at Sage</p>
         </div>
+
+        {errorMessage && (
+          <div
+            role="alert"
+            className="mb-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-200"
+          >
+            {errorMessage}
+          </div>
+        )}
 
         <div className="glass rounded-2xl p-7">
           <form action={signInWithEmail} className="flex flex-col gap-4">
@@ -44,5 +63,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }
