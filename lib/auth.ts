@@ -1,5 +1,6 @@
 import { getUser } from './supabase/server'
 import { supabaseAdmin } from './supabase/admin'
+import { redirect } from 'next/navigation'
 
 export async function getCurrentUser() {
   const authUser = await getUser()
@@ -22,13 +23,13 @@ export async function getCurrentUser() {
 
 export async function requireUser() {
   const user = await getCurrentUser()
-  if (!user) throw new Error('Unauthorized')
+  if (!user) redirect('/login')
   return user
 }
 
 export async function requireAdmin() {
   const user = await requireUser()
-  if (user.role !== 'admin') throw new Error('Forbidden')
+  if (user.role !== 'admin') redirect('/dashboard')
   return user
 }
 
