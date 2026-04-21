@@ -106,7 +106,13 @@ export async function editMaterial(materialId: string, title: string, type: 'not
 }
 
 export async function incrementViewCount(materialId: string): Promise<boolean> {
-  await requireUser()
-  const { data } = await supabaseAdmin.rpc('increment_view_count', { material_id: materialId })
+  // The RPC takes user_id explicitly because we call it via the service-role
+  // client, where auth.uid() is NULL. Pass the authenticated user's id so
+  // material_views.user_id isn't null and the row can actually insert.
+  const user = await requireUser()
+  const { data } = await supabaseAdmin.rpc('increment_view_count', {
+    p_material_id: materialId,
+    p_user_id: user.id,
+  })
   return data === true
 }

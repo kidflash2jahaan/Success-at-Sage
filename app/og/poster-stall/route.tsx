@@ -124,8 +124,10 @@ export async function GET(request: Request) {
             marginTop: 32,
           }}
         >
-          <div style={{ fontSize: 20, color: brand.textDim, fontWeight: 600 }}>
-            {settings.next_reset_date ? `Deadline ${formatShortDate(settings.next_reset_date)}` : 'Monthly contest'}
+          <div style={{ display: 'flex', fontSize: 20, fontWeight: 600 }}>
+            <span style={{ color: brand.textDim }}>
+              {settings.next_reset_date ? `Deadline ${formatShortDate(settings.next_reset_date)}` : 'Monthly contest'}
+            </span>
             {daysLeft !== null && daysLeft >= 0 && daysLeft <= 31 && (
               <span style={{ color: brand.amber400, marginLeft: 12 }}>
                 {daysLeft === 0 ? '· today' : `· ${daysLeft}d left`}

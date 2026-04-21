@@ -113,11 +113,13 @@ export async function GET(request: Request) {
             <span style={{ color: brand.amber400 }}>.com</span>
           </div>
           {settings.next_reset_date && (
-            <div style={{ fontSize: 20, color: brand.textDim, marginTop: 18, fontWeight: 600 }}>
-              Deadline {formatShortDate(settings.next_reset_date)}
+            <div style={{ display: 'flex', fontSize: 20, marginTop: 18, fontWeight: 600 }}>
+              <span style={{ color: brand.textDim }}>
+                {`Deadline ${formatShortDate(settings.next_reset_date)}`}
+              </span>
               {daysLeft !== null && daysLeft >= 0 && daysLeft <= 31 && (
-                <span style={{ color: brand.amber400 }}>
-                  {' '}· {daysLeft === 0 ? 'today' : `${daysLeft}d left`}
+                <span style={{ color: brand.amber400, marginLeft: 8 }}>
+                  {daysLeft === 0 ? '· today' : `· ${daysLeft}d left`}
                 </span>
               )}
             </div>

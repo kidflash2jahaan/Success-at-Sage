@@ -123,10 +123,12 @@ export async function GET(request: Request) {
             <div style={{ fontSize: 22, color: brand.textFaint, textTransform: 'uppercase', letterSpacing: '0.24em', fontWeight: 600 }}>
               Deadline
             </div>
-            <div style={{ fontSize: 40, color: brand.text, fontWeight: 700, marginTop: 6 }}>
-              {deadline ? formatShortDate(deadline) : 'Month end'}
+            <div style={{ display: 'flex', alignItems: 'baseline', marginTop: 6 }}>
+              <span style={{ fontSize: 40, color: brand.text, fontWeight: 700 }}>
+                {deadline ? formatShortDate(deadline) : 'Month end'}
+              </span>
               {daysLeft !== null && daysLeft >= 0 && (
-                <span style={{ color: brand.amber400, marginLeft: 14, fontSize: 28 }}>
+                <span style={{ color: brand.amber400, marginLeft: 14, fontSize: 28, fontWeight: 700 }}>
                   {daysLeft === 0 ? 'today' : `${daysLeft}d left`}
                 </span>
               )}

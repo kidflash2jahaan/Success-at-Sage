@@ -76,7 +76,7 @@ export async function GET(request: Request) {
               marginTop: 18,
             }}
           >
-            {prize.amount} {prize.label || 'prize'} for #1 on {settings.next_reset_date ? formatShortDate(settings.next_reset_date) : 'month end'}
+            {`${prize.amount} ${prize.label || 'prize'} for #1 on ${settings.next_reset_date ? formatShortDate(settings.next_reset_date) : 'month end'}`}
           </div>
         </div>
 
@@ -121,9 +121,9 @@ export async function GET(request: Request) {
                 </div>
                 {leader ? (
                   <div style={{ display: 'flex', fontSize: 24, color: brand.textDim, marginTop: 6, gap: 18 }}>
-                    <span>{leader.submission_count} {leader.submission_count === 1 ? 'upload' : 'uploads'}</span>
+                    <span>{`${Number(leader.submission_count)} ${Number(leader.submission_count) === 1 ? 'upload' : 'uploads'}`}</span>
                     <span style={{ color: brand.textFaint }}>·</span>
-                    <span>{leader.total_views.toLocaleString()} views</span>
+                    <span>{`${Number(leader.total_views).toLocaleString()} views`}</span>
                   </div>
                 ) : (
                   <div style={{ fontSize: 24, color: brand.textFaint, marginTop: 6 }}>
