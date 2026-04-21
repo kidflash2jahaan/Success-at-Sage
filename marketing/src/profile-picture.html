@@ -5,7 +5,7 @@
 <title>Success at Sage — profile picture</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=block" rel="stylesheet" />
 <style>
   :root {
     --bg: #06060f;
@@ -14,10 +14,14 @@
     --blue-400: #60a5fa;
     --green-400: #34d399;
     --amber-400: #fbbf24;
-    --amber-500: #f59e0b;
     --text: #ffffff;
   }
-  html, body { margin: 0; padding: 0; background: transparent; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #06060f;
+    overflow: hidden;
+  }
   body {
     width: 1080px;
     height: 1080px;
@@ -58,87 +62,32 @@
     filter: blur(90px);
   }
 
-  /* Top eyebrow wordmark */
-  .eyebrow {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: 0.32em;
-    color: var(--amber-400);
-    text-transform: uppercase;
-    margin-bottom: 80px;
-  }
-  .eyebrow .tick {
-    width: 50px; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--amber-400));
-  }
-  .eyebrow .tick.right {
-    background: linear-gradient(90deg, var(--amber-400), transparent);
-  }
-
-  /* Hero wordmark — stacked */
+  /* Hero wordmark — stacked and centered */
   .hero {
     position: relative;
     z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: center;
-    line-height: 0.88;
+    /* Give the "g" descender generous headroom so it never clips. */
+    line-height: 1.02;
+    padding: 0 80px;
   }
   .hero .success {
-    font-size: 228px;
-    font-weight: 900;
-    letter-spacing: -0.045em;
+    font-size: 250px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
     color: var(--text);
     text-shadow: 0 8px 48px rgba(167, 139, 250, 0.25);
   }
   .hero .at-sage {
-    font-size: 228px;
-    font-weight: 900;
-    letter-spacing: -0.045em;
+    font-size: 250px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
     background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 25%, #60a5fa 55%, #34d399 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-  }
-
-  /* Divider rule with amber dot */
-  .rule {
-    position: relative;
-    z-index: 3;
-    margin-top: 72px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-  .rule .line {
-    width: 90px; height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35));
-  }
-  .rule .line.right {
-    background: linear-gradient(90deg, rgba(255,255,255,0.35), transparent);
-  }
-  .rule .dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    background: var(--amber-400);
-    box-shadow: 0 0 24px rgba(251, 191, 36, 0.8);
-  }
-
-  /* Bottom tagline */
-  .tagline {
-    position: relative;
-    z-index: 3;
-    margin-top: 28px;
-    font-size: 26px;
-    font-weight: 600;
-    letter-spacing: 0.32em;
-    color: rgba(255, 255, 255, 0.55);
-    text-transform: uppercase;
   }
 
   /* Corner ornaments — tiny crosshair marks for an "emblem" feel */
@@ -154,6 +103,12 @@
   .corner.bl { bottom: 56px; left: 56px; border-right: 0; border-top: 0; }
   .corner.br { bottom: 56px; right: 56px; border-left: 0; border-top: 0; }
 </style>
+<script>
+  // Signal to headless Chrome that fonts are fully loaded before screenshot.
+  // Without this, the renderer can race the webfont and fall back to a
+  // sans-serif with different metrics (clipped descenders, wrong kerning).
+  document.fonts.ready.then(() => { document.body.dataset.ready = "1"; });
+</script>
 </head>
 <body>
   <div class="card">
@@ -165,24 +120,10 @@
     <div class="corner bl"></div>
     <div class="corner br"></div>
 
-    <div class="eyebrow">
-      <span class="tick"></span>
-      <span>Top&nbsp;of&nbsp;the&nbsp;Class</span>
-      <span class="tick right"></span>
-    </div>
-
     <div class="hero">
       <div class="success">Success</div>
       <div class="at-sage">at&nbsp;Sage</div>
     </div>
-
-    <div class="rule">
-      <span class="line"></span>
-      <span class="dot"></span>
-      <span class="line right"></span>
-    </div>
-
-    <div class="tagline">Sage&nbsp;Hill · Est&nbsp;MMXXVI</div>
   </div>
 </body>
 </html>
