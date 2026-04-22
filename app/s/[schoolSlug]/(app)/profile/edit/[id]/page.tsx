@@ -8,10 +8,10 @@ import EditMaterialForm from '@/components/profile/EditMaterialForm'
 export default async function EditMaterialPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ schoolSlug: string; id: string }>
 }) {
   const user = await requireUser()
-  const { id } = await params
+  const { schoolSlug, id } = await params
 
   const { data: material } = await supabaseAdmin
     .from('materials')
@@ -20,7 +20,7 @@ export default async function EditMaterialPage({
     .single()
 
   if (!material) notFound()
-  if ((material as any).uploaded_by !== user.id) redirect('/profile')
+  if ((material as any).uploaded_by !== user.id) redirect(`/s/${schoolSlug}/profile`)
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">

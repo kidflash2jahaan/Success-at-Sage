@@ -4,18 +4,19 @@ import { updateUserInfo } from '@/app/actions/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function EditUserPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function EditUserPage({ params }: { params: Promise<{ schoolSlug: string; id: string }> }) {
   await requireAdmin()
-  const { id } = await params
+  const { schoolSlug, id } = await params
+  const backPath = `/s/${schoolSlug}/admin/users`
   const { data: user } = await supabaseAdmin.from('users').select('*').eq('id', id).single()
-  if (!user) redirect('/admin/users')
+  if (!user) redirect(backPath)
 
   async function handleUpdate(formData: FormData) {
     'use server'
     const fullName = formData.get('fullName') as string
     const graduatingYear = parseInt(formData.get('graduatingYear') as string)
     await updateUserInfo(id, fullName, graduatingYear)
-    redirect('/admin/users')
+    redirect(backPath)
   }
 
   const currentYear = new Date().getFullYear()
@@ -24,7 +25,7 @@ export default async function EditUserPage({ params }: { params: Promise<{ id: s
   return (
     <div className="p-8 max-w-md">
       <div className="mb-6">
-        <Link href="/admin/users" className="text-white/40 hover:text-white/70 text-sm transition-colors">
+        <Link href={backPath} className="text-white/40 hover:text-white/70 text-sm transition-colors">
           ← Back to Users
         </Link>
       </div>

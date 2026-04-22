@@ -25,7 +25,7 @@ export default async function LandingPage({ params }: { params: Promise<{ school
         </span>
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
-            href="/leaderboard"
+            href={`/s/${schoolSlug}/leaderboard`}
             className="hidden sm:block text-sm text-white/60 hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5"
           >
             Leaderboard
@@ -95,7 +95,7 @@ export default async function LandingPage({ params }: { params: Promise<{ school
               Create Free Account
             </Link>
             <Link
-              href="/leaderboard"
+              href={`/s/${schoolSlug}/leaderboard`}
               className="btn-press font-semibold text-white/80 hover:text-white glass px-7 py-3 rounded-xl text-base transition-all hover:bg-white/[0.08]"
             >
               Leaderboard

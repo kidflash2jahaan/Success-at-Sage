@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { editMaterial } from '@/app/actions/materials'
 import { uploadFileWithTUS, uploadPdfWithTUS } from '@/lib/storage/upload'
 import { imagesToPdf, isPdfFile } from '@/lib/utils/imagesToPdf'
@@ -27,6 +27,8 @@ export default function EditMaterialForm({
   unitTitle, courseName,
 }: Props) {
   const router = useRouter()
+  const params = useParams<{ schoolSlug?: string }>()
+  const profilePath = `/s/${params?.schoolSlug ?? 'sage'}/profile`
   const [mode, setMode] = useState<'typed' | 'paper'>(initialContentType === 'pdf' ? 'paper' : 'typed')
   const [title, setTitle] = useState(initialTitle)
   const [content, setContent] = useState(initialContent)
@@ -68,7 +70,7 @@ export default function EditMaterialForm({
         setSaving(false)
         return
       }
-      router.push('/profile')
+      router.push(profilePath)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setSaving(false)
@@ -78,7 +80,7 @@ export default function EditMaterialForm({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       <div>
-        <Link href="/profile" className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-white/30 hover:text-white/60 transition-colors mb-6">
+        <Link href={profilePath} className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-white/30 hover:text-white/60 transition-colors mb-6">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -175,7 +177,7 @@ export default function EditMaterialForm({
         >
           {saving ? 'Saving...' : 'Save & Resubmit'}
         </button>
-        <Link href="/profile" className="btn-press glass hover:bg-white/[0.07] text-white/50 hover:text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-all">
+        <Link href={profilePath} className="btn-press glass hover:bg-white/[0.07] text-white/50 hover:text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-all">
           Cancel
         </Link>
       </div>

@@ -4,7 +4,8 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { getGraduatingYearOptions } from '@/lib/grade'
 import { redirect } from 'next/navigation'
 
-export default async function OnboardingPage() {
+export default async function OnboardingPage({ params }: { params: Promise<{ schoolSlug: string }> }) {
+  const { schoolSlug } = await params
   const authUser = await getUser()
   if (!authUser) redirect('/login')
 
@@ -13,7 +14,7 @@ export default async function OnboardingPage() {
     .select('id')
     .eq('id', authUser.id)
     .single()
-  if (existing) redirect('/dashboard')
+  if (existing) redirect(`/s/${schoolSlug}/dashboard`)
 
   const years = getGraduatingYearOptions()
 

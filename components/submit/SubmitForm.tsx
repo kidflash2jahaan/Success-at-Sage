@@ -5,13 +5,15 @@ import { uploadFileWithTUS, uploadPdfWithTUS } from '@/lib/storage/upload'
 import { imagesToPdf, isPdfFile } from '@/lib/utils/imagesToPdf'
 import FileDropZone from '@/components/ui/FileDropZone'
 import PdfDropZone from '@/components/ui/PdfDropZone'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 
 interface Course { id: string; name: string; slug: string }
 interface Unit { id: string; title: string; courseId: string }
 
 export default function SubmitForm({ courses, units, preselectedSlug, preselectedUnitId }: { courses: Course[]; units: Unit[]; preselectedSlug?: string; preselectedUnitId?: string }) {
   const router = useRouter()
+  const params = useParams<{ schoolSlug?: string }>()
+  const schoolSlug = params?.schoolSlug ?? 'sage'
 
   const initialCourse = preselectedSlug ? (courses.find(c => c.slug === preselectedSlug) ?? null) : null
 
@@ -128,7 +130,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
         return
       }
 
-      router.push('/profile')
+      router.push(`/s/${schoolSlug}/profile`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
       setSubmitting(false)
