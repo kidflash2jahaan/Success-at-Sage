@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, timestamp, pgEnum, index, primaryKey, jsonb, boolean } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, integer, timestamp, date, pgEnum, index, primaryKey, jsonb, boolean } from 'drizzle-orm/pg-core'
 
 export const roleEnum = pgEnum('role', ['student', 'admin'])
 export const materialTypeEnum = pgEnum('material_type', ['note', 'test'])
@@ -52,6 +52,7 @@ export const schoolRequests = pgTable('school_requests', {
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey(),
+  schoolId: uuid('school_id').notNull().references(() => schools.id),
   email: text('email').notNull(),
   fullName: text('full_name').notNull(),
   graduatingYear: integer('graduating_year').notNull(),
@@ -61,6 +62,7 @@ export const users = pgTable('users', {
 
 export const departments = pgTable('departments', {
   id: uuid('id').primaryKey().defaultRandom(),
+  schoolId: uuid('school_id').notNull().references(() => schools.id),
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
   colorAccent: text('color_accent').notNull(),
@@ -68,6 +70,7 @@ export const departments = pgTable('departments', {
 
 export const courses = pgTable('courses', {
   id: uuid('id').primaryKey().defaultRandom(),
+  schoolId: uuid('school_id').notNull().references(() => schools.id),
   departmentId: uuid('department_id').notNull().references(() => departments.id),
   name: text('name').notNull(),
   description: text('description').notNull().default(''),
@@ -76,6 +79,7 @@ export const courses = pgTable('courses', {
 
 export const units = pgTable('units', {
   id: uuid('id').primaryKey().defaultRandom(),
+  schoolId: uuid('school_id').notNull().references(() => schools.id),
   courseId: uuid('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
   orderIndex: integer('order_index').notNull(),
@@ -83,6 +87,7 @@ export const units = pgTable('units', {
 
 export const materials = pgTable('materials', {
   id: uuid('id').primaryKey().defaultRandom(),
+  schoolId: uuid('school_id').notNull().references(() => schools.id),
   unitId: uuid('unit_id').notNull().references(() => units.id, { onDelete: 'cascade' }),
   uploadedBy: uuid('uploaded_by').notNull().references(() => users.id),
   title: text('title').notNull(),
@@ -101,8 +106,35 @@ export const materials = pgTable('materials', {
 
 export const userCourses = pgTable('user_courses', {
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  schoolId: uuid('school_id').notNull().references(() => schools.id),
   courseId: uuid('course_id').notNull().references(() => courses.id, { onDelete: 'cascade' }),
   addedAt: timestamp('added_at').notNull().defaultNow(),
 }, (t) => [
   primaryKey({ columns: [t.userId, t.courseId] }),
 ])
+
+// ============================================================================
+// Contest tables — previously untracked by Drizzle but live in the DB.
+// Retroactively typed in Phase 1. Shapes mirror the live DB exactly.
+//
+// contestSettings is shown in its Phase-1 end state (school_id PK;
+// id column is dropped by migration 0005).
+// ============================================================================
+
+export const contestSettings = pgTable('contest_settings', {
+  schoolId: uuid('school_id').primaryKey().references(() => schools.id),
+  periodStart: date('period_start').notNull(),
+  nextResetDate: date('next_reset_date').notNull(),
+  prizeDescription: text('prize_description').notNull(),
+})
+
+export const contestWinners = pgTable('contest_winners', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  schoolId: uuid('school_id').notNull().references(() => schools.id),
+  userId: uuid('user_id').notNull().references(() => users.id),
+  periodLabel: text('period_label').notNull(),
+  periodStart: date('period_start').notNull(),
+  periodEnd: date('period_end').notNull(),
+  paidAt: timestamp('paid_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+})
