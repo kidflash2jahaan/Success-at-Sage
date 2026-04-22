@@ -30,7 +30,7 @@ export async function submitNewUnit(
     .select('id')
     .single()
   if (error || !data) return { ok: false, error: 'Could not create unit. Please try again.' }
-  revalidatePath('/admin/submissions')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
   return { ok: true, data: { unitId: (data as any).id as string } }
 }
 
@@ -92,7 +92,7 @@ export async function submitMaterial(input: {
     } catch {}
   })()
 
-  revalidatePath('/profile')
+  revalidatePath('/s/[schoolSlug]/profile', 'page')
   return { ok: true, data: undefined }
 }
 
@@ -136,7 +136,7 @@ export async function editMaterial(
   }
   const { error } = await supabaseAdmin.from('materials').update(updates).eq('id', materialId)
   if (error) return { ok: false, error: 'Could not save changes. Please try again.' }
-  revalidatePath('/profile')
+  revalidatePath('/s/[schoolSlug]/profile', 'page')
   return { ok: true, data: undefined }
 }
 

@@ -21,6 +21,9 @@ export async function isSuperadmin(): Promise<boolean> {
 }
 
 export async function requireSuperadmin() {
-  const ok = await isSuperadmin()
-  if (!ok) redirect('/')
+  const authUser = await getUser()
+  if (!authUser) redirect('/login')
+  if (!authUser.email) redirect('/login')
+  const { data } = await supabaseAdmin.rpc('is_superadmin_email', { p_email: authUser.email })
+  if (data !== true) redirect('/')
 }

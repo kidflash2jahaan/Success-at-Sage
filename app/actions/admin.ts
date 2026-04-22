@@ -26,7 +26,7 @@ export async function approveMaterial(materialId: string) {
   if (!result) return
   await supabaseAdmin.from('materials').update({ status: 'approved' }).eq('id', materialId)
   if (result.uploader) await sendApprovalEmail(result.uploader.email, result.material.title)
-  revalidatePath('/admin/submissions')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
 }
 
 export async function rejectMaterial(materialId: string, note: string) {
@@ -38,13 +38,13 @@ export async function rejectMaterial(materialId: string, note: string) {
     .update({ status: 'rejected', rejection_note: note || null })
     .eq('id', materialId)
   if (result.uploader) await sendRejectionEmail(result.uploader.email, result.material.title, note)
-  revalidatePath('/admin/submissions')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
 }
 
 export async function approveUnit(unitId: string) {
   await requireAdmin()
   await supabaseAdmin.from('units').update({ status: 'approved' }).eq('id', unitId)
-  revalidatePath('/admin/submissions')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
 }
 
 export async function rejectUnit(unitId: string) {
@@ -52,26 +52,26 @@ export async function rejectUnit(unitId: string) {
   // Reject the unit and any pending materials attached to it
   await supabaseAdmin.from('materials').update({ status: 'rejected' }).eq('unit_id', unitId).eq('status', 'pending')
   await supabaseAdmin.from('units').delete().eq('id', unitId)
-  revalidatePath('/admin/submissions')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
 }
 
 export async function deleteMaterial(materialId: string) {
   await requireAdmin()
   await supabaseAdmin.from('materials').delete().eq('id', materialId)
-  revalidatePath('/admin/courses')
-  revalidatePath('/admin/submissions')
+  revalidatePath('/s/[schoolSlug]/admin/courses', 'page')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
 }
 
 export async function adminUpdatePendingUnitTitle(unitId: string, title: string) {
   await requireAdmin()
   await supabaseAdmin.from('units').update({ title: title.trim() }).eq('id', unitId)
-  revalidatePath('/admin/submissions')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
 }
 
 export async function adminMoveMaterialToUnit(materialId: string, newUnitId: string) {
   await requireAdmin()
   await supabaseAdmin.from('materials').update({ unit_id: newUnitId }).eq('id', materialId)
-  revalidatePath('/admin/submissions')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
 }
 
 export async function adminCreateUnitAndMove(materialId: string, courseId: string, unitTitle: string) {
@@ -92,8 +92,8 @@ export async function adminCreateUnitAndMove(materialId: string, courseId: strin
     .single()
   if (!newUnit) throw new Error('Could not create unit')
   await supabaseAdmin.from('materials').update({ unit_id: (newUnit as any).id }).eq('id', materialId)
-  revalidatePath('/admin/submissions')
-  revalidatePath('/admin/courses')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
+  revalidatePath('/s/[schoolSlug]/admin/courses', 'page')
 }
 
 export async function adminEditMaterial(materialId: string, title: string, type: 'note' | 'test', contentText: string | null, linkUrl?: string, attachmentPaths?: string[]) {
@@ -106,8 +106,8 @@ export async function adminEditMaterial(materialId: string, title: string, type:
   if (attachmentPaths !== undefined) updates.attachment_paths = attachmentPaths
   if (contentText !== null) updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
   await supabaseAdmin.from('materials').update(updates).eq('id', materialId)
-  revalidatePath('/admin/submissions')
-  revalidatePath('/admin/courses')
+  revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
+  revalidatePath('/s/[schoolSlug]/admin/courses', 'page')
 }
 
 export async function updateUserInfo(userId: string, fullName: string, graduatingYear: number) {
@@ -116,7 +116,7 @@ export async function updateUserInfo(userId: string, fullName: string, graduatin
     .from('users')
     .update({ full_name: fullName.trim(), graduating_year: graduatingYear })
     .eq('id', userId)
-  revalidatePath('/admin/users')
+  revalidatePath('/s/[schoolSlug]/admin/users', 'page')
 }
 
 export async function updateContestSettings(nextResetDate: string, prizeDescription: string, periodStart: string) {
@@ -159,17 +159,17 @@ export async function markWinnerPaid(winnerId: string) {
     .from('contest_winners')
     .update({ paid_at: new Date().toISOString() })
     .eq('id', winnerId)
-  revalidatePath('/admin/contest')
+  revalidatePath('/s/[schoolSlug]/admin/contest', 'page')
 }
 
 export async function promoteToAdmin(userId: string) {
   await requireAdmin()
   await supabaseAdmin.from('users').update({ role: 'admin' }).eq('id', userId)
-  revalidatePath('/admin/users')
+  revalidatePath('/s/[schoolSlug]/admin/users', 'page')
 }
 
 export async function demoteToStudent(userId: string) {
   await requireAdmin()
   await supabaseAdmin.from('users').update({ role: 'student' }).eq('id', userId)
-  revalidatePath('/admin/users')
+  revalidatePath('/s/[schoolSlug]/admin/users', 'page')
 }
