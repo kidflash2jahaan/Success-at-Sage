@@ -16,6 +16,7 @@ const supabaseAdmin = createClient(url, key)
 const TENANT_TABLES = [
   'users','departments','courses','units','materials',
   'user_courses','contest_settings','contest_winners',
+  'material_views', // added in migration 0006
 ] as const
 
 async function main() {

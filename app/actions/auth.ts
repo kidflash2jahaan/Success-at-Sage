@@ -1,6 +1,7 @@
 'use server'
 import { getUser } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { SAGE_SCHOOL_ID } from '@/lib/constants'
 import { redirect } from 'next/navigation'
 
 export async function completeOnboarding(formData: FormData) {
@@ -20,6 +21,7 @@ export async function completeOnboarding(formData: FormData) {
   // crash on a primary-key conflict.
   await supabaseAdmin.from('users').upsert({
     id: authUser.id,
+    school_id: SAGE_SCHOOL_ID,
     email,
     full_name: fullName,
     graduating_year: graduatingYear,
