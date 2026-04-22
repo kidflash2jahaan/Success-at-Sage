@@ -11,7 +11,7 @@ export default async function DashboardPage({ params }: { params: Promise<{ scho
   const tenant = await resolveTenantBySlug(schoolSlug)
   const user = await requireUser()
   const [userCourses, { data: contestSettings }] = await Promise.all([
-    getUserCourses(user.id),
+    getUserCourses(user.id, tenant.id),
     supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('school_id', tenant.id).single(),
   ])
   const settings = contestSettings as { prize_description?: string; next_reset_date?: string } | null

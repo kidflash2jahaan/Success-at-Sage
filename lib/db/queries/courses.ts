@@ -102,12 +102,19 @@ export async function isUserEnrolled(userId: string, courseId: string) {
   return !!data
 }
 
-export async function getUserCourses(userId: string) {
+export async function getUserCourses(userId: string, schoolId?: string) {
+  // When schoolId is supplied, only return enrollments where the user's
+  // course belongs to that tenant. Keeps student dashboards clean when a
+  // user (or superadmin) views a tenant they're not enrolled in — shows
+  // empty state instead of leaking enrollments from another school.
+  let userCoursesQuery = supabaseAdmin
+    .from('user_courses')
+    .select('courses(id, name, slug, description, department_id, departments(id, name, slug, color_accent))')
+    .eq('user_id', userId)
+  if (schoolId) userCoursesQuery = userCoursesQuery.eq('school_id', schoolId)
+
   const [{ data }, { data: unitData }, { data: materialData }] = await Promise.all([
-    supabaseAdmin
-      .from('user_courses')
-      .select('courses(id, name, slug, description, department_id, departments(id, name, slug, color_accent))')
-      .eq('user_id', userId),
+    userCoursesQuery,
     supabaseAdmin.from('units').select('id, course_id').eq('status', 'approved'),
     supabaseAdmin.from('materials').select('id, unit_id').eq('status', 'approved'),
   ])

@@ -1,5 +1,6 @@
 import { requireAdmin } from '@/lib/auth'
 import { isSuperadmin } from '@/lib/superadmin'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -10,12 +11,14 @@ export default async function AdminLayout({
   children: React.ReactNode
   params: Promise<{ schoolSlug: string }>
 }) {
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   try {
-    await requireAdmin()
+    // Pass tenant.id so non-superadmin admins can't cross-tenant-escalate
+    await requireAdmin(tenant.id)
   } catch {
     notFound()
   }
-  const { schoolSlug } = await params
   const showAllSchools = await isSuperadmin()
 
   return (
