@@ -1,13 +1,14 @@
 'use client'
 import { signUpWithEmail } from '@/app/actions/signup'
 import { getGraduatingYearOptions } from '@/lib/grade'
+import SubmitButton from '@/components/ui/SubmitButton'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 const ERRORS: Record<string, string> = {
   taken: 'An account with that email already exists.',
-  domain: 'Signups are restricted to @sagehillschool.org email addresses.',
+  domain: 'No school is set up for that email domain yet. Request your school to get added.',
 }
 
 function SignupForm() {
@@ -28,7 +29,7 @@ function SignupForm() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Create your account</h1>
-          <p className="text-white/40 text-sm mt-1">Join Success at Sage</p>
+          <p className="text-white/40 text-sm mt-1">Join Success at HS</p>
         </div>
 
         {errorMessage && (
@@ -49,7 +50,7 @@ function SignupForm() {
             </div>
             <div>
               <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Email</label>
-              <input name="email" type="email" required placeholder="you@sagehillschool.org"
+              <input name="email" type="email" required placeholder="you@yourschool.org"
                 className="glass-input w-full rounded-xl px-4 py-2.5 text-sm" />
             </div>
             <div>
@@ -65,10 +66,12 @@ function SignupForm() {
                 ))}
               </select>
             </div>
-            <button type="submit"
-              className="btn-press mt-2 w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]">
+            <SubmitButton
+              pendingLabel="Creating account..."
+              className="btn-press mt-2 w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-70 disabled:cursor-wait text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
+            >
               Create Account
-            </button>
+            </SubmitButton>
           </form>
         </div>
 

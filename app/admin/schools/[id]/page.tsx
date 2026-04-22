@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { approveSchoolRequest, rejectSchoolRequest } from '@/app/actions/superadmin'
+import SubmitButton from '@/components/ui/SubmitButton'
 
 export default async function SchoolRequestDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -42,11 +43,14 @@ export default async function SchoolRequestDetail({ params }: { params: Promise<
       {r.status === 'pending' && (
         <div className="mt-6 grid grid-cols-1 gap-6">
           <form action={approve}>
-            <button type="submit" className="w-full px-4 py-2.5 rounded-xl bg-green-500/90 text-black font-semibold text-sm hover:bg-green-500">
+            <SubmitButton
+              pendingLabel="Approving..."
+              className="w-full px-4 py-2.5 rounded-xl bg-green-500/90 disabled:opacity-70 disabled:cursor-wait text-black font-semibold text-sm hover:bg-green-500"
+            >
               Approve
-            </button>
+            </SubmitButton>
             <p className="text-white/40 text-xs mt-1">
-              Creates the school, adds domains, flags requester email so they'll become admin of the new school on next login.
+              Creates the school, adds domains, flags requester email so they&apos;ll become admin of the new school on next login.
             </p>
           </form>
           <form action={reject} className="space-y-2">
@@ -56,9 +60,12 @@ export default async function SchoolRequestDetail({ params }: { params: Promise<
               placeholder="Reason for rejection (optional — emailed to requester if configured)"
               className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-white/30"
             />
-            <button type="submit" className="w-full px-4 py-2.5 rounded-xl bg-red-500/80 text-white font-semibold text-sm hover:bg-red-500">
+            <SubmitButton
+              pendingLabel="Rejecting..."
+              className="w-full px-4 py-2.5 rounded-xl bg-red-500/80 disabled:opacity-70 disabled:cursor-wait text-white font-semibold text-sm hover:bg-red-500"
+            >
               Reject
-            </button>
+            </SubmitButton>
           </form>
         </div>
       )}

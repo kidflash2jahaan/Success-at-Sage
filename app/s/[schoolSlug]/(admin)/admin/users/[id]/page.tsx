@@ -3,6 +3,7 @@ import { requireAdmin } from '@/lib/auth'
 import { updateUserInfo } from '@/app/actions/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import SubmitButton from '@/components/ui/SubmitButton'
 
 export default async function EditUserPage({ params }: { params: Promise<{ schoolSlug: string; id: string }> }) {
   await requireAdmin()
@@ -67,12 +68,12 @@ export default async function EditUserPage({ params }: { params: Promise<{ schoo
           <span className="text-xs text-white/25">Email cannot be changed here</span>
         </div>
 
-        <button
-          type="submit"
-          className="mt-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
+        <SubmitButton
+          pendingLabel="Saving..."
+          className="mt-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
         >
           Save Changes
-        </button>
+        </SubmitButton>
       </form>
     </div>
   )

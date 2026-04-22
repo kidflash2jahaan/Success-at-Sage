@@ -5,6 +5,7 @@ import { uploadFileWithTUS } from '@/lib/storage/upload'
 import { fileNameFromPath, openAttachment } from '@/lib/utils/attachments'
 import MaterialViewer from '@/components/materials/MaterialViewer'
 import FileDropZone from '@/components/ui/FileDropZone'
+import SubmitButton, { PendingButton } from '@/components/ui/SubmitButton'
 import UnitSelectorWithCreate from './UnitSelectorWithCreate'
 
 interface Item {
@@ -129,9 +130,9 @@ export default function ApprovedMaterialEditor({ item, availableUnits = [], cour
               />
             </div>
             <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={pending}
+              <PendingButton
+                pending={pending}
+                pendingLabel="Saving..."
                 onClick={() => startTransition(async () => {
                   const newPaths: string[] = []
                   for (const file of editAttachmentFiles) {
@@ -143,10 +144,10 @@ export default function ApprovedMaterialEditor({ item, availableUnits = [], cour
                   setMode('view')
                   setEditAttachmentFiles([])
                 })}
-                className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+                className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
               >
-                {pending ? 'Saving...' : 'Save Changes'}
-              </button>
+                Save Changes
+              </PendingButton>
               <button type="button" onClick={() => setMode('view')}
                 className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">
                 Cancel
@@ -158,9 +159,12 @@ export default function ApprovedMaterialEditor({ item, availableUnits = [], cour
         {mode === 'delete' && (
           <div className="flex gap-2">
             <form action={deleteMaterial.bind(null, item.id)} className="flex-1">
-              <button type="submit" className="w-full bg-red-600/80 hover:bg-red-600 text-white text-sm font-medium py-2 rounded-lg transition-colors">
+              <SubmitButton
+                pendingLabel="Deleting..."
+                className="w-full bg-red-600/80 hover:bg-red-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              >
                 Confirm Delete
-              </button>
+              </SubmitButton>
             </form>
             <button type="button" onClick={() => setMode('view')}
               className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">

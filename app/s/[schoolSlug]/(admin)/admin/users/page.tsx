@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { promoteToAdmin, demoteToStudent } from '@/app/actions/admin'
 import { calculateGrade } from '@/lib/auth'
 import Link from 'next/link'
+import SubmitButton from '@/components/ui/SubmitButton'
 
 export default async function AdminUsersPage() {
   const { data } = await supabaseAdmin.from('users').select('*').order('created_at')
@@ -38,11 +39,11 @@ export default async function AdminUsersPage() {
                 </Link>
                 {user.role === 'student' ? (
                   <form action={promoteToAdmin.bind(null, user.id)}>
-                    <button type="submit" className="text-xs text-purple-400 hover:text-purple-300">Make Admin</button>
+                    <SubmitButton pendingLabel="..." className="text-xs text-purple-400 hover:text-purple-300 disabled:opacity-60 disabled:cursor-wait">Make Admin</SubmitButton>
                   </form>
                 ) : (
                   <form action={demoteToStudent.bind(null, user.id)}>
-                    <button type="submit" className="text-xs text-white/30 hover:text-white/60">Remove Admin</button>
+                    <SubmitButton pendingLabel="..." className="text-xs text-white/30 hover:text-white/60 disabled:opacity-60 disabled:cursor-wait">Remove Admin</SubmitButton>
                   </form>
                 )}
               </div>

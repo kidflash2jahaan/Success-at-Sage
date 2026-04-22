@@ -18,13 +18,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Success at Sage",
-  description: "Study notes and practice tests for Sage Hill School students",
+  title: "Success at HS",
+  description: "Study notes and practice tests, built by high schoolers, for their own high school.",
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Success at Sage',
+    title: 'Success at HS',
   },
 };
 

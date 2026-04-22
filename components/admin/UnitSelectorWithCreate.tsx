@@ -1,6 +1,7 @@
 'use client'
 import { useState, useTransition, useMemo } from 'react'
 import { adminMoveMaterialToUnit, adminCreateUnitAndMove } from '@/app/actions/admin'
+import { PendingButton } from '@/components/ui/SubmitButton'
 
 interface AvailableUnit { id: string; title: string; courseName: string }
 interface Course { id: string; name: string }
@@ -59,17 +60,18 @@ export default function UnitSelectorWithCreate({
               </optgroup>
             ))}
           </select>
-          <button
-            type="button"
+          <PendingButton
+            pending={movePending}
+            pendingLabel="Moving…"
             disabled={!selectedUnitId || movePending}
             onClick={() => startMoveTransition(async () => {
               await adminMoveMaterialToUnit(materialId, selectedUnitId)
               setSelectedUnitId('')
             })}
-            className="shrink-0 px-3 py-2 rounded-lg bg-violet-600/40 hover:bg-violet-600/70 disabled:opacity-30 text-white/80 text-sm transition-colors"
+            className="shrink-0 px-3 py-2 rounded-lg bg-violet-600/40 hover:bg-violet-600/70 disabled:opacity-30 disabled:cursor-wait text-white/80 text-sm transition-colors"
           >
-            {movePending ? 'Moving…' : 'Move'}
-          </button>
+            Move
+          </PendingButton>
           <button
             type="button"
             onClick={() => setCreating(true)}
@@ -124,17 +126,18 @@ export default function UnitSelectorWithCreate({
             className="glass-input w-full rounded-lg px-3 py-2 text-sm"
           />
           <div className="flex gap-2">
-            <button
-              type="button"
+            <PendingButton
+              pending={createPending}
+              pendingLabel="Creating…"
               disabled={!selectedCourse || !newUnitTitle.trim() || createPending}
               onClick={() => startCreateTransition(async () => {
                 await adminCreateUnitAndMove(materialId, selectedCourse!.id, newUnitTitle)
                 resetCreate()
               })}
-              className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-30 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-30 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
             >
-              {createPending ? 'Creating…' : 'Create & Move'}
-            </button>
+              Create & Move
+            </PendingButton>
             <button
               type="button"
               onClick={resetCreate}

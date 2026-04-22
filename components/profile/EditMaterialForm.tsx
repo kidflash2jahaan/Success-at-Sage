@@ -173,9 +173,18 @@ export default function EditMaterialForm({
         <button
           type="submit"
           disabled={saving || !title.trim() || (mode === 'paper' && pdfFiles.length === 0 && !initialPdfPath)}
-          className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
+          aria-busy={saving}
+          className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-wait text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
         >
-          {saving ? 'Saving...' : 'Save & Resubmit'}
+          <span className="inline-flex items-center justify-center gap-2">
+            {saving && (
+              <svg className="w-4 h-4 animate-spin shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" strokeOpacity="0.25" />
+                <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+            )}
+            <span>{saving ? 'Saving...' : 'Save & Resubmit'}</span>
+          </span>
         </button>
         <Link href={profilePath} className="btn-press glass hover:bg-white/[0.07] text-white/50 hover:text-white font-semibold rounded-xl px-6 py-2.5 text-sm transition-all">
           Cancel

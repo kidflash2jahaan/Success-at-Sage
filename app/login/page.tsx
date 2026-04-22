@@ -1,5 +1,6 @@
 'use client'
 import { signInWithEmail } from '@/app/actions/login'
+import SubmitButton from '@/components/ui/SubmitButton'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -26,7 +27,7 @@ function LoginForm() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Welcome back</h1>
-          <p className="text-white/40 text-sm mt-1">Sign in to Success at Sage</p>
+          <p className="text-white/40 text-sm mt-1">Sign in to Success at HS</p>
         </div>
 
         {errorMessage && (
@@ -42,7 +43,7 @@ function LoginForm() {
           <form action={signInWithEmail} className="flex flex-col gap-4">
             <div>
               <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Email</label>
-              <input name="email" type="email" required placeholder="you@sagehillschool.org"
+              <input name="email" type="email" required placeholder="you@yourschool.org"
                 className="glass-input w-full rounded-xl px-4 py-2.5 text-sm" />
             </div>
             <div>
@@ -50,10 +51,12 @@ function LoginForm() {
               <input name="password" type="password" required placeholder="••••••••"
                 className="glass-input w-full rounded-xl px-4 py-2.5 text-sm" />
             </div>
-            <button type="submit"
-              className="btn-press mt-2 w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]">
+            <SubmitButton
+              pendingLabel="Signing in..."
+              className="btn-press mt-2 w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-70 disabled:cursor-wait text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
+            >
               Sign In
-            </button>
+            </SubmitButton>
           </form>
         </div>
 

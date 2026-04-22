@@ -17,17 +17,18 @@ interface DashboardShellProps {
   courses: Course[]
   userName: string
   isAdmin?: boolean
+  displayShort?: string
   children: React.ReactNode
 }
 
-export default function DashboardShell({ courses, userName, isAdmin, children }: DashboardShellProps) {
+export default function DashboardShell({ courses, userName, isAdmin, displayShort, children }: DashboardShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const pathname = usePathname()
   const activeCourseSlug = pathname.match(/\/courses\/([^/]+)/)?.[1]
 
   return (
     <div className="flex flex-col h-dvh">
-      <TopNav userName={userName} isAdmin={isAdmin} onMenuClick={() => setDrawerOpen(true)} />
+      <TopNav userName={userName} isAdmin={isAdmin} onMenuClick={() => setDrawerOpen(true)} displayShort={displayShort} />
       <div className="flex flex-1 overflow-hidden">
         <div className="hidden md:block">
           <Sidebar courses={courses} activeCourseSlug={activeCourseSlug} />

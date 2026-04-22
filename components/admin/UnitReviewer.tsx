@@ -1,6 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { approveUnit, rejectUnit, adminUpdatePendingUnitTitle } from '@/app/actions/admin'
+import SubmitButton from '@/components/ui/SubmitButton'
 
 interface PendingUnit {
   id: string
@@ -35,7 +36,8 @@ export default function UnitReviewer({ unit }: { unit: PendingUnit }) {
               onBlur={saveTitle}
               className="glass-input rounded-lg px-3 py-1.5 text-sm text-white font-medium w-full"
             />
-            {saved && <span className="text-emerald-400 text-xs shrink-0">Saved</span>}
+            {pending && <span className="text-white/40 text-xs shrink-0">Saving…</span>}
+            {saved && !pending && <span className="text-emerald-400 text-xs shrink-0">Saved</span>}
           </div>
           <div className="text-white/40 text-xs mt-0.5">
             {unit.courseName} · proposed by {unit.submittedByName}
@@ -51,14 +53,20 @@ export default function UnitReviewer({ unit }: { unit: PendingUnit }) {
 
       <div className="px-5 py-3 border-t border-white/[0.07] flex gap-2">
         <form action={approveUnit.bind(null, unit.id)} className="flex-1">
-          <button type="submit" className="w-full bg-green-600/80 hover:bg-green-600 text-white text-sm font-medium py-2 rounded-lg transition-colors">
+          <SubmitButton
+            pendingLabel="Approving..."
+            className="w-full bg-green-600/80 hover:bg-green-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
+          >
             ✓ Approve Unit
-          </button>
+          </SubmitButton>
         </form>
         <form action={rejectUnit.bind(null, unit.id)} className="flex-1">
-          <button type="submit" className="w-full bg-red-600/20 hover:bg-red-600/40 text-red-400 text-sm font-medium py-2 rounded-lg border border-red-600/30 transition-colors">
+          <SubmitButton
+            pendingLabel="Rejecting..."
+            className="w-full bg-red-600/20 hover:bg-red-600/40 disabled:opacity-70 disabled:cursor-wait text-red-400 text-sm font-medium py-2 rounded-lg border border-red-600/30 transition-colors"
+          >
             ✕ Reject Unit
-          </button>
+          </SubmitButton>
         </form>
       </div>
     </div>

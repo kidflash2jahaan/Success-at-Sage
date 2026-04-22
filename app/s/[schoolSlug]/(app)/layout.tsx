@@ -1,10 +1,19 @@
 import { requireUser } from '@/lib/auth'
 import { getUserCourses } from '@/lib/db/queries/courses'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import DashboardShell from '@/components/DashboardShell'
 
-export default async function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ schoolSlug: string }>
+}) {
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const user = await requireUser()
-  const userCourses = await getUserCourses(user.id)
+  const userCourses = await getUserCourses(user.id, tenant.id)
 
   const courses = userCourses.map(({ course, department }) => ({
     id: course.id,
@@ -14,7 +23,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   }))
 
   return (
-    <DashboardShell courses={courses} userName={user.fullName} isAdmin={user.role === 'admin'}>
+    <DashboardShell
+      courses={courses}
+      userName={user.fullName}
+      isAdmin={user.role === 'admin'}
+      displayShort={tenant.displayShort}
+    >
       {children}
     </DashboardShell>
   )

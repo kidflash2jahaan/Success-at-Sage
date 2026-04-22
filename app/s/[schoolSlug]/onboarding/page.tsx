@@ -1,11 +1,14 @@
 import { completeOnboarding } from '@/app/actions/auth'
 import { getUser } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import { getGraduatingYearOptions } from '@/lib/grade'
+import SubmitButton from '@/components/ui/SubmitButton'
 import { redirect } from 'next/navigation'
 
 export default async function OnboardingPage({ params }: { params: Promise<{ schoolSlug: string }> }) {
   const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const authUser = await getUser()
   if (!authUser) redirect('/login')
 
@@ -22,7 +25,7 @@ export default async function OnboardingPage({ params }: { params: Promise<{ sch
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="animate-scale-in w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-white tracking-tight">Welcome to Success at Sage</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Welcome to Success at {tenant.displayShort}</h1>
           <p className="text-white/40 text-sm mt-1">Tell us a bit about yourself to get started.</p>
         </div>
         <div className="glass rounded-2xl p-8">
@@ -48,12 +51,12 @@ export default async function OnboardingPage({ params }: { params: Promise<{ sch
                 ))}
               </select>
             </div>
-            <button
-              type="submit"
-              className="btn-press mt-2 w-full bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
+            <SubmitButton
+              pendingLabel="Setting up..."
+              className="btn-press mt-2 w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-70 disabled:cursor-wait text-white font-semibold rounded-xl py-2.5 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
             >
               Get Started
-            </button>
+            </SubmitButton>
           </form>
         </div>
       </div>

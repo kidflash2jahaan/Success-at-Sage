@@ -5,6 +5,7 @@ import { resolveTenantBySlug } from '@/lib/tenant'
 import { requireAdmin, calculateGrade } from '@/lib/auth'
 import { chooseContestWinner, markWinnerPaid, updateContestSettings } from '@/app/actions/admin'
 import { redirect } from 'next/navigation'
+import SubmitButton from '@/components/ui/SubmitButton'
 import MarketingAssets from './MarketingAssets'
 
 export default async function AdminContestPage({ params, searchParams }: { params: Promise<{ schoolSlug: string }>; searchParams: Promise<{ saved?: string }> }) {
@@ -102,15 +103,15 @@ export default async function AdminContestPage({ params, searchParams }: { param
               </div>
               <form action={handleMarkPaid}>
                 <input type="hidden" name="winnerId" value={w.id} />
-                <button
-                  type="submit"
-                  className="flex items-center gap-2 text-sm bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+                <SubmitButton
+                  pendingLabel="Marking paid..."
+                  className="flex items-center gap-2 text-sm bg-emerald-600 hover:bg-emerald-500 disabled:opacity-70 disabled:cursor-wait text-white px-4 py-2 rounded-lg transition-colors font-medium"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   Mark Paid
-                </button>
+                </SubmitButton>
               </form>
             </div>
           ))}
@@ -136,12 +137,12 @@ export default async function AdminContestPage({ params, searchParams }: { param
               <input type="hidden" name="periodLabel" value={periodLabel} />
               <input type="hidden" name="periodStart" value={settings.period_start} />
               <input type="hidden" name="periodEnd" value={settings.next_reset_date ?? ''} />
-              <button
-                type="submit"
-                className="text-sm bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+              <SubmitButton
+                pendingLabel="Choosing winner..."
+                className="text-sm bg-violet-600 hover:bg-violet-500 disabled:opacity-70 disabled:cursor-wait text-white px-4 py-2 rounded-lg transition-colors font-medium"
               >
                 Choose as Winner
-              </button>
+              </SubmitButton>
             </form>
           </div>
         ) : (
@@ -197,9 +198,12 @@ export default async function AdminContestPage({ params, searchParams }: { param
               className="glass-input rounded-xl px-4 py-2.5 text-sm text-white"
             />
           </div>
-          <button type="submit" className="bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">
+          <SubmitButton
+            pendingLabel="Saving..."
+            className="bg-violet-600 hover:bg-violet-500 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
+          >
             Save Settings
-          </button>
+          </SubmitButton>
         </form>
       </div>
 

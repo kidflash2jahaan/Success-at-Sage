@@ -1,13 +1,22 @@
 import { getCurrentUser } from '@/lib/auth'
 import { getUserCourses } from '@/lib/db/queries/courses'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import DashboardShell from '@/components/DashboardShell'
 import Link from 'next/link'
 
-export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+export default async function PublicLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ schoolSlug: string }>
+}) {
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const user = await getCurrentUser()
 
   if (user) {
-    const userCourses = await getUserCourses(user.id)
+    const userCourses = await getUserCourses(user.id, tenant.id)
     const courses = userCourses.map(({ course, department }) => ({
       id: course.id,
       name: course.name,
@@ -15,7 +24,12 @@ export default async function PublicLayout({ children }: { children: React.React
       department: { colorAccent: department.colorAccent, name: department.name },
     }))
     return (
-      <DashboardShell courses={courses} userName={user.fullName} isAdmin={user.role === 'admin'}>
+      <DashboardShell
+        courses={courses}
+        userName={user.fullName}
+        isAdmin={user.role === 'admin'}
+        displayShort={tenant.displayShort}
+      >
         {children}
       </DashboardShell>
     )
@@ -27,8 +41,8 @@ export default async function PublicLayout({ children }: { children: React.React
         className="glass-nav flex items-center px-4 gap-4 shrink-0 sticky top-0 z-10"
         style={{ height: '56px', paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <Link href="/" className="font-bold text-white text-base tracking-tight">
-          Success at Sage
+        <Link href={`/s/${schoolSlug}`} className="font-bold text-white text-base tracking-tight">
+          Success at {tenant.displayShort}
         </Link>
         <div className="ml-auto flex items-center gap-2">
           <Link

@@ -6,6 +6,7 @@ import { requireUser } from '@/lib/auth'
 import { addCourseToSchedule, removeCourseFromSchedule } from '@/app/actions/courses'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import SubmitButton from '@/components/ui/SubmitButton'
 
 export default async function CourseDetailPage({
   params,
@@ -42,9 +43,9 @@ export default async function CourseDetailPage({
               ? removeCourseFromSchedule.bind(null, course.id)
               : addCourseToSchedule.bind(null, course.id)
             }>
-              <button
-                type="submit"
-                className={`btn-press px-5 py-2 rounded-xl text-sm font-semibold transition-all ${
+              <SubmitButton
+                pendingLabel={enrolled ? 'Removing...' : 'Adding...'}
+                className={`btn-press px-5 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-70 disabled:cursor-wait ${
                   enrolled
                     ? 'glass text-white/70 hover:text-white hover:bg-white/[0.08]'
                     : 'text-white hover:shadow-lg'
@@ -55,7 +56,7 @@ export default async function CourseDetailPage({
                 }}
               >
                 {enrolled ? 'Remove from Schedule' : '+ Add to My Schedule'}
-              </button>
+              </SubmitButton>
             </form>
             <Link
               href={`/submit?course=${slug}`}

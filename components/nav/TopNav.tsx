@@ -8,14 +8,18 @@ interface TopNavProps {
   userName: string
   isAdmin?: boolean
   onMenuClick?: () => void
+  /** Short display name of the current tenant (e.g. "Sage"). Rendered as "Success at {displayShort}" in the logo. */
+  displayShort?: string
 }
 
-export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) {
+export default function TopNav({ userName, isAdmin, onMenuClick, displayShort }: TopNavProps) {
   const [query, setQuery] = useState('')
   const router = useRouter()
   const params = useParams<{ schoolSlug?: string }>()
   const slug = params?.schoolSlug ?? 'sage'
   const supabase = createSupabaseBrowserClient()
+  // Fallback to "HS" for the generic parent brand when no tenant is in scope
+  const brand = displayShort ? `Success at ${displayShort}` : 'Success at HS'
 
   async function handleSignOut() {
     await supabase.auth.signOut()
@@ -34,7 +38,7 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
     >
       {/* Mobile: just the logo */}
       <Link href={`/s/${slug}/dashboard`} className="md:hidden font-bold text-white text-base tracking-tight">
-        Success at Sage
+        {brand}
       </Link>
 
       {/* Desktop: hamburger + logo + search */}
@@ -48,7 +52,7 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
       </button>
 
       <Link href={`/s/${slug}/dashboard`} className="font-bold text-white text-sm hidden md:block shrink-0 tracking-tight">
-        Success at Sage
+        {brand}
       </Link>
 
       <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md">

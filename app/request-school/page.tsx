@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { requestSchool } from '@/app/actions/request-school'
+import SubmitButton from '@/components/ui/SubmitButton'
 
 export default async function RequestSchoolPage({
   searchParams,
@@ -48,12 +49,12 @@ export default async function RequestSchoolPage({
             className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-white/30"
           />
         </label>
-        <button
-          type="submit"
-          className="w-full mt-2 px-4 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-white/90 transition-colors"
+        <SubmitButton
+          pendingLabel="Submitting..."
+          className="w-full mt-2 px-4 py-2.5 rounded-xl bg-white text-black font-semibold text-sm hover:bg-white/90 disabled:opacity-70 disabled:cursor-wait transition-colors"
         >
           Submit request
-        </button>
+        </SubmitButton>
       </form>
     </div>
   )

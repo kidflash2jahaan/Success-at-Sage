@@ -5,6 +5,7 @@ import { uploadFileWithTUS } from '@/lib/storage/upload'
 import { fileNameFromPath, openAttachment } from '@/lib/utils/attachments'
 import MaterialViewer from '@/components/materials/MaterialViewer'
 import FileDropZone from '@/components/ui/FileDropZone'
+import SubmitButton, { PendingButton } from '@/components/ui/SubmitButton'
 import UnitSelectorWithCreate from './UnitSelectorWithCreate'
 
 interface SubmissionItem {
@@ -119,9 +120,12 @@ export default function SubmissionReviewer({ item, availableUnits = [], courses 
               className="glass-input w-full rounded-lg px-3 py-2 text-sm resize-none" rows={2} />
             <div className="flex gap-2">
               <form action={rejectMaterial.bind(null, item.id, note)} className="flex-1">
-                <button type="submit" className="w-full bg-red-600/80 hover:bg-red-600 text-white text-sm font-medium py-2 rounded-lg transition-colors">
+                <SubmitButton
+                  pendingLabel="Rejecting..."
+                  className="w-full bg-red-600/80 hover:bg-red-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
+                >
                   Confirm Reject
-                </button>
+                </SubmitButton>
               </form>
               <button type="button" onClick={() => setMode('review')} className="flex-1 glass hover:bg-white/[0.08] text-white/60 text-sm py-2 rounded-lg transition-colors">
                 Cancel
@@ -165,9 +169,9 @@ export default function SubmissionReviewer({ item, availableUnits = [], courses 
               />
             </div>
             <div className="flex gap-2">
-              <button
-                type="button"
-                disabled={pending}
+              <PendingButton
+                pending={pending}
+                pendingLabel="Saving..."
                 onClick={() => startTransition(async () => {
                   const newPaths: string[] = []
                   for (const file of editAttachmentFiles) {
@@ -178,10 +182,10 @@ export default function SubmissionReviewer({ item, availableUnits = [], courses 
                   await adminEditMaterial(item.id, editTitle, 'note', editContent, editLinkUrl, allPaths)
                   setMode('review')
                 })}
-                className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-40 text-white text-sm font-medium py-2 rounded-lg transition-colors"
+                className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
               >
-                {pending ? 'Saving...' : 'Save Changes'}
-              </button>
+                Save Changes
+              </PendingButton>
             </div>
           </>
         )}
@@ -189,9 +193,12 @@ export default function SubmissionReviewer({ item, availableUnits = [], courses 
         {mode === 'review' && (
           <div className="flex gap-2">
             <form action={approveMaterial.bind(null, item.id)} className="flex-1">
-              <button type="submit" className="w-full bg-green-600/80 hover:bg-green-600 text-white text-sm font-medium py-2 rounded-lg transition-colors">
+              <SubmitButton
+                pendingLabel="Approving..."
+                className="w-full bg-green-600/80 hover:bg-green-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
+              >
                 ✓ Approve
-              </button>
+              </SubmitButton>
             </form>
             <button type="button" onClick={() => setMode('edit')} className="flex-1 glass hover:bg-white/[0.08] text-white/50 text-sm font-medium py-2 rounded-lg border border-white/[0.08] transition-colors">
               Edit

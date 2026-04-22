@@ -21,7 +21,7 @@ export default async function LandingPage({ params }: { params: Promise<{ school
       {/* Nav */}
       <header className="glass-nav sticky top-0 z-20 flex items-center justify-between px-4 sm:px-6 py-4">
         <span className="font-bold text-white tracking-tight text-base shrink-0">
-          Success at Sage
+          Success at {tenant.displayShort}
         </span>
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
@@ -51,7 +51,7 @@ export default async function LandingPage({ params }: { params: Promise<{ school
           {/* Badge */}
           <div className="animate-fade-in-down inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-300 glass px-4 py-2 rounded-full mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-violet-400 inline-block" />
-            For Sage Hill School Students
+            For {tenant.name} Students
           </div>
 
           {/* Headline */}
@@ -72,7 +72,7 @@ export default async function LandingPage({ params }: { params: Promise<{ school
           {/* Subtext */}
           <p className="animate-fade-up stagger-3 text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed">
             Student-submitted study notes and practice tests, organized by course and unit.
-            Made by Sage Hill students, for Sage Hill students.
+            Made by {tenant.displayShort} students, for {tenant.displayShort} students.
           </p>
 
           {/* Prize badge — hidden when this school has the contest toggled off */}
@@ -120,7 +120,7 @@ export default async function LandingPage({ params }: { params: Promise<{ school
 
       {/* Footer */}
       <footer className="px-6 py-5 text-center text-white/20 text-xs">
-        Success at Sage — A passion project for Sage Hill School
+        Success at {tenant.displayShort} — a study platform for {tenant.name}
       </footer>
     </div>
   )

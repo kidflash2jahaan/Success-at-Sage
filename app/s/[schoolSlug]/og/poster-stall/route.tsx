@@ -46,7 +46,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ width: 36, height: 2, background: brand.amber400 }} />
           <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '0.3em', textTransform: 'uppercase', color: brand.amber400 }}>
-            Sage Hill · Study Contest
+            {tenant.displayShort} · Study Contest
           </span>
         </div>
 

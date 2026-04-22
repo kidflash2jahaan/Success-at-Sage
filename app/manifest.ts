@@ -2,10 +2,10 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Success at Sage',
-    short_name: 'Success at Sage',
-    description: 'Study notes and practice tests for Sage Hill School students',
-    start_url: '/dashboard',
+    name: 'Success at HS',
+    short_name: 'Success at HS',
+    description: 'Study notes and practice tests, built by high schoolers, for their own high school.',
+    start_url: '/',
     display: 'standalone',
     background_color: '#06060f',
     theme_color: '#06060f',

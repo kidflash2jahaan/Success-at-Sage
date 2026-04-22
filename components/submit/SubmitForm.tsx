@@ -286,9 +286,18 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
       <button
         type="submit"
         disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title || (mode === 'paper' && pdfFiles.length === 0)}
+        aria-busy={submitting}
         className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
       >
-        {submitting ? 'Submitting...' : 'Submit for Review'}
+        <span className="inline-flex items-center justify-center gap-2">
+          {submitting && (
+            <svg className="w-4 h-4 animate-spin shrink-0" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" strokeOpacity="0.25" />
+              <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+            </svg>
+          )}
+          <span>{submitting ? 'Submitting...' : 'Submit for Review'}</span>
+        </span>
       </button>
     </form>
   )
