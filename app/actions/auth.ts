@@ -1,7 +1,7 @@
 'use server'
 import { getUser } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { SAGE_SCHOOL_ID } from '@/lib/constants'
+import { resolveTenantByEmail, resolveTenantBySlug } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 
 export async function completeOnboarding(formData: FormData) {
@@ -13,7 +13,13 @@ export async function completeOnboarding(formData: FormData) {
   const email = (authUser.email ?? '').trim().toLowerCase()
 
   const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase())
-  const role = adminEmails.includes(email) ? 'admin' as const : 'student' as const
+  const isSuperadmin = adminEmails.includes(email)
+  const role = isSuperadmin ? 'admin' as const : 'student' as const
+
+  // Tenant resolution: email domain → Tenant; superadmin falls back to Sage.
+  let tenant = await resolveTenantByEmail(email)
+  if (!tenant && isSuperadmin) tenant = await resolveTenantBySlug('sage')
+  if (!tenant) redirect(`/request-school?email=${encodeURIComponent(email)}`)
 
   // Use upsert so this is idempotent — /signup eagerly creates the user row
   // for email+password signups, but the /auth/callback path routes through
@@ -21,12 +27,12 @@ export async function completeOnboarding(formData: FormData) {
   // crash on a primary-key conflict.
   await supabaseAdmin.from('users').upsert({
     id: authUser.id,
-    school_id: SAGE_SCHOOL_ID,
+    school_id: tenant.id,
     email,
     full_name: fullName,
     graduating_year: graduatingYear,
     role,
   }, { onConflict: 'id' })
 
-  redirect('/dashboard')
+  redirect(`/s/${tenant.slug}/dashboard`)
 }
