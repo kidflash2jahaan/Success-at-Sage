@@ -1,6 +1,7 @@
 'use server'
 import { requireUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { SAGE_SCHOOL_ID } from '@/lib/constants'
 import { sendAdminSubmissionEmail } from '@/lib/email/resend'
 import { revalidatePath } from 'next/cache'
 
@@ -24,7 +25,7 @@ export async function submitNewUnit(
   if (!title.trim()) return { ok: false, error: 'Unit title is required.' }
   const { data, error } = await supabaseAdmin
     .from('units')
-    .insert({ course_id: courseId, title: title.trim(), order_index: 9999, status: 'pending', submitted_by: user.id })
+    .insert({ school_id: SAGE_SCHOOL_ID, course_id: courseId, title: title.trim(), order_index: 9999, status: 'pending', submitted_by: user.id })
     .select('id')
     .single()
   if (error || !data) return { ok: false, error: 'Could not create unit. Please try again.' }
@@ -57,6 +58,7 @@ export async function submitMaterial(input: {
   if (existing) return { ok: false, error: 'A submission with that title already exists in this unit.' }
 
   const { error: insertError } = await supabaseAdmin.from('materials').insert({
+    school_id: SAGE_SCHOOL_ID,
     unit_id: input.unitId,
     uploaded_by: user.id,
     title: cleanTitle,
