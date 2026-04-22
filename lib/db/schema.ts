@@ -1,9 +1,54 @@
-import { pgTable, uuid, text, integer, timestamp, pgEnum, index, primaryKey, jsonb } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, integer, timestamp, pgEnum, index, primaryKey, jsonb, boolean } from 'drizzle-orm/pg-core'
 
 export const roleEnum = pgEnum('role', ['student', 'admin'])
 export const materialTypeEnum = pgEnum('material_type', ['note', 'test'])
 export const contentTypeEnum = pgEnum('content_type', ['pdf', 'richtext'])
 export const statusEnum = pgEnum('status', ['pending', 'approved', 'rejected'])
+export const schoolRequestStatusEnum = pgEnum('school_request_status', ['pending', 'approved', 'rejected'])
+
+// ============================================================================
+// Tenant-management tables (added in multi-tenant Phase 1)
+// ============================================================================
+
+export const schools = pgTable('schools', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  displayShort: text('display_short').notNull(),
+  contestEnabled: boolean('contest_enabled').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+export const schoolDomains = pgTable('school_domains', {
+  schoolId: uuid('school_id').notNull().references(() => schools.id, { onDelete: 'cascade' }),
+  domain: text('domain').notNull().unique(),
+}, (t) => [
+  primaryKey({ columns: [t.schoolId, t.domain] }),
+])
+
+export const schoolRequests = pgTable('school_requests', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  proposedSlug: text('proposed_slug').notNull(),
+  proposedName: text('proposed_name').notNull(),
+  proposedDisplayShort: text('proposed_display_short').notNull(),
+  proposedDomains: text('proposed_domains').array().notNull(),
+  requesterName: text('requester_name').notNull(),
+  requesterEmail: text('requester_email').notNull(),
+  requesterRole: text('requester_role'),
+  notes: text('notes'),
+  status: schoolRequestStatusEnum('status').notNull().default('pending'),
+  reviewNote: text('review_note'),
+  reviewedBy: uuid('reviewed_by').references(() => users.id),
+  reviewedAt: timestamp('reviewed_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+}, (t) => [
+  index('school_requests_status_idx').on(t.status),
+  index('school_requests_requester_email_idx').on(t.requesterEmail),
+])
+
+// ============================================================================
+// Existing (Sage) tables
+// ============================================================================
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey(),
