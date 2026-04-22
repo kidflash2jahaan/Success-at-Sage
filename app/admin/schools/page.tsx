@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { startImpersonating } from '@/app/actions/superadmin'
 
 export default async function SchoolsQueue({
   searchParams,
@@ -75,11 +74,9 @@ export default async function SchoolsQueue({
                 <div className="text-white text-sm font-medium">{s.name} <span className="text-white/30 text-xs font-normal">/{s.slug}</span></div>
                 <div className="text-white/40 text-xs">contest: {s.contest_enabled ? 'on' : 'off'}</div>
               </div>
-              <form action={startImpersonating.bind(null, s.slug)}>
-                <button type="submit" className="text-xs text-white/60 hover:text-white underline underline-offset-2">
-                  impersonate →
-                </button>
-              </form>
+              <Link href={`/s/${s.slug}/admin`} className="text-xs text-amber-400 hover:text-amber-300 underline underline-offset-2 font-medium">
+                open admin →
+              </Link>
             </li>
           ))}
         </ul>

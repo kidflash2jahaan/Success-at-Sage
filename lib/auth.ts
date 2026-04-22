@@ -29,9 +29,19 @@ export async function requireUser() {
   return user
 }
 
+/**
+ * Tenant-admin gate. Superadmins bypass the per-school admin check —
+ * they're implicitly admin of every school, so viewing any school's
+ * admin pages works the same as if they were a native admin of that
+ * tenant. No cookie, no banner, no impersonation state — just access.
+ */
 export async function requireAdmin() {
   const user = await requireUser()
-  if (user.role !== 'admin') redirect('/dashboard')
-  return user
-}
+  if (user.role === 'admin') return user
 
+  // Not admin of their own tenant — check superadmin allowlist
+  const { data: isSa } = await supabaseAdmin.rpc('is_superadmin_email', { p_email: user.email })
+  if (isSa === true) return user
+
+  redirect('/')
+}

@@ -4,7 +4,7 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-const DIR = join(process.cwd(), 'app', 'og', '_lib', 'fonts')
+const DIR = join(process.cwd(), 'app', 's', '[schoolSlug]', 'og', '_lib', 'fonts')
 
 let cached: Array<{ name: string; data: ArrayBuffer; weight: 400 | 700 | 900; style: 'normal' }> | null = null
 
