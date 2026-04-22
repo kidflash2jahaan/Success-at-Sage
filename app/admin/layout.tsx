@@ -9,6 +9,7 @@ export default async function SuperadminLayout({ children }: { children: React.R
         <div className="flex items-center gap-6">
           <Link href="/admin/schools" className="text-white font-semibold text-sm">Superadmin</Link>
           <Link href="/admin/schools" className="text-white/50 text-sm hover:text-white transition-colors">School requests</Link>
+          <Link href="/admin/users" className="text-white/50 text-sm hover:text-white transition-colors">All users</Link>
         </div>
         <Link href="/" className="text-white/40 text-xs hover:text-white/70">Exit</Link>
       </header>

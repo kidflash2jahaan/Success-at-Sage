@@ -1,23 +1,34 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import ApprovedMaterialEditor from '@/components/admin/ApprovedMaterialEditor'
 
-export default async function AdminCoursesPage() {
+export default async function AdminCoursesPage({
+  params,
+}: {
+  params: Promise<{ schoolSlug: string }>
+}) {
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
+
   const [{ data }, { data: unitsData }, { data: coursesData }] = await Promise.all([
     supabaseAdmin
       .from('materials')
       .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, units!unit_id(id, title, courses(name))')
       .eq('status', 'approved')
+      .eq('school_id', tenant.id)
       .order('created_at', { ascending: false }),
     supabaseAdmin
       .from('units')
       .select('id, title, courses(name)')
       .eq('status', 'approved')
+      .eq('school_id', tenant.id)
       .order('title'),
     supabaseAdmin
       .from('courses')
       .select('id, name')
+      .eq('school_id', tenant.id)
       .order('name'),
   ])
 
@@ -41,7 +52,7 @@ export default async function AdminCoursesPage() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-white mb-2">All Materials</h1>
-      <p className="text-white/40 mb-8">{materials.length} approved</p>
+      <p className="text-white/40 mb-8">{materials.length} approved in {tenant.displayShort}</p>
 
       <div className="flex flex-col gap-3 max-w-3xl">
         {materials.map(m => (

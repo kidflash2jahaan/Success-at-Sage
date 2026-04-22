@@ -9,9 +9,9 @@ import SubmitButton from '@/components/ui/SubmitButton'
 import MarketingAssets from './MarketingAssets'
 
 export default async function AdminContestPage({ params, searchParams }: { params: Promise<{ schoolSlug: string }>; searchParams: Promise<{ saved?: string }> }) {
-  await requireAdmin()
   const { schoolSlug } = await params
   const tenant = await resolveTenantBySlug(schoolSlug)
+  await requireAdmin(tenant.id)
   const { saved } = await searchParams
 
   const today = new Date().toISOString().split('T')[0]

@@ -1,15 +1,20 @@
 export const dynamic = 'force-dynamic'
 
 import { requireUser } from '@/lib/auth'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import { searchContent } from '@/lib/db/queries/materials'
 import Link from 'next/link'
 
 export default async function SearchPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ schoolSlug: string }>
   searchParams: Promise<{ q?: string }>
 }) {
   await requireUser()
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const { q } = await searchParams
   const query = q?.trim() ?? ''
 
@@ -22,7 +27,7 @@ export default async function SearchPage({
     )
   }
 
-  const { courses, materials } = await searchContent(query)
+  const { courses, materials } = await searchContent(query, tenant.id)
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">

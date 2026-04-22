@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { getCourseWithUnits, isUserEnrolled } from '@/lib/db/queries/courses'
 import { getTrendingMaterialsForCourse } from '@/lib/db/queries/materials'
 import { requireUser } from '@/lib/auth'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import { addCourseToSchedule, removeCourseFromSchedule } from '@/app/actions/courses'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -11,10 +12,11 @@ import SubmitButton from '@/components/ui/SubmitButton'
 export default async function CourseDetailPage({
   params,
 }: {
-  params: Promise<{ slug: string }>
+  params: Promise<{ schoolSlug: string; slug: string }>
 }) {
-  const { slug } = await params
-  const data = await getCourseWithUnits(slug)
+  const { schoolSlug, slug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
+  const data = await getCourseWithUnits(tenant.id, slug)
   if (!data) notFound()
 
   const { course, department, units, totalMaterials } = data

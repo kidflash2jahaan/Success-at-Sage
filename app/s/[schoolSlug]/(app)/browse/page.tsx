@@ -1,15 +1,29 @@
 export const dynamic = 'force-dynamic'
 
 import { getAllDepartmentsWithCourses } from '@/lib/db/queries/courses'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import Link from 'next/link'
 
-export default async function BrowsePage() {
-  const departments = await getAllDepartmentsWithCourses()
+export default async function BrowsePage({
+  params,
+}: {
+  params: Promise<{ schoolSlug: string }>
+}) {
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
+  const departments = await getAllDepartmentsWithCourses(tenant.id)
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold text-white mb-1 tracking-tight">Browse Courses</h1>
       <p className="text-white/40 mb-10 text-sm">Find your courses and add them to your schedule.</p>
+
+      {departments.length === 0 && (
+        <div className="glass rounded-2xl px-6 py-14 text-center">
+          <p className="text-white/40 text-sm mb-2">No courses are set up yet for {tenant.displayShort}.</p>
+          <p className="text-white/25 text-xs">Ask a school admin to add departments and courses.</p>
+        </div>
+      )}
 
       <div className="flex flex-col gap-10">
         {departments.map((dept, di) => (
@@ -26,7 +40,7 @@ export default async function BrowsePage() {
               {dept.courses.map((course: any, ci: number) => (
                 <Link
                   key={course.id}
-                  href={`/courses/${course.slug}`}
+                  href={`/s/${schoolSlug}/courses/${course.slug}`}
                   className="card-hover glass rounded-xl p-4 transition-all hover:bg-white/[0.07] hover:border-white/[0.13] group"
                   style={{ animationDelay: `${di * 0.07 + ci * 0.04}s` }}
                 >

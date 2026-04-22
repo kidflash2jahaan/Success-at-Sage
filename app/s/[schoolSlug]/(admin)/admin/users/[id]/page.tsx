@@ -1,15 +1,29 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth'
 import { updateUserInfo } from '@/app/actions/admin'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import SubmitButton from '@/components/ui/SubmitButton'
 
-export default async function EditUserPage({ params }: { params: Promise<{ schoolSlug: string; id: string }> }) {
-  await requireAdmin()
+export default async function EditUserPage({
+  params,
+}: {
+  params: Promise<{ schoolSlug: string; id: string }>
+}) {
   const { schoolSlug, id } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
+  await requireAdmin(tenant.id)
   const backPath = `/s/${schoolSlug}/admin/users`
-  const { data: user } = await supabaseAdmin.from('users').select('*').eq('id', id).single()
+
+  // Cross-tenant guard: admin of Sage shouldn't be able to edit an
+  // Oakwood user by guessing their URL. Scope to tenant.id.
+  const { data: user } = await supabaseAdmin
+    .from('users')
+    .select('*')
+    .eq('id', id)
+    .eq('school_id', tenant.id)
+    .single()
   if (!user) redirect(backPath)
 
   async function handleUpdate(formData: FormData) {

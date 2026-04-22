@@ -60,17 +60,19 @@ export async function getUserSubmissions(userId: string) {
   }))
 }
 
-export async function searchContent(query: string) {
+export async function searchContent(query: string, schoolId: string) {
   const term = `%${query}%`
   const [{ data: matchedCourses }, { data: matchedMaterials }] = await Promise.all([
     supabaseAdmin
       .from('courses')
       .select('id, name, slug, departments(name, color_accent)')
+      .eq('school_id', schoolId)
       .ilike('name', term)
       .limit(5),
     supabaseAdmin
       .from('materials')
       .select('id, title, type, unit_id, units(title, courses(slug, name))')
+      .eq('school_id', schoolId)
       .ilike('title', term)
       .eq('status', 'approved')
       .limit(10),

@@ -1,13 +1,23 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
-export async function getAllDepartmentsWithCourses() {
+/**
+ * All departments + their courses for ONE tenant.
+ *
+ * Every department, course, unit, and material row carries a `school_id`
+ * (migration 0003). Filtering here is what keeps a Sage student from
+ * seeing Oakwood's course catalog, even though the underlying tables are
+ * shared.
+ */
+export async function getAllDepartmentsWithCourses(schoolId: string) {
   const [{ data }, { data: unitData }, { data: materialData }] = await Promise.all([
-    supabaseAdmin.from('departments').select('*, courses(*)'),
-    supabaseAdmin.from('units').select('id, course_id').eq('status', 'approved'),
-    supabaseAdmin.from('materials').select('id, unit_id').eq('status', 'approved'),
+    supabaseAdmin.from('departments').select('*, courses(*)').eq('school_id', schoolId),
+    supabaseAdmin.from('units').select('id, course_id').eq('status', 'approved').eq('school_id', schoolId),
+    supabaseAdmin.from('materials').select('id, unit_id').eq('status', 'approved').eq('school_id', schoolId),
   ])
 
-  // Build lookup maps
+  // Supabase returns embedded `courses` nested under each department, but
+  // they aren't filtered by school_id from the join — defensively filter
+  // here so a mis-seeded row can't leak cross-tenant.
   const unitsByCourse: Record<string, Set<string>> = {}
   for (const u of (unitData ?? []) as any[]) {
     if (!unitsByCourse[u.course_id]) unitsByCourse[u.course_id] = new Set()
@@ -29,22 +39,32 @@ export async function getAllDepartmentsWithCourses() {
     name: d.name as string,
     slug: d.slug as string,
     colorAccent: d.color_accent as string,
-    courses: (d.courses ?? []).map((c: any) => ({
-      id: c.id as string,
-      name: c.name as string,
-      slug: c.slug as string,
-      description: c.description as string,
-      departmentId: c.department_id as string,
-      unitCount: unitsByCourse[c.id]?.size ?? 0,
-      materialCount: materialsByCourse[c.id] ?? 0,
-    })),
+    courses: (d.courses ?? [])
+      .filter((c: any) => c.school_id === schoolId)
+      .map((c: any) => ({
+        id: c.id as string,
+        name: c.name as string,
+        slug: c.slug as string,
+        description: c.description as string,
+        departmentId: c.department_id as string,
+        unitCount: unitsByCourse[c.id]?.size ?? 0,
+        materialCount: materialsByCourse[c.id] ?? 0,
+      })),
   }))
 }
 
-export async function getCourseWithUnits(slug: string) {
+/**
+ * Course detail by slug, scoped to a tenant.
+ *
+ * Courses.slug is not globally unique (migration 0004 enforces
+ * uniqueness per school), so the tenant id is required to disambiguate
+ * between e.g. Sage's "ap-calc-bc" and Oakwood's "ap-calc-bc".
+ */
+export async function getCourseWithUnits(schoolId: string, slug: string) {
   const { data } = await supabaseAdmin
     .from('courses')
     .select('*, departments(*), units(*)')
+    .eq('school_id', schoolId)
     .eq('slug', slug)
     .single()
   if (!data) return null
