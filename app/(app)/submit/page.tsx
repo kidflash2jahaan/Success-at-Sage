@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { requireUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { SAGE_SCHOOL_ID } from '@/lib/constants'
 import SubmitForm from '@/components/submit/SubmitForm'
 import Link from 'next/link'
 
@@ -15,7 +16,7 @@ export default async function SubmitPage({
   const [{ data: coursesData }, { data: unitsData }, { data: contestSettings }] = await Promise.all([
     supabaseAdmin.from('courses').select('id, name, slug').order('name'),
     supabaseAdmin.from('units').select('id, title, course_id').eq('status', 'approved').order('title'),
-    supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('id', 1).single(),
+    supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('school_id', SAGE_SCHOOL_ID).single(),
   ])
 
   const settings = contestSettings as { prize_description?: string; next_reset_date?: string } | null

@@ -3,6 +3,7 @@
 // admin Supabase client (service role — routes are admin-gated already).
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { SAGE_SCHOOL_ID } from '@/lib/constants'
 
 export type ContestSettings = {
   period_start: string
@@ -31,7 +32,7 @@ export type Winner = {
 
 export async function getContestSettings(): Promise<ContestSettings> {
   const today = new Date().toISOString().split('T')[0]
-  const { data } = await supabaseAdmin.from('contest_settings').select('*').eq('id', 1).single()
+  const { data } = await supabaseAdmin.from('contest_settings').select('*').eq('school_id', SAGE_SCHOOL_ID).single()
   return (data ?? { period_start: today, next_reset_date: today, prize_description: '$50 Amazon gift card' }) as ContestSettings
 }
 

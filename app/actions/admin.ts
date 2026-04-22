@@ -1,6 +1,7 @@
 'use server'
 import { requireAdmin } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { SAGE_SCHOOL_ID } from '@/lib/constants'
 import { sendApprovalEmail, sendRejectionEmail } from '@/lib/email/resend'
 import { revalidatePath } from 'next/cache'
 
@@ -85,7 +86,7 @@ export async function adminCreateUnitAndMove(materialId: string, courseId: strin
   const nextOrder = ((top?.[0] as any)?.order_index ?? 0) + 1
   const { data: newUnit } = await supabaseAdmin
     .from('units')
-    .insert({ course_id: courseId, title: unitTitle.trim(), order_index: nextOrder, status: 'approved' })
+    .insert({ school_id: SAGE_SCHOOL_ID, course_id: courseId, title: unitTitle.trim(), order_index: nextOrder, status: 'approved' })
     .select('id')
     .single()
   if (!newUnit) throw new Error('Could not create unit')
@@ -122,7 +123,7 @@ export async function updateContestSettings(nextResetDate: string, prizeDescript
   await supabaseAdmin
     .from('contest_settings')
     .update({ next_reset_date: nextResetDate, prize_description: prizeDescription, period_start: periodStart })
-    .eq('id', 1)
+    .eq('school_id', SAGE_SCHOOL_ID)
   revalidatePath('/admin/contest')
   revalidatePath('/leaderboard')
 }
@@ -130,6 +131,7 @@ export async function updateContestSettings(nextResetDate: string, prizeDescript
 export async function chooseContestWinner(userId: string, periodLabel: string, periodStart: string, periodEnd: string) {
   await requireAdmin()
   await supabaseAdmin.from('contest_winners').insert({
+    school_id: SAGE_SCHOOL_ID,
     user_id: userId,
     period_label: periodLabel,
     period_start: periodStart,
@@ -143,7 +145,7 @@ export async function chooseContestWinner(userId: string, periodLabel: string, p
   await supabaseAdmin
     .from('contest_settings')
     .update({ period_start: periodEnd, next_reset_date: nextReset })
-    .eq('id', 1)
+    .eq('school_id', SAGE_SCHOOL_ID)
   revalidatePath('/admin/contest')
   revalidatePath('/leaderboard')
 }

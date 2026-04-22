@@ -1,13 +1,14 @@
 'use server'
 import { requireUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { SAGE_SCHOOL_ID } from '@/lib/constants'
 import { revalidatePath } from 'next/cache'
 
 export async function addCourseToSchedule(courseId: string) {
   const user = await requireUser()
   await supabaseAdmin
     .from('user_courses')
-    .insert({ user_id: user.id, course_id: courseId })
+    .insert({ school_id: SAGE_SCHOOL_ID, user_id: user.id, course_id: courseId })
   revalidatePath('/dashboard')
   revalidatePath('/courses')
 }

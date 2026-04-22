@@ -1,6 +1,7 @@
 'use server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { SAGE_SCHOOL_ID } from '@/lib/constants'
 import { redirect } from 'next/navigation'
 
 export async function signUpWithEmail(formData: FormData) {
@@ -26,6 +27,7 @@ export async function signUpWithEmail(formData: FormData) {
 
   await supabaseAdmin.from('users').insert({
     id: data.user.id,
+    school_id: SAGE_SCHOOL_ID,
     email,
     full_name: fullName,
     graduating_year: graduatingYear,

@@ -3,12 +3,13 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { SAGE_SCHOOL_ID } from '@/lib/constants'
 import { redirect } from 'next/navigation'
 
 export default async function LandingPage() {
   const [user, { data: settingsData }] = await Promise.all([
     getCurrentUser().catch(() => null),
-    supabaseAdmin.from('contest_settings').select('prize_description').eq('id', 1).single(),
+    supabaseAdmin.from('contest_settings').select('prize_description').eq('school_id', SAGE_SCHOOL_ID).single(),
   ])
   if (user) redirect('/dashboard')
   const prize = (settingsData as { prize_description?: string } | null)?.prize_description ?? '$50 Amazon gift card'

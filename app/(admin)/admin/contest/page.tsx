@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
+import { SAGE_SCHOOL_ID } from '@/lib/constants'
 import { requireAdmin, calculateGrade } from '@/lib/auth'
 import { chooseContestWinner, markWinnerPaid, updateContestSettings } from '@/app/actions/admin'
 import { redirect } from 'next/navigation'
@@ -12,7 +13,7 @@ export default async function AdminContestPage({ searchParams }: { searchParams:
 
   const today = new Date().toISOString().split('T')[0]
   const [{ data: settingsData }, { data: winnersData }] = await Promise.all([
-    supabaseAdmin.from('contest_settings').select('*').eq('id', 1).single(),
+    supabaseAdmin.from('contest_settings').select('*').eq('school_id', SAGE_SCHOOL_ID).single(),
     supabaseAdmin
       .from('contest_winners')
       .select('*, users(full_name, email)')
