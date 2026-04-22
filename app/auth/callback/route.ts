@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         .from('users')
         .select('id, school_id')
         .eq('id', data.user.id)
-        .single()
+        .single<{ id: string; school_id: string }>()
 
       if (!existing) {
         const tenant = await resolveTenantByEmail(email)
@@ -36,14 +36,14 @@ export async function GET(request: Request) {
       const { data: school } = await supabaseAdmin
         .from('schools')
         .select('slug')
-        .eq('id', (existing as any).school_id)
-        .single()
+        .eq('id', existing.school_id)
+        .single<{ slug: string }>()
       if (!school) {
         // users row is orphaned (school was deleted). Send them to the
         // generic landing so they can re-request.
         return NextResponse.redirect(`${origin}/`)
       }
-      return NextResponse.redirect(`${origin}/s/${(school as any).slug}/dashboard`)
+      return NextResponse.redirect(`${origin}/s/${school.slug}/dashboard`)
     }
 
     console.error('[auth/callback] Supabase error:', error)

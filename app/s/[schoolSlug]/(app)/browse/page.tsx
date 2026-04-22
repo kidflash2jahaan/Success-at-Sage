@@ -37,7 +37,7 @@ export default async function BrowsePage({
               <span className="text-xs text-white/25 ml-1">{dept.courses.length}</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-              {dept.courses.map((course: any, ci: number) => (
+              {dept.courses.map((course, ci) => (
                 <Link
                   key={course.id}
                   href={`/s/${schoolSlug}/courses/${course.slug}`}
@@ -51,9 +51,9 @@ export default async function BrowsePage({
                     {course.name}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-white/25">{(course as any).unitCount} unit{(course as any).unitCount !== 1 ? 's' : ''}</span>
+                    <span className="text-[10px] text-white/25">{course.unitCount} unit{course.unitCount !== 1 ? 's' : ''}</span>
                     <span className="text-white/15 text-[10px]">·</span>
-                    <span className="text-[10px] text-white/25">{(course as any).materialCount} material{(course as any).materialCount !== 1 ? 's' : ''}</span>
+                    <span className="text-[10px] text-white/25">{course.materialCount} material{course.materialCount !== 1 ? 's' : ''}</span>
                   </div>
                 </Link>
               ))}

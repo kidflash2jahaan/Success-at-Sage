@@ -23,29 +23,29 @@ export default async function UnitPage({
     .select('id, title, course_id, school_id')
     .eq('id', id)
     .eq('school_id', tenant.id)
-    .single()
+    .single<{ id: string; title: string; course_id: string; school_id: string }>()
   if (!unit) notFound()
 
   const { data: course } = await supabaseAdmin
     .from('courses')
     .select('id, name, department_id')
-    .eq('id', (unit as any).course_id)
+    .eq('id', unit.course_id)
     .eq('school_id', tenant.id)
-    .single()
+    .single<{ id: string; name: string; department_id: string }>()
   if (!course) notFound()
 
   const { data: dept } = await supabaseAdmin
     .from('departments')
     .select('id, name, color_accent')
-    .eq('id', (course as any).department_id)
+    .eq('id', course.department_id)
     .eq('school_id', tenant.id)
-    .single()
+    .single<{ id: string; name: string; color_accent: string }>()
   if (!dept) notFound()
 
   const approvedMaterials = await getApprovedMaterialsForUnit(id)
   const notes = approvedMaterials.filter(m => m.type === 'note')
   const tests = approvedMaterials.filter(m => m.type === 'test')
-  const accentColor = (dept as any).color_accent
+  const accentColor = dept.color_accent
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">

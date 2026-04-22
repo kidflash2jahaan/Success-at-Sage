@@ -5,6 +5,16 @@ import { getUser } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+type SchoolRequestRow = {
+  id: string
+  status: 'pending' | 'approved' | 'rejected'
+  proposed_slug: string
+  proposed_name: string
+  proposed_display_short: string
+  proposed_domains: string[] | null
+  requester_email: string
+}
+
 /** Approve a school request. Creates the school + domains, flags the requester as pending-admin. */
 export async function approveSchoolRequest(requestId: string) {
   await requireSuperadmin()
@@ -14,31 +24,31 @@ export async function approveSchoolRequest(requestId: string) {
     .from('school_requests')
     .select('*')
     .eq('id', requestId)
-    .single()
+    .single<SchoolRequestRow>()
   if (reqErr || !req) throw new Error('Request not found')
-  if ((req as any).status !== 'pending') throw new Error(`Request already ${(req as any).status}`)
+  if (req.status !== 'pending') throw new Error(`Request already ${req.status}`)
 
   const { data: school, error: schoolErr } = await supabaseAdmin
     .from('schools')
     .insert({
-      slug: (req as any).proposed_slug,
-      name: (req as any).proposed_name,
-      display_short: (req as any).proposed_display_short,
+      slug: req.proposed_slug,
+      name: req.proposed_name,
+      display_short: req.proposed_display_short,
       contest_enabled: false,
     })
     .select('id, slug')
-    .single()
+    .single<{ id: string; slug: string }>()
   if (schoolErr || !school) throw new Error(`Could not create school: ${schoolErr?.message ?? 'unknown'}`)
 
-  const domains = ((req as any).proposed_domains as string[]) ?? []
+  const domains = req.proposed_domains ?? []
   if (domains.length > 0) {
-    const rows = domains.map(d => ({ school_id: (school as any).id, domain: d.toLowerCase() }))
+    const rows = domains.map(d => ({ school_id: school.id, domain: d.toLowerCase() }))
     await supabaseAdmin.from('school_domains').insert(rows)
   }
 
-  await supabaseAdmin.rpc('mark_pending_school_admin' as any, {
-    p_email: ((req as any).requester_email as string).toLowerCase(),
-    p_school_id: (school as any).id,
+  await supabaseAdmin.rpc('mark_pending_school_admin' as never, {
+    p_email: req.requester_email.toLowerCase(),
+    p_school_id: school.id,
   })
 
   await supabaseAdmin

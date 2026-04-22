@@ -18,7 +18,8 @@ async function getAdminEmailsForTenant(schoolId: string): Promise<string[]> {
     .select('email')
     .eq('role', 'admin')
     .eq('school_id', schoolId)
-  return (data ?? []).map((u: any) => u.email as string)
+    .returns<{ email: string }[]>()
+  return (data ?? []).map(u => u.email)
 }
 
 export async function submitNewUnit(
@@ -40,10 +41,10 @@ export async function submitNewUnit(
       submitted_by: user.id,
     })
     .select('id')
-    .single()
+    .single<{ id: string }>()
   if (error || !data) return { ok: false, error: 'Could not create unit. Please try again.' }
   revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')
-  return { ok: true, data: { unitId: (data as any).id as string } }
+  return { ok: true, data: { unitId: data.id } }
 }
 
 export async function submitMaterial(
@@ -99,7 +100,7 @@ export async function submitMaterial(
           .select('title, courses(name)')
           .eq('id', input.unitId)
           .eq('school_id', tenant.id)
-          .single(),
+          .single<{ title: string; courses: { name: string } | null }>(),
         getAdminEmailsForTenant(tenant.id),
       ])
       await sendAdminSubmissionEmail(
@@ -107,8 +108,8 @@ export async function submitMaterial(
         user.fullName,
         cleanTitle,
         input.type,
-        (unit as any)?.courses?.name ?? '',
-        (unit as any)?.title ?? '',
+        unit?.courses?.name ?? '',
+        unit?.title ?? '',
       )
     } catch {}
   })()
@@ -138,8 +139,8 @@ export async function editMaterial(
     .select('id, uploaded_by, status')
     .eq('id', materialId)
     .eq('school_id', tenant.id)
-    .single()
-  if (!material || (material as any).uploaded_by !== user.id) {
+    .single<{ id: string; uploaded_by: string; status: string }>()
+  if (!material || material.uploaded_by !== user.id) {
     return { ok: false, error: 'You can only edit your own submissions.' }
   }
 

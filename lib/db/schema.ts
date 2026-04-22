@@ -1,7 +1,3 @@
-// PHASE 2 TODO (silent-tenant-leak risk): drop DEFAULT Sage from every
-// school_id column on migration 0003 + 0006 before the auth hook lands.
-// See lib/constants.ts Phase-2 removal checklist.
-
 import { pgTable, uuid, text, integer, timestamp, date, pgEnum, index, primaryKey, jsonb, boolean } from 'drizzle-orm/pg-core'
 
 export const roleEnum = pgEnum('role', ['student', 'admin'])
@@ -11,7 +7,7 @@ export const statusEnum = pgEnum('status', ['pending', 'approved', 'rejected'])
 export const schoolRequestStatusEnum = pgEnum('school_request_status', ['pending', 'approved', 'rejected'])
 
 // ============================================================================
-// Tenant-management tables (added in multi-tenant Phase 1)
+// Tenant-management tables
 // ============================================================================
 
 export const schools = pgTable('schools', {
@@ -51,7 +47,7 @@ export const schoolRequests = pgTable('school_requests', {
 ])
 
 // ============================================================================
-// Existing (Sage) tables
+// Tenant-scoped tables
 // ============================================================================
 
 export const users = pgTable('users', {
@@ -118,11 +114,8 @@ export const userCourses = pgTable('user_courses', {
 ])
 
 // ============================================================================
-// Contest tables — previously untracked by Drizzle but live in the DB.
-// Retroactively typed in Phase 1. Shapes mirror the live DB exactly.
-//
-// contestSettings is shown in its Phase-1 end state (school_id PK;
-// id column is dropped by migration 0005).
+// Contest tables — schema mirrors the live DB (contestSettings uses
+// school_id as its primary key after migration 0005).
 // ============================================================================
 
 export const contestSettings = pgTable('contest_settings', {

@@ -6,8 +6,8 @@ import { redirect } from 'next/navigation'
  * Public form at /request-school. Anyone can submit a request for a new
  * school to be added. Superadmin reviews it at /admin/schools.
  *
- * No RLS bypass needed — Phase 2 RLS permits anonymous INSERT on
- * school_requests (policy: school_requests_public_insert).
+ * RLS policy `school_requests_public_insert` permits anonymous INSERT,
+ * so no service-role bypass is required to accept the submission.
  */
 export async function requestSchool(formData: FormData) {
   const email = ((formData.get('requester_email') as string) ?? '').trim().toLowerCase()

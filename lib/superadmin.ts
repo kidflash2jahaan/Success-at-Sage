@@ -4,14 +4,14 @@ import { getUser } from './supabase/server'
 import { supabaseAdmin } from './supabase/admin'
 
 /**
- * Superadmin status via DB (single source of truth — the
- * private.superadmin_emails table seeded from ADMIN_EMAILS env var in
- * Phase 2). Uses the public.is_superadmin_email RPC which security-
- * definers into private schema.
+ * Superadmin status via DB: the private.superadmin_emails table is the
+ * single source of truth, seeded from the ADMIN_EMAILS env var. Reads
+ * go through the is_superadmin_email RPC (SECURITY DEFINER into the
+ * private schema).
  *
- * Alternative fast-path would be to read the is_superadmin JWT claim
- * set by the Custom Access Token hook, but that can be stale up to 1h
- * after a change — DB check is always fresh.
+ * The JWT also carries an is_superadmin claim via the Custom Access
+ * Token hook, but claims can be stale up to an hour — we prefer the DB
+ * check so changes take effect immediately.
  */
 export async function isSuperadmin(): Promise<boolean> {
   const authUser = await getUser()

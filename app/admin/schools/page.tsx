@@ -3,6 +3,25 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
+type SchoolRequestRow = {
+  id: string
+  status: 'pending' | 'approved' | 'rejected'
+  proposed_slug: string
+  proposed_name: string
+  proposed_domains: string[] | null
+  requester_email: string
+  requester_role: string | null
+}
+
+type SchoolRow = {
+  id: string
+  slug: string
+  name: string
+  display_short: string
+  contest_enabled: boolean
+  created_at: string
+}
+
 export default async function SchoolsPage({
   searchParams,
 }: {
@@ -11,12 +30,20 @@ export default async function SchoolsPage({
   const { approved, rejected } = await searchParams
 
   const [{ data: pending }, { data: schools }] = await Promise.all([
-    supabaseAdmin.from('school_requests').select('*').order('created_at', { ascending: false }),
-    supabaseAdmin.from('schools').select('id, slug, name, display_short, contest_enabled, created_at').order('created_at', { ascending: false }),
+    supabaseAdmin
+      .from('school_requests')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .returns<SchoolRequestRow[]>(),
+    supabaseAdmin
+      .from('schools')
+      .select('id, slug, name, display_short, contest_enabled, created_at')
+      .order('created_at', { ascending: false })
+      .returns<SchoolRow[]>(),
   ])
 
-  const reqs = (pending ?? []) as any[]
-  const scs = (schools ?? []) as any[]
+  const reqs = pending ?? []
+  const scs = schools ?? []
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">

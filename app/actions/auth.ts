@@ -35,7 +35,7 @@ export async function completeOnboarding(formData: FormData) {
   // by superadmin), promote them and switch their school_id to the approved
   // school. This overrides the email-domain tenant resolution above.
   const { data: promotedSchoolId } = await supabaseAdmin.rpc(
-    'promote_pending_school_admin' as any,
+    'promote_pending_school_admin' as never,
     { p_user_id: authUser.id, p_email: email },
   )
   if (promotedSchoolId) {
@@ -43,9 +43,9 @@ export async function completeOnboarding(formData: FormData) {
       .from('schools')
       .select('slug')
       .eq('id', promotedSchoolId)
-      .single()
+      .single<{ slug: string }>()
     const promotedTenant = promotedSchool
-      ? await resolveTenantBySlug((promotedSchool as any).slug).catch(() => tenant)
+      ? await resolveTenantBySlug(promotedSchool.slug).catch(() => tenant)
       : tenant
     redirect(`/s/${promotedTenant.slug}/dashboard`)
   }

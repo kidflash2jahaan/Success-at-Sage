@@ -6,12 +6,31 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { approveSchoolRequest, rejectSchoolRequest } from '@/app/actions/superadmin'
 import SubmitButton from '@/components/ui/SubmitButton'
 
+type SchoolRequestDetailRow = {
+  id: string
+  status: 'pending' | 'approved' | 'rejected'
+  proposed_slug: string
+  proposed_name: string
+  proposed_display_short: string
+  proposed_domains: string[] | null
+  requester_name: string
+  requester_email: string
+  requester_role: string | null
+  notes: string | null
+  review_note: string | null
+  reviewed_at: string | null
+  created_at: string
+}
+
 export default async function SchoolRequestDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  const { data } = await supabaseAdmin.from('school_requests').select('*').eq('id', id).single()
-  if (!data) notFound()
-  const r = data as any
+  const { data: r } = await supabaseAdmin
+    .from('school_requests')
+    .select('*')
+    .eq('id', id)
+    .single<SchoolRequestDetailRow>()
+  if (!r) notFound()
 
   const approve = approveSchoolRequest.bind(null, id)
   const reject = async (formData: FormData) => {

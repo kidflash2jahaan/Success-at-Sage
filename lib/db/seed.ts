@@ -1,6 +1,9 @@
 import { db } from './index'
 import { departments, courses, units } from './schema'
-import { SAGE_SCHOOL_ID } from '@/lib/constants'
+
+// The Sage tenant UUID, fixed at migration 0002. Only used here by the
+// initial seed script.
+const SAGE_SCHOOL_ID = 'a0000000-0000-0000-0000-000000000001'
 
 async function seed() {
   const [math] = await db.insert(departments).values({

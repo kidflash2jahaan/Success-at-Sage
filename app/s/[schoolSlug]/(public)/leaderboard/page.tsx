@@ -15,16 +15,33 @@ interface LeaderEntry {
 
 const MEDAL = ['#fbbf24', '#94a3b8', '#b87333']
 
+type ContestSettingsRow = {
+  period_start: string
+  next_reset_date: string | null
+  prize_description: string
+}
+
+type LeaderboardRpcRow = {
+  id: string
+  full_name: string
+  graduating_year: number
+  submission_count: number | string
+  total_views: number | string
+}
+
 export default async function LeaderboardPage({ params }: { params: Promise<{ schoolSlug: string }> }) {
   const { schoolSlug } = await params
   const tenant = await resolveTenantBySlug(schoolSlug)
-  const [{ data: settingsData }, user] = await Promise.all([
-    supabaseAdmin.from('contest_settings').select('*').eq('school_id', tenant.id).single(),
+  const [{ data: settings }, user] = await Promise.all([
+    supabaseAdmin
+      .from('contest_settings')
+      .select('period_start, next_reset_date, prize_description')
+      .eq('school_id', tenant.id)
+      .single<ContestSettingsRow>(),
     getCurrentUser(),
   ])
 
   const today = new Date().toISOString().split('T')[0]
-  const settings = settingsData as { period_start?: string; next_reset_date?: string | null; prize_description?: string } | null
   const periodStart = settings?.period_start ?? today
   const nextReset = settings?.next_reset_date ?? null
   const prize = settings?.prize_description ?? '$50 Amazon gift card'
@@ -34,7 +51,8 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ sc
     p_end: nextReset ?? today,
   })
 
-  const entries: LeaderEntry[] = (data ?? []).map((r: any) => ({
+  const rows = (data ?? []) as LeaderboardRpcRow[]
+  const entries: LeaderEntry[] = rows.map(r => ({
     id: r.id,
     fullName: r.full_name,
     graduatingYear: r.graduating_year,

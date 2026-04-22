@@ -141,16 +141,17 @@ export async function adminCreateUnitAndMove(
     .eq('status', 'approved')
     .order('order_index', { ascending: false })
     .limit(1)
-  const nextOrder = ((top?.[0] as any)?.order_index ?? 0) + 1
+    .returns<{ order_index: number }[]>()
+  const nextOrder = (top?.[0]?.order_index ?? 0) + 1
   const { data: newUnit } = await supabaseAdmin
     .from('units')
     .insert({ school_id: tenant.id, course_id: courseId, title: unitTitle.trim(), order_index: nextOrder, status: 'approved' })
     .select('id')
-    .single()
+    .single<{ id: string }>()
   if (!newUnit) throw new Error('Could not create unit')
   await supabaseAdmin
     .from('materials')
-    .update({ unit_id: (newUnit as any).id })
+    .update({ unit_id: newUnit.id })
     .eq('id', materialId)
     .eq('school_id', tenant.id)
   revalidatePath('/s/[schoolSlug]/admin/submissions', 'page')

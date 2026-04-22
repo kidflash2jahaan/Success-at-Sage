@@ -30,8 +30,8 @@ export default async function RootLanding() {
       .from('schools')
       .select('slug')
       .eq('id', user.schoolId)
-      .single()
-    if (school) redirect(`/s/${(school as any).slug}/dashboard`)
+      .single<{ slug: string }>()
+    if (school) redirect(`/s/${school.slug}/dashboard`)
     // users row points at a deleted school — fall through to marketing
   }
 
@@ -39,7 +39,8 @@ export default async function RootLanding() {
     .from('schools')
     .select('slug, display_short, name')
     .order('created_at', { ascending: true })
-  const schools = ((schoolsData ?? []) as { slug: string; display_short: string; name: string }[])
+    .returns<{ slug: string; display_short: string; name: string }[]>()
+  const schools = schoolsData ?? []
 
   return (
     <div className="min-h-screen flex flex-col">
