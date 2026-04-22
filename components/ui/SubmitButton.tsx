@@ -42,12 +42,14 @@ export default function SubmitButton({
 
 /**
  * Client-driven variant: for buttons that trigger a React transition (not a
- * form submission). Callers pass `pending` themselves.
+ * form submission). Callers pass `pending` themselves, and may pass
+ * `disabled` on top — the button is disabled when either is true.
  */
 export function PendingButton({
   children,
   pendingLabel,
   pending,
+  disabled,
   className,
   type = 'button',
   ...rest
@@ -55,13 +57,14 @@ export function PendingButton({
   children: ReactNode
   pendingLabel?: ReactNode
   pending: boolean
+  disabled?: boolean
   className?: string
   type?: 'button' | 'submit'
 } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'disabled'>) {
   return (
     <button
       type={type}
-      disabled={pending}
+      disabled={pending || disabled}
       aria-busy={pending}
       className={className}
       {...rest}
