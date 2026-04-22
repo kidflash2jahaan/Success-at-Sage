@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { SAGE_SCHOOL_ID } from '@/lib/constants'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import { getCurrentUser, calculateGrade } from '@/lib/auth'
 import Link from 'next/link'
 
@@ -15,9 +15,11 @@ interface LeaderEntry {
 
 const MEDAL = ['#fbbf24', '#94a3b8', '#b87333']
 
-export default async function LeaderboardPage() {
+export default async function LeaderboardPage({ params }: { params: Promise<{ schoolSlug: string }> }) {
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const [{ data: settingsData }, user] = await Promise.all([
-    supabaseAdmin.from('contest_settings').select('*').eq('school_id', SAGE_SCHOOL_ID).single(),
+    supabaseAdmin.from('contest_settings').select('*').eq('school_id', tenant.id).single(),
     getCurrentUser(),
   ])
 

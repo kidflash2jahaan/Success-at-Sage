@@ -3,14 +3,16 @@ export const dynamic = 'force-dynamic'
 import { requireUser } from '@/lib/auth'
 import { getUserCourses } from '@/lib/db/queries/courses'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { SAGE_SCHOOL_ID } from '@/lib/constants'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import Link from 'next/link'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ params }: { params: Promise<{ schoolSlug: string }> }) {
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const user = await requireUser()
   const [userCourses, { data: contestSettings }] = await Promise.all([
     getUserCourses(user.id),
-    supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('school_id', SAGE_SCHOOL_ID).single(),
+    supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('school_id', tenant.id).single(),
   ])
   const settings = contestSettings as { prize_description?: string; next_reset_date?: string } | null
   const prize = settings?.prize_description ?? '$50 Amazon gift card'
