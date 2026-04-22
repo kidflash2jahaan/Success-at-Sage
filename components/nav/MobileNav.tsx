@@ -2,9 +2,15 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-const tabs = [
+type Tab = {
+  path: string
+  label: string
+  icon: (active: boolean) => React.ReactNode
+}
+
+const tabs: Tab[] = [
   {
-    href: '/dashboard',
+    path: 'dashboard',
     label: 'Home',
     icon: (active: boolean) => (
       <svg className="w-6 h-6" fill={active ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 0 : 1.8}>
@@ -13,7 +19,7 @@ const tabs = [
     ),
   },
   {
-    href: '/browse',
+    path: 'browse',
     label: 'Browse',
     icon: (active: boolean) => (
       <svg className="w-6 h-6" fill={active ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 0 : 1.8}>
@@ -22,7 +28,7 @@ const tabs = [
     ),
   },
   {
-    href: '/submit',
+    path: 'submit',
     label: 'Submit',
     icon: (_active: boolean) => (
       <div className="w-12 h-12 rounded-2xl bg-violet-600 flex items-center justify-center -mt-5" style={{ boxShadow: '0 0 20px rgba(124,58,237,0.5)' }}>
@@ -33,7 +39,7 @@ const tabs = [
     ),
   },
   {
-    href: '/trending',
+    path: 'trending',
     label: 'Trending',
     icon: (active: boolean) => (
       <svg className="w-6 h-6" fill={active ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 0 : 1.8}>
@@ -42,7 +48,7 @@ const tabs = [
     ),
   },
   {
-    href: '/leaderboard',
+    path: 'leaderboard',
     label: 'Ranks',
     icon: (active: boolean) => (
       <svg className="w-6 h-6" fill={active ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={active ? 0 : 1.8}>
@@ -52,8 +58,9 @@ const tabs = [
   },
 ]
 
-export default function MobileNav() {
+export default function MobileNav({ schoolSlug }: { schoolSlug: string }) {
   const pathname = usePathname()
+  const basePath = `/s/${schoolSlug}`
 
   return (
     <nav
@@ -61,12 +68,13 @@ export default function MobileNav() {
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 6px)', paddingTop: '8px' }}
     >
       {tabs.map(tab => {
-        const active = pathname === tab.href || (tab.href !== '/dashboard' && pathname.startsWith(tab.href))
-        const isSubmit = tab.href === '/submit'
+        const href = `${basePath}/${tab.path}`
+        const active = pathname === href || (tab.path !== 'dashboard' && pathname.startsWith(href))
+        const isSubmit = tab.path === 'submit'
         return (
           <Link
-            key={tab.href}
-            href={tab.href}
+            key={tab.path}
+            href={href}
             className={`flex flex-col items-center gap-0.5 min-w-0 flex-1 transition-colors ${
               isSubmit ? 'pb-1' : active ? 'text-violet-400' : 'text-white/30'
             }`}

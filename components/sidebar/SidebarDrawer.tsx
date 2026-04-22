@@ -10,13 +10,14 @@ interface SidebarCourse {
 }
 
 interface SidebarDrawerProps {
+  schoolSlug: string
   courses: SidebarCourse[]
   activeCourseSlug?: string
   open: boolean
   onClose: () => void
 }
 
-export default function SidebarDrawer({ courses, activeCourseSlug, open, onClose }: SidebarDrawerProps) {
+export default function SidebarDrawer({ schoolSlug, courses, activeCourseSlug, open, onClose }: SidebarDrawerProps) {
   useEffect(() => {
     if (open) document.body.style.overflow = 'hidden'
     else document.body.style.overflow = ''
@@ -32,7 +33,7 @@ export default function SidebarDrawer({ courses, activeCourseSlug, open, onClose
         />
       )}
       <div className={`fixed inset-y-0 left-0 z-50 md:hidden transition-transform duration-200 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
-        <Sidebar courses={courses} activeCourseSlug={activeCourseSlug} onClose={onClose} />
+        <Sidebar schoolSlug={schoolSlug} courses={courses} activeCourseSlug={activeCourseSlug} onClose={onClose} />
       </div>
     </>
   )

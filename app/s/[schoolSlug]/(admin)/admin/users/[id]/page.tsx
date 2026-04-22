@@ -30,7 +30,7 @@ export default async function EditUserPage({
     'use server'
     const fullName = formData.get('fullName') as string
     const graduatingYear = parseInt(formData.get('graduatingYear') as string)
-    await updateUserInfo(id, fullName, graduatingYear)
+    await updateUserInfo(schoolSlug, id, fullName, graduatingYear)
     redirect(backPath)
   }
 

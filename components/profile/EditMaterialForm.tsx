@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { editMaterial } from '@/app/actions/materials'
 import { uploadFileWithTUS, uploadPdfWithTUS } from '@/lib/storage/upload'
 import { imagesToPdf, isPdfFile } from '@/lib/utils/imagesToPdf'
@@ -10,6 +10,7 @@ import PdfDropZone from '@/components/ui/PdfDropZone'
 import Link from 'next/link'
 
 interface Props {
+  schoolSlug: string
   id: string
   unitId: string
   initialTitle: string
@@ -22,13 +23,13 @@ interface Props {
 }
 
 export default function EditMaterialForm({
+  schoolSlug,
   id, unitId, initialTitle, initialContentType,
   initialContent, initialAttachmentPaths, initialPdfPath,
   unitTitle, courseName,
 }: Props) {
   const router = useRouter()
-  const params = useParams<{ schoolSlug?: string }>()
-  const profilePath = `/s/${params?.schoolSlug ?? 'sage'}/profile`
+  const profilePath = `/s/${schoolSlug}/profile`
   const [mode, setMode] = useState<'typed' | 'paper'>(initialContentType === 'pdf' ? 'paper' : 'typed')
   const [title, setTitle] = useState(initialTitle)
   const [content, setContent] = useState(initialContent)
@@ -55,7 +56,7 @@ export default function EditMaterialForm({
             : await imagesToPdf(pdfFiles)
           pdfPath = await uploadPdfWithTUS(fileToUpload, unitId)
         }
-        result = await editMaterial(id, title, 'note', 'pdf', null, pdfPath, undefined, null)
+        result = await editMaterial(schoolSlug, id, title, 'note', 'pdf', null, pdfPath, undefined, null)
       } else {
         const uploadedPaths: string[] = []
         for (const file of newFiles) {
@@ -63,7 +64,7 @@ export default function EditMaterialForm({
           uploadedPaths.push(path)
         }
         const finalPaths = [...existingPaths, ...uploadedPaths]
-        result = await editMaterial(id, title, 'note', 'richtext', content, null, undefined, finalPaths.length ? finalPaths : null)
+        result = await editMaterial(schoolSlug, id, title, 'note', 'richtext', content, null, undefined, finalPaths.length ? finalPaths : null)
       }
       if (!result.ok) {
         setError(result.error)

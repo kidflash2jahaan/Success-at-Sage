@@ -1,6 +1,6 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { resolveTenantByEmail, resolveTenantBySlug } from '@/lib/tenant'
+import { resolveTenantByEmail } from '@/lib/tenant'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -13,7 +13,8 @@ export async function GET(request: Request) {
 
     if (!error && data.user) {
       // Resolve tenant: existing users row → their school_id; new users →
-      // resolve by email domain; fall back to Sage if nothing matches.
+      // resolve by email domain. If nothing matches for a new user, send
+      // them to /request-school so their school can be created.
       const email = (data.user.email ?? '').trim().toLowerCase()
 
       const { data: existing } = await supabaseAdmin
@@ -23,16 +24,26 @@ export async function GET(request: Request) {
         .single()
 
       if (!existing) {
-        const tenant = await resolveTenantByEmail(email) ?? await resolveTenantBySlug('sage').catch(() => null)
-        const slug = tenant?.slug ?? 'sage'
-        return NextResponse.redirect(`${origin}/s/${slug}/onboarding`)
+        const tenant = await resolveTenantByEmail(email)
+        if (!tenant) {
+          return NextResponse.redirect(`${origin}/request-school?email=${encodeURIComponent(email)}`)
+        }
+        return NextResponse.redirect(`${origin}/s/${tenant.slug}/onboarding`)
       }
 
-      // Existing user: look up their tenant's slug
+      // Existing user: look up their tenant's slug and drop them on the
+      // dashboard for that school.
       const { data: school } = await supabaseAdmin
-        .from('schools').select('slug').eq('id', (existing as any).school_id).single()
-      const slug = (school as any)?.slug ?? 'sage'
-      return NextResponse.redirect(`${origin}/s/${slug}/dashboard`)
+        .from('schools')
+        .select('slug')
+        .eq('id', (existing as any).school_id)
+        .single()
+      if (!school) {
+        // users row is orphaned (school was deleted). Send them to the
+        // generic landing so they can re-request.
+        return NextResponse.redirect(`${origin}/`)
+      }
+      return NextResponse.redirect(`${origin}/s/${(school as any).slug}/dashboard`)
     }
 
     console.error('[auth/callback] Supabase error:', error)

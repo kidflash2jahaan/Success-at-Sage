@@ -53,11 +53,11 @@ export default async function AdminUsersPage({
                   Edit
                 </Link>
                 {user.role === 'student' ? (
-                  <form action={promoteToAdmin.bind(null, user.id)}>
+                  <form action={promoteToAdmin.bind(null, schoolSlug, user.id)}>
                     <SubmitButton pendingLabel="..." className="text-xs text-purple-400 hover:text-purple-300 disabled:opacity-60 disabled:cursor-wait">Make Admin</SubmitButton>
                   </form>
                 ) : (
-                  <form action={demoteToStudent.bind(null, user.id)}>
+                  <form action={demoteToStudent.bind(null, schoolSlug, user.id)}>
                     <SubmitButton pendingLabel="..." className="text-xs text-white/30 hover:text-white/60 disabled:opacity-60 disabled:cursor-wait">Remove Admin</SubmitButton>
                   </form>
                 )}

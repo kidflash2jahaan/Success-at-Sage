@@ -14,11 +14,11 @@ export async function completeOnboarding(formData: FormData) {
 
   const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase())
   const isSuperadmin = adminEmails.includes(email)
-  let role: 'student' | 'admin' = isSuperadmin ? 'admin' : 'student'
+  const role: 'student' | 'admin' = isSuperadmin ? 'admin' : 'student'
 
-  // Resolve tenant by email domain; superadmin falls back to Sage.
-  let tenant = await resolveTenantByEmail(email)
-  if (!tenant && isSuperadmin) tenant = await resolveTenantBySlug('sage')
+  // Resolve tenant by email domain. If nothing matches, there's no
+  // school to attach the user to — bounce them to /request-school.
+  const tenant = await resolveTenantByEmail(email)
   if (!tenant) redirect(`/request-school?email=${encodeURIComponent(email)}`)
 
   // Upsert users row under the resolved tenant.
@@ -39,9 +39,14 @@ export async function completeOnboarding(formData: FormData) {
     { p_user_id: authUser.id, p_email: email },
   )
   if (promotedSchoolId) {
-    const promotedTenant = await resolveTenantBySlug(
-      (await supabaseAdmin.from('schools').select('slug').eq('id', promotedSchoolId).single()).data?.slug as string,
-    ).catch(() => tenant)
+    const { data: promotedSchool } = await supabaseAdmin
+      .from('schools')
+      .select('slug')
+      .eq('id', promotedSchoolId)
+      .single()
+    const promotedTenant = promotedSchool
+      ? await resolveTenantBySlug((promotedSchool as any).slug).catch(() => tenant)
+      : tenant
     redirect(`/s/${promotedTenant.slug}/dashboard`)
   }
 

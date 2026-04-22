@@ -1,7 +1,7 @@
 'use server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { resolveTenantByEmail, resolveTenantBySlug } from '@/lib/tenant'
+import { resolveTenantByEmail } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 
 /**
@@ -12,9 +12,10 @@ import { redirect } from 'next/navigation'
  *   3. if tenant found → sign up, create users row under that tenant, route
  *      to /s/<slug>/onboarding
  *
- * ADMIN_EMAILS allowlist still bypasses the domain check and creates the
- * user under Sage (superadmin lives there). Superadmin status itself
- * comes from the JWT hook, not from this function.
+ * Superadmin status is granted by the JWT hook from the ADMIN_EMAILS
+ * allowlist; it doesn't influence where the users row lives. A superadmin
+ * without a matching domain is sent to /request-school just like anyone
+ * else — no silent fallback to Sage.
  */
 export async function signUpWithEmail(formData: FormData) {
   const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
@@ -22,14 +23,7 @@ export async function signUpWithEmail(formData: FormData) {
   const fullName = formData.get('fullName') as string
   const graduatingYear = parseInt(formData.get('graduatingYear') as string)
 
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase())
-  const isSuperadmin = adminEmails.includes(email)
-
-  let tenant = await resolveTenantByEmail(email)
-  if (!tenant && isSuperadmin) {
-    // Superadmin signup without a matching school → land in Sage
-    tenant = await resolveTenantBySlug('sage')
-  }
+  const tenant = await resolveTenantByEmail(email)
   if (!tenant) {
     redirect(`/request-school?email=${encodeURIComponent(email)}`)
   }
@@ -38,7 +32,8 @@ export async function signUpWithEmail(formData: FormData) {
   const { data, error } = await supabase.auth.signUp({ email, password })
   if (error || !data.user) redirect('/signup?error=taken')
 
-  const role = isSuperadmin ? 'admin' as const : 'student' as const
+  const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase())
+  const role = adminEmails.includes(email) ? 'admin' as const : 'student' as const
 
   await supabaseAdmin.from('users').insert({
     id: data.user.id,

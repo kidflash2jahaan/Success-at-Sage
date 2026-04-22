@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useParams } from 'next/navigation'
 
 // The dynamic assets — each maps to a route under /og/.
 // Previews are cache-busted with ?t=<timestamp> so clicking Generate
@@ -57,9 +56,7 @@ const DYNAMIC_ASSETS: Array<{
   },
 ]
 
-export default function MarketingAssets() {
-  const params = useParams<{ schoolSlug?: string }>()
-  const schoolSlug = params?.schoolSlug ?? 'sage'
+export default function MarketingAssets({ schoolSlug }: { schoolSlug: string }) {
   const [timestamp, setTimestamp] = useState<number | null>(null)
   const hasGenerated = timestamp !== null
 

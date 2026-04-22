@@ -42,8 +42,8 @@ export default async function CourseDetailPage({
 
         <div className="mt-5 flex items-center gap-2 flex-wrap">
             <form action={enrolled
-              ? removeCourseFromSchedule.bind(null, course.id)
-              : addCourseToSchedule.bind(null, course.id)
+              ? removeCourseFromSchedule.bind(null, schoolSlug, course.id)
+              : addCourseToSchedule.bind(null, schoolSlug, course.id)
             }>
               <SubmitButton
                 pendingLabel={enrolled ? 'Removing...' : 'Adding...'}

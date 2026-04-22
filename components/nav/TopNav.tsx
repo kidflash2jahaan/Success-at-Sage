@@ -1,25 +1,24 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 interface TopNavProps {
+  schoolSlug: string
   userName: string
   isAdmin?: boolean
   onMenuClick?: () => void
   /** Short display name of the current tenant (e.g. "Sage"). Rendered as "Success at {displayShort}" in the logo. */
-  displayShort?: string
+  displayShort: string
 }
 
-export default function TopNav({ userName, isAdmin, onMenuClick, displayShort }: TopNavProps) {
+export default function TopNav({ schoolSlug, userName, isAdmin, onMenuClick, displayShort }: TopNavProps) {
   const [query, setQuery] = useState('')
   const router = useRouter()
-  const params = useParams<{ schoolSlug?: string }>()
-  const slug = params?.schoolSlug ?? 'sage'
   const supabase = createSupabaseBrowserClient()
-  // Fallback to "HS" for the generic parent brand when no tenant is in scope
-  const brand = displayShort ? `Success at ${displayShort}` : 'Success at HS'
+  const slug = schoolSlug
+  const brand = `Success at ${displayShort}`
 
   async function handleSignOut() {
     await supabase.auth.signOut()

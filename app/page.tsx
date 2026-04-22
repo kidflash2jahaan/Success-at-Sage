@@ -2,28 +2,37 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth'
-import { resolveTenantByEmail } from '@/lib/tenant'
+import { isSuperadmin } from '@/lib/superadmin'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 
 /**
  * Root landing — the generic parent brand.
  *
- * - Authenticated user → redirect to /s/<their-tenant-slug>/dashboard
- *   (resolved from email domain; falls back to Sage if unmatched — Sage
- *   is the flagship tenant and the only one with real users today)
- * - Anonymous user → render the generic "Success at HS" marketing page
- *   with entry points to sign in, sign up, or request a new school
+ * Routing:
+ * - Superadmin          → /admin/schools  (the cross-tenant console)
+ * - Authenticated user  → /s/<their-school-slug>/dashboard
+ * - Orphaned auth user  → /  (falls through to the marketing page so
+ *                             they can re-request)
+ * - Anonymous           → renders the generic "Success at HS" page
  *
- * Per-tenant landings (the Sage hero, etc.) live at /s/[schoolSlug] and
- * are also served when a tenant-subdomain is used (handled in middleware).
+ * Per-tenant landings (Sage hero, Oakwood hero, …) live at
+ * /s/[schoolSlug] and are also served when a tenant subdomain is used
+ * (see proxy.ts).
  */
 export default async function RootLanding() {
   const user = await getCurrentUser().catch(() => null)
-  if (user?.email) {
-    const tenant = await resolveTenantByEmail(user.email)
-    if (tenant) redirect(`/s/${tenant.slug}/dashboard`)
-    redirect('/s/sage/dashboard')
+
+  if (user) {
+    if (await isSuperadmin()) redirect('/admin/schools')
+
+    const { data: school } = await supabaseAdmin
+      .from('schools')
+      .select('slug')
+      .eq('id', user.schoolId)
+      .single()
+    if (school) redirect(`/s/${(school as any).slug}/dashboard`)
+    // users row points at a deleted school — fall through to marketing
   }
 
   const { data: schoolsData } = await supabaseAdmin

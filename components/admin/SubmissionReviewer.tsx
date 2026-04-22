@@ -34,7 +34,7 @@ interface Course {
   name: string
 }
 
-export default function SubmissionReviewer({ item, availableUnits = [], courses = [], onIgnoreUser }: { item: SubmissionItem; availableUnits?: AvailableUnit[]; courses?: Course[]; onIgnoreUser?: () => void }) {
+export default function SubmissionReviewer({ schoolSlug, item, availableUnits = [], courses = [], onIgnoreUser }: { schoolSlug: string; item: SubmissionItem; availableUnits?: AvailableUnit[]; courses?: Course[]; onIgnoreUser?: () => void }) {
   const [expanded, setExpanded] = useState(false)
   const [mode, setMode] = useState<'review' | 'reject' | 'edit'>('review')
   const [note, setNote] = useState('')
@@ -119,7 +119,7 @@ export default function SubmissionReviewer({ item, availableUnits = [], courses 
             <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Rejection reason (optional)"
               className="glass-input w-full rounded-lg px-3 py-2 text-sm resize-none" rows={2} />
             <div className="flex gap-2">
-              <form action={rejectMaterial.bind(null, item.id, note)} className="flex-1">
+              <form action={rejectMaterial.bind(null, schoolSlug, item.id, note)} className="flex-1">
                 <SubmitButton
                   pendingLabel="Rejecting..."
                   className="w-full bg-red-600/80 hover:bg-red-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
@@ -163,6 +163,7 @@ export default function SubmissionReviewer({ item, availableUnits = [], courses 
                 className="glass-input w-full rounded-lg px-3 py-2 text-sm"
               />
               <UnitSelectorWithCreate
+                schoolSlug={schoolSlug}
                 materialId={item.id}
                 availableUnits={availableUnits}
                 courses={courses}
@@ -179,7 +180,7 @@ export default function SubmissionReviewer({ item, availableUnits = [], courses 
                     newPaths.push(path)
                   }
                   const allPaths = newPaths.length ? [...item.attachmentPaths, ...newPaths] : undefined
-                  await adminEditMaterial(item.id, editTitle, 'note', editContent, editLinkUrl, allPaths)
+                  await adminEditMaterial(schoolSlug, item.id, editTitle, 'note', editContent, editLinkUrl, allPaths)
                   setMode('review')
                 })}
                 className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
@@ -192,7 +193,7 @@ export default function SubmissionReviewer({ item, availableUnits = [], courses 
 
         {mode === 'review' && (
           <div className="flex gap-2">
-            <form action={approveMaterial.bind(null, item.id)} className="flex-1">
+            <form action={approveMaterial.bind(null, schoolSlug, item.id)} className="flex-1">
               <SubmitButton
                 pendingLabel="Approving..."
                 className="w-full bg-green-600/80 hover:bg-green-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"

@@ -1,9 +1,9 @@
 'use client'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 interface SidebarProps {
+  schoolSlug: string
   courses?: unknown[]   // kept for compat, not used
   activeCourseSlug?: string
   onClose?: () => void
@@ -19,9 +19,8 @@ interface RecentMaterial {
 
 const RECENTS_KEY = 'sas_recent_materials'
 
-export default function Sidebar({ activeCourseSlug, onClose }: SidebarProps) {
-  const params = useParams<{ schoolSlug?: string }>()
-  const slug = params?.schoolSlug ?? 'sage'
+export default function Sidebar({ schoolSlug, activeCourseSlug, onClose }: SidebarProps) {
+  const slug = schoolSlug
   const [recents, setRecents] = useState<RecentMaterial[]>([])
 
   useEffect(() => {

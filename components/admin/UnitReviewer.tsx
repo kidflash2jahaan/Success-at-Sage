@@ -11,7 +11,7 @@ interface PendingUnit {
   pendingMaterialCount: number
 }
 
-export default function UnitReviewer({ unit }: { unit: PendingUnit }) {
+export default function UnitReviewer({ schoolSlug, unit }: { schoolSlug: string; unit: PendingUnit }) {
   const [title, setTitle] = useState(unit.title)
   const [saved, setSaved] = useState(false)
   const [pending, startTransition] = useTransition()
@@ -19,7 +19,7 @@ export default function UnitReviewer({ unit }: { unit: PendingUnit }) {
   function saveTitle() {
     if (!title.trim() || title.trim() === unit.title) return
     startTransition(async () => {
-      await adminUpdatePendingUnitTitle(unit.id, title)
+      await adminUpdatePendingUnitTitle(schoolSlug, unit.id, title)
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
     })
@@ -52,7 +52,7 @@ export default function UnitReviewer({ unit }: { unit: PendingUnit }) {
       </div>
 
       <div className="px-5 py-3 border-t border-white/[0.07] flex gap-2">
-        <form action={approveUnit.bind(null, unit.id)} className="flex-1">
+        <form action={approveUnit.bind(null, schoolSlug, unit.id)} className="flex-1">
           <SubmitButton
             pendingLabel="Approving..."
             className="w-full bg-green-600/80 hover:bg-green-600 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"
@@ -60,7 +60,7 @@ export default function UnitReviewer({ unit }: { unit: PendingUnit }) {
             ✓ Approve Unit
           </SubmitButton>
         </form>
-        <form action={rejectUnit.bind(null, unit.id)} className="flex-1">
+        <form action={rejectUnit.bind(null, schoolSlug, unit.id)} className="flex-1">
           <SubmitButton
             pendingLabel="Rejecting..."
             className="w-full bg-red-600/20 hover:bg-red-600/40 disabled:opacity-70 disabled:cursor-wait text-red-400 text-sm font-medium py-2 rounded-lg border border-red-600/30 transition-colors"

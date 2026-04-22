@@ -59,8 +59,8 @@ export default async function AdminContestPage({ params, searchParams }: { param
     const label = formData.get('periodLabel') as string
     const start = formData.get('periodStart') as string
     const end = formData.get('periodEnd') as string
-    await chooseContestWinner(userId, label, start, end)
-    redirect('/admin/contest')
+    await chooseContestWinner(schoolSlug, userId, label, start, end)
+    redirect(`/s/${schoolSlug}/admin/contest`)
   }
 
   async function handleUpdateSettings(formData: FormData) {
@@ -68,15 +68,15 @@ export default async function AdminContestPage({ params, searchParams }: { param
     const nextReset = formData.get('nextResetDate') as string
     const prize = formData.get('prizeDescription') as string
     const periodStart = formData.get('periodStart') as string
-    await updateContestSettings(nextReset, prize, periodStart)
-    redirect('/admin/contest?saved=1')
+    await updateContestSettings(schoolSlug, nextReset, prize, periodStart)
+    redirect(`/s/${schoolSlug}/admin/contest?saved=1`)
   }
 
   async function handleMarkPaid(formData: FormData) {
     'use server'
     const winnerId = formData.get('winnerId') as string
-    await markWinnerPaid(winnerId)
-    redirect('/admin/contest')
+    await markWinnerPaid(schoolSlug, winnerId)
+    redirect(`/s/${schoolSlug}/admin/contest`)
   }
 
   return (
@@ -208,7 +208,7 @@ export default async function AdminContestPage({ params, searchParams }: { param
       </div>
 
       {/* Marketing assets */}
-      <MarketingAssets />
+      <MarketingAssets schoolSlug={schoolSlug} />
 
       {/* Past winners */}
       {paidWinners.length > 0 && (

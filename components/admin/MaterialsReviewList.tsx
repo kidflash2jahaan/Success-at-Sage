@@ -28,7 +28,7 @@ interface Course {
   name: string
 }
 
-export default function MaterialsReviewList({ items, availableUnits = [], courses = [] }: { items: SubmissionItem[], availableUnits?: AvailableUnit[], courses?: Course[] }) {
+export default function MaterialsReviewList({ schoolSlug, items, availableUnits = [], courses = [] }: { schoolSlug: string; items: SubmissionItem[], availableUnits?: AvailableUnit[], courses?: Course[] }) {
   const [ignoredUsers, setIgnoredUsers] = useState<Set<string>>(new Set())
 
   function ignoreUser(email: string) {
@@ -70,6 +70,7 @@ export default function MaterialsReviewList({ items, availableUnits = [], course
         {visible.map(item => (
           <SubmissionReviewer
             key={item.id}
+            schoolSlug={schoolSlug}
             item={item}
             availableUnits={availableUnits}
             courses={courses}

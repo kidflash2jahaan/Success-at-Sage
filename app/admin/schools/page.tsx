@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
-export default async function SchoolsQueue({
+export default async function SchoolsPage({
   searchParams,
 }: {
   searchParams: Promise<{ approved?: string; rejected?: string }>
@@ -20,7 +20,15 @@ export default async function SchoolsQueue({
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-white mb-6">School requests</h1>
+      <div className="flex items-end justify-between gap-4 mb-6 flex-wrap">
+        <h1 className="text-2xl font-bold text-white">Schools</h1>
+        <Link
+          href="/admin/users"
+          className="text-sm font-medium text-amber-400 hover:text-amber-300 transition-colors"
+        >
+          View users →
+        </Link>
+      </div>
 
       {approved === '1' && (
         <div className="mb-4 p-3 rounded-xl bg-green-500/10 border border-green-500/30 text-green-300 text-sm">

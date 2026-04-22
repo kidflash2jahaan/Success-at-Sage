@@ -58,6 +58,7 @@ export default async function AdminCoursesPage({
         {materials.map(m => (
           <ApprovedMaterialEditor
             key={m.id}
+            schoolSlug={schoolSlug}
             availableUnits={availableUnits}
             courses={courses}
             item={{

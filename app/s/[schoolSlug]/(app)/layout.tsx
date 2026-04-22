@@ -24,10 +24,11 @@ export default async function AppLayout({
 
   return (
     <DashboardShell
+      schoolSlug={schoolSlug}
+      displayShort={tenant.displayShort}
       courses={courses}
       userName={user.fullName}
       isAdmin={user.role === 'admin'}
-      displayShort={tenant.displayShort}
     >
       {children}
     </DashboardShell>

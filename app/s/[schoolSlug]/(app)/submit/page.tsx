@@ -44,6 +44,7 @@ export default async function SubmitPage({
         </Link>
       )}
       <SubmitForm
+        schoolSlug={schoolSlug}
         courses={(coursesData ?? []).map((c: any) => ({ id: c.id, name: c.name, slug: c.slug }))}
         units={(unitsData ?? []).map((u: any) => ({ id: u.id, title: u.title, courseId: u.course_id }))}
         preselectedSlug={preselectedSlug}

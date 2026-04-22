@@ -5,15 +5,25 @@ import { uploadFileWithTUS, uploadPdfWithTUS } from '@/lib/storage/upload'
 import { imagesToPdf, isPdfFile } from '@/lib/utils/imagesToPdf'
 import FileDropZone from '@/components/ui/FileDropZone'
 import PdfDropZone from '@/components/ui/PdfDropZone'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 interface Course { id: string; name: string; slug: string }
 interface Unit { id: string; title: string; courseId: string }
 
-export default function SubmitForm({ courses, units, preselectedSlug, preselectedUnitId }: { courses: Course[]; units: Unit[]; preselectedSlug?: string; preselectedUnitId?: string }) {
+export default function SubmitForm({
+  schoolSlug,
+  courses,
+  units,
+  preselectedSlug,
+  preselectedUnitId,
+}: {
+  schoolSlug: string
+  courses: Course[]
+  units: Unit[]
+  preselectedSlug?: string
+  preselectedUnitId?: string
+}) {
   const router = useRouter()
-  const params = useParams<{ schoolSlug?: string }>()
-  const schoolSlug = params?.schoolSlug ?? 'sage'
 
   const initialCourse = preselectedSlug ? (courses.find(c => c.slug === preselectedSlug) ?? null) : null
 
@@ -87,7 +97,7 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
     try {
       let unitId = selectedUnitId
       if (creatingUnit) {
-        const unitResult = await submitNewUnit(selectedCourse.id, newUnitTitle)
+        const unitResult = await submitNewUnit(schoolSlug, selectedCourse.id, newUnitTitle)
         if (!unitResult.ok) {
           setError(unitResult.error)
           setSubmitting(false)
@@ -107,14 +117,14 @@ export default function SubmitForm({ courses, units, preselectedSlug, preselecte
           ? pdfFiles[0]
           : await imagesToPdf(pdfFiles)
         const pdfPath = await uploadPdfWithTUS(fileToUpload, unitId)
-        result = await submitMaterial({ unitId, title, type: 'note', contentType: 'pdf', contentText: '', pdfPath })
+        result = await submitMaterial(schoolSlug, { unitId, title, type: 'note', contentType: 'pdf', contentText: '', pdfPath })
       } else {
         const attachmentPaths: string[] = []
         for (const file of attachmentFiles) {
           const path = await uploadFileWithTUS(file, unitId)
           attachmentPaths.push(path)
         }
-        result = await submitMaterial({
+        result = await submitMaterial(schoolSlug, {
           unitId,
           title,
           type: 'note',

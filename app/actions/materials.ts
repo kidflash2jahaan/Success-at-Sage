@@ -1,32 +1,44 @@
 'use server'
 import { requireUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { getUserSchoolId } from '@/lib/tenant-for-user'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import { sendAdminSubmissionEmail } from '@/lib/email/resend'
 import { revalidatePath } from 'next/cache'
 
-// Server actions throw errors get redacted on the client in production, so the
-// user sees a generic "an error occurred". Return a typed result object instead
-// so callers can render the real message.
+// Server actions' thrown errors get redacted on the client in production, so
+// the user sees a generic "an error occurred". Return a typed result object
+// instead so callers can render the real message.
 export type ActionResult<T = undefined> =
   | { ok: true; data: T }
   | { ok: false; error: string }
 
-async function getAdminEmails(): Promise<string[]> {
-  const { data } = await supabaseAdmin.from('users').select('email').eq('role', 'admin')
+async function getAdminEmailsForTenant(schoolId: string): Promise<string[]> {
+  const { data } = await supabaseAdmin
+    .from('users')
+    .select('email')
+    .eq('role', 'admin')
+    .eq('school_id', schoolId)
   return (data ?? []).map((u: any) => u.email as string)
 }
 
 export async function submitNewUnit(
+  schoolSlug: string,
   courseId: string,
   title: string,
 ): Promise<ActionResult<{ unitId: string }>> {
   const user = await requireUser()
   if (!title.trim()) return { ok: false, error: 'Unit title is required.' }
-  const schoolId = await getUserSchoolId(user.id)
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const { data, error } = await supabaseAdmin
     .from('units')
-    .insert({ school_id: schoolId, course_id: courseId, title: title.trim(), order_index: 9999, status: 'pending', submitted_by: user.id })
+    .insert({
+      school_id: tenant.id,
+      course_id: courseId,
+      title: title.trim(),
+      order_index: 9999,
+      status: 'pending',
+      submitted_by: user.id,
+    })
     .select('id')
     .single()
   if (error || !data) return { ok: false, error: 'Could not create unit. Please try again.' }
@@ -34,17 +46,21 @@ export async function submitNewUnit(
   return { ok: true, data: { unitId: (data as any).id as string } }
 }
 
-export async function submitMaterial(input: {
-  unitId: string
-  title: string
-  type: 'note' | 'test'
-  contentType: 'richtext' | 'pdf'
-  contentText: string
-  pdfPath?: string
-  linkUrl?: string
-  attachmentPaths?: string[]
-}): Promise<ActionResult> {
+export async function submitMaterial(
+  schoolSlug: string,
+  input: {
+    unitId: string
+    title: string
+    type: 'note' | 'test'
+    contentType: 'richtext' | 'pdf'
+    contentText: string
+    pdfPath?: string
+    linkUrl?: string
+    attachmentPaths?: string[]
+  },
+): Promise<ActionResult> {
   const user = await requireUser()
+  const tenant = await resolveTenantBySlug(schoolSlug)
 
   const cleanTitle = input.title.trim()
   if (!cleanTitle) return { ok: false, error: 'Title is required.' }
@@ -53,14 +69,14 @@ export async function submitMaterial(input: {
     .from('materials')
     .select('id')
     .eq('unit_id', input.unitId)
+    .eq('school_id', tenant.id)
     .ilike('title', cleanTitle)
     .neq('status', 'rejected')
     .maybeSingle()
   if (existing) return { ok: false, error: 'A submission with that title already exists in this unit.' }
 
-  const schoolId = await getUserSchoolId(user.id)
   const { error: insertError } = await supabaseAdmin.from('materials').insert({
-    school_id: schoolId,
+    school_id: tenant.id,
     unit_id: input.unitId,
     uploaded_by: user.id,
     title: cleanTitle,
@@ -78,8 +94,13 @@ export async function submitMaterial(input: {
   ;(async () => {
     try {
       const [{ data: unit }, adminEmails] = await Promise.all([
-        supabaseAdmin.from('units').select('title, courses(name)').eq('id', input.unitId).single(),
-        getAdminEmails(),
+        supabaseAdmin
+          .from('units')
+          .select('title, courses(name)')
+          .eq('id', input.unitId)
+          .eq('school_id', tenant.id)
+          .single(),
+        getAdminEmailsForTenant(tenant.id),
       ])
       await sendAdminSubmissionEmail(
         adminEmails,
@@ -97,6 +118,7 @@ export async function submitMaterial(input: {
 }
 
 export async function editMaterial(
+  schoolSlug: string,
   materialId: string,
   title: string,
   type: 'note' | 'test',
@@ -107,11 +129,16 @@ export async function editMaterial(
   attachmentPaths?: string[] | null,
 ): Promise<ActionResult> {
   const user = await requireUser()
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const cleanTitle = title.trim()
   if (!cleanTitle) return { ok: false, error: 'Title is required.' }
 
   const { data: material } = await supabaseAdmin
-    .from('materials').select('id, uploaded_by, status').eq('id', materialId).single()
+    .from('materials')
+    .select('id, uploaded_by, status')
+    .eq('id', materialId)
+    .eq('school_id', tenant.id)
+    .single()
   if (!material || (material as any).uploaded_by !== user.id) {
     return { ok: false, error: 'You can only edit your own submissions.' }
   }
@@ -134,7 +161,11 @@ export async function editMaterial(
     if (attachmentPaths !== undefined) updates.attachment_paths = attachmentPaths ?? []
     if (contentText !== null) updates.content_json = contentText.trim() ? { text: contentText.trim() } : null
   }
-  const { error } = await supabaseAdmin.from('materials').update(updates).eq('id', materialId)
+  const { error } = await supabaseAdmin
+    .from('materials')
+    .update(updates)
+    .eq('id', materialId)
+    .eq('school_id', tenant.id)
   if (error) return { ok: false, error: 'Could not save changes. Please try again.' }
   revalidatePath('/s/[schoolSlug]/profile', 'page')
   return { ok: true, data: undefined }

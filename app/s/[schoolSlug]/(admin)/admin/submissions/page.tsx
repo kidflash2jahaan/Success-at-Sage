@@ -88,7 +88,7 @@ export default async function SubmissionsPage({
             New Units — {pendingUnits.length}
           </h2>
           <div className="flex flex-col gap-3 max-w-3xl">
-            {pendingUnits.map(unit => <UnitReviewer key={unit.id} unit={unit} />)}
+            {pendingUnits.map(unit => <UnitReviewer key={unit.id} schoolSlug={schoolSlug} unit={unit} />)}
           </div>
         </div>
       )}
@@ -100,6 +100,7 @@ export default async function SubmissionsPage({
           </h2>
           <div className="max-w-3xl">
             <MaterialsReviewList
+              schoolSlug={schoolSlug}
               items={pending}
               availableUnits={(approvedUnitsData ?? []).map((u: any) => ({ id: u.id, title: u.title, courseName: u.courses?.name ?? '' }))}
               courses={(coursesData ?? []).map((c: any) => ({ id: c.id, name: c.name }))}

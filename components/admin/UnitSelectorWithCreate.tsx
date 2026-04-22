@@ -7,10 +7,12 @@ interface AvailableUnit { id: string; title: string; courseName: string }
 interface Course { id: string; name: string }
 
 export default function UnitSelectorWithCreate({
+  schoolSlug,
   materialId,
   availableUnits,
   courses,
 }: {
+  schoolSlug: string
   materialId: string
   availableUnits: AvailableUnit[]
   courses: Course[]
@@ -65,7 +67,7 @@ export default function UnitSelectorWithCreate({
             pendingLabel="Moving…"
             disabled={!selectedUnitId || movePending}
             onClick={() => startMoveTransition(async () => {
-              await adminMoveMaterialToUnit(materialId, selectedUnitId)
+              await adminMoveMaterialToUnit(schoolSlug, materialId, selectedUnitId)
               setSelectedUnitId('')
             })}
             className="shrink-0 px-3 py-2 rounded-lg bg-violet-600/40 hover:bg-violet-600/70 disabled:opacity-30 disabled:cursor-wait text-white/80 text-sm transition-colors"
@@ -131,7 +133,7 @@ export default function UnitSelectorWithCreate({
               pendingLabel="Creating…"
               disabled={!selectedCourse || !newUnitTitle.trim() || createPending}
               onClick={() => startCreateTransition(async () => {
-                await adminCreateUnitAndMove(materialId, selectedCourse!.id, newUnitTitle)
+                await adminCreateUnitAndMove(schoolSlug, materialId, selectedCourse!.id, newUnitTitle)
                 resetCreate()
               })}
               className="flex-1 bg-violet-600/80 hover:bg-violet-600 disabled:opacity-30 disabled:cursor-wait text-white text-sm font-medium py-2 rounded-lg transition-colors"

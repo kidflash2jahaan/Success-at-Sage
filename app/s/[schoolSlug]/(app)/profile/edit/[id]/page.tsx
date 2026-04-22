@@ -25,6 +25,7 @@ export default async function EditMaterialPage({
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
       <EditMaterialForm
+        schoolSlug={schoolSlug}
         id={(material as any).id}
         unitId={(material as any).unit_id}
         initialTitle={(material as any).title}

@@ -14,26 +14,41 @@ interface Course {
 }
 
 interface DashboardShellProps {
+  schoolSlug: string
+  displayShort: string
   courses: Course[]
   userName: string
   isAdmin?: boolean
-  displayShort?: string
   children: React.ReactNode
 }
 
-export default function DashboardShell({ courses, userName, isAdmin, displayShort, children }: DashboardShellProps) {
+export default function DashboardShell({
+  schoolSlug,
+  displayShort,
+  courses,
+  userName,
+  isAdmin,
+  children,
+}: DashboardShellProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const pathname = usePathname()
   const activeCourseSlug = pathname.match(/\/courses\/([^/]+)/)?.[1]
 
   return (
     <div className="flex flex-col h-dvh">
-      <TopNav userName={userName} isAdmin={isAdmin} onMenuClick={() => setDrawerOpen(true)} displayShort={displayShort} />
+      <TopNav
+        schoolSlug={schoolSlug}
+        displayShort={displayShort}
+        userName={userName}
+        isAdmin={isAdmin}
+        onMenuClick={() => setDrawerOpen(true)}
+      />
       <div className="flex flex-1 overflow-hidden">
         <div className="hidden md:block">
-          <Sidebar courses={courses} activeCourseSlug={activeCourseSlug} />
+          <Sidebar schoolSlug={schoolSlug} courses={courses} activeCourseSlug={activeCourseSlug} />
         </div>
         <SidebarDrawer
+          schoolSlug={schoolSlug}
           courses={courses}
           activeCourseSlug={activeCourseSlug}
           open={drawerOpen}
@@ -43,7 +58,7 @@ export default function DashboardShell({ courses, userName, isAdmin, displayShor
           {children}
         </main>
       </div>
-      <MobileNav />
+      <MobileNav schoolSlug={schoolSlug} />
     </div>
   )
 }
