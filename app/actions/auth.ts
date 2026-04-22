@@ -14,17 +14,14 @@ export async function completeOnboarding(formData: FormData) {
 
   const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase())
   const isSuperadmin = adminEmails.includes(email)
-  const role = isSuperadmin ? 'admin' as const : 'student' as const
+  let role: 'student' | 'admin' = isSuperadmin ? 'admin' : 'student'
 
-  // Tenant resolution: email domain → Tenant; superadmin falls back to Sage.
+  // Resolve tenant by email domain; superadmin falls back to Sage.
   let tenant = await resolveTenantByEmail(email)
   if (!tenant && isSuperadmin) tenant = await resolveTenantBySlug('sage')
   if (!tenant) redirect(`/request-school?email=${encodeURIComponent(email)}`)
 
-  // Use upsert so this is idempotent — /signup eagerly creates the user row
-  // for email+password signups, but the /auth/callback path routes through
-  // /onboarding when no row exists yet. A race (or repeat submit) shouldn't
-  // crash on a primary-key conflict.
+  // Upsert users row under the resolved tenant.
   await supabaseAdmin.from('users').upsert({
     id: authUser.id,
     school_id: tenant.id,
@@ -33,6 +30,20 @@ export async function completeOnboarding(formData: FormData) {
     graduating_year: graduatingYear,
     role,
   }, { onConflict: 'id' })
+
+  // If this user is a pending school admin (their school was just approved
+  // by superadmin), promote them and switch their school_id to the approved
+  // school. This overrides the email-domain tenant resolution above.
+  const { data: promotedSchoolId } = await supabaseAdmin.rpc(
+    'promote_pending_school_admin' as any,
+    { p_user_id: authUser.id, p_email: email },
+  )
+  if (promotedSchoolId) {
+    const promotedTenant = await resolveTenantBySlug(
+      (await supabaseAdmin.from('schools').select('slug').eq('id', promotedSchoolId).single()).data?.slug as string,
+    ).catch(() => tenant)
+    redirect(`/s/${promotedTenant.slug}/dashboard`)
+  }
 
   redirect(`/s/${tenant.slug}/dashboard`)
 }
