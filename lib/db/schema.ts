@@ -1,3 +1,7 @@
+// PHASE 2 TODO (silent-tenant-leak risk): drop DEFAULT Sage from every
+// school_id column on migration 0003 + 0006 before the auth hook lands.
+// See lib/constants.ts Phase-2 removal checklist.
+
 import { pgTable, uuid, text, integer, timestamp, date, pgEnum, index, primaryKey, jsonb, boolean } from 'drizzle-orm/pg-core'
 
 export const roleEnum = pgEnum('role', ['student', 'admin'])
