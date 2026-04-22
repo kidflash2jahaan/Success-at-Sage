@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 interface SidebarProps {
@@ -19,6 +20,8 @@ interface RecentMaterial {
 const RECENTS_KEY = 'sas_recent_materials'
 
 export default function Sidebar({ activeCourseSlug, onClose }: SidebarProps) {
+  const params = useParams<{ schoolSlug?: string }>()
+  const slug = params?.schoolSlug ?? 'sage'
   const [recents, setRecents] = useState<RecentMaterial[]>([])
 
   useEffect(() => {
@@ -68,7 +71,7 @@ export default function Sidebar({ activeCourseSlug, onClose }: SidebarProps) {
             </button>
           )}
           <Link
-            href="/browse"
+            href={`/s/${slug}/browse`}
             onClick={onClose}
             className="w-6 h-6 flex items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/[0.06] transition-colors"
             title="Browse & add courses"
@@ -89,7 +92,7 @@ export default function Sidebar({ activeCourseSlug, onClose }: SidebarProps) {
           recents.map(m => (
             <Link
               key={m.id}
-              href={`/courses/${m.courseSlug}/units/${m.unitId}`}
+              href={`/s/${slug}/courses/${m.courseSlug}/units/${m.unitId}`}
               onClick={onClose}
               className="sidebar-nav-item flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm transition-all text-white/50 hover:text-white hover:bg-white/[0.04]"
             >

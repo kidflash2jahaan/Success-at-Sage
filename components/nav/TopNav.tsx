@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { createSupabaseBrowserClient } from '@/lib/supabase/client'
 
 interface TopNavProps {
@@ -13,6 +13,8 @@ interface TopNavProps {
 export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) {
   const [query, setQuery] = useState('')
   const router = useRouter()
+  const params = useParams<{ schoolSlug?: string }>()
+  const slug = params?.schoolSlug ?? 'sage'
   const supabase = createSupabaseBrowserClient()
 
   async function handleSignOut() {
@@ -22,7 +24,7 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
-    if (query.trim()) router.push(`/search?q=${encodeURIComponent(query.trim())}`)
+    if (query.trim()) router.push(`/s/${slug}/search?q=${encodeURIComponent(query.trim())}`)
   }
 
   return (
@@ -31,7 +33,7 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
       style={{ height: '56px', paddingTop: 'env(safe-area-inset-top)' }}
     >
       {/* Mobile: just the logo */}
-      <Link href="/dashboard" className="md:hidden font-bold text-white text-base tracking-tight">
+      <Link href={`/s/${slug}/dashboard`} className="md:hidden font-bold text-white text-base tracking-tight">
         Success at Sage
       </Link>
 
@@ -45,7 +47,7 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
         </svg>
       </button>
 
-      <Link href="/dashboard" className="font-bold text-white text-sm hidden md:block shrink-0 tracking-tight">
+      <Link href={`/s/${slug}/dashboard`} className="font-bold text-white text-sm hidden md:block shrink-0 tracking-tight">
         Success at Sage
       </Link>
 
@@ -60,26 +62,26 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
 
       <div className="ml-auto flex items-center gap-2">
         <Link
-          href="/dashboard"
+          href={`/s/${slug}/dashboard`}
           className="hidden sm:block text-sm text-white/40 hover:text-white/70 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
         >
           Dashboard
         </Link>
         <Link
-          href="/trending"
+          href={`/s/${slug}/trending`}
           className="hidden sm:block text-sm text-white/40 hover:text-white/70 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
         >
           Trending
         </Link>
         <Link
-          href="/leaderboard"
+          href={`/s/${slug}/leaderboard`}
           className="hidden sm:block text-sm text-white/40 hover:text-white/70 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
         >
           Leaderboard
         </Link>
         {isAdmin && (
           <Link
-            href="/admin"
+            href={`/s/${slug}/admin`}
             className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-amber-400 hover:text-amber-300 px-3 py-1.5 rounded-lg hover:bg-amber-500/10 transition-colors"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -89,7 +91,7 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
           </Link>
         )}
         <Link
-          href="/submit"
+          href={`/s/${slug}/submit`}
           className="btn-press hidden sm:flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 font-medium px-3 py-1.5 rounded-lg hover:bg-violet-500/10 transition-colors"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,7 +100,7 @@ export default function TopNav({ userName, isAdmin, onMenuClick }: TopNavProps) 
           Submit
         </Link>
         <Link
-          href="/profile"
+          href={`/s/${slug}/profile`}
           className="text-sm text-white/60 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
         >
           {userName}

@@ -84,7 +84,7 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ sc
       {user && myRank === 0 && (
         <div className="animate-fade-up stagger-2 glass rounded-xl px-5 py-3.5 mb-6 flex items-center justify-between">
           <span className="text-white/40 text-sm">You haven&apos;t submitted anything approved yet.</span>
-          <Link href="/submit" className="text-xs text-violet-400 hover:text-violet-300 transition-colors">Submit something →</Link>
+          <Link href={`/s/${schoolSlug}/submit`} className="text-xs text-violet-400 hover:text-violet-300 transition-colors">Submit something →</Link>
         </div>
       )}
       {!user && (
