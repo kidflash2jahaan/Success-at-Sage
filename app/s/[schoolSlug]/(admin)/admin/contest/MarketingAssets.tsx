@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useParams } from 'next/navigation'
 
 // The dynamic assets — each maps to a route under /og/.
 // Previews are cache-busted with ?t=<timestamp> so clicking Generate
@@ -57,6 +58,8 @@ const DYNAMIC_ASSETS: Array<{
 ]
 
 export default function MarketingAssets() {
+  const params = useParams<{ schoolSlug?: string }>()
+  const schoolSlug = params?.schoolSlug ?? 'sage'
   const [timestamp, setTimestamp] = useState<number | null>(null)
   const hasGenerated = timestamp !== null
 
@@ -117,7 +120,7 @@ export default function MarketingAssets() {
       {hasGenerated && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
           {DYNAMIC_ASSETS.map(asset => (
-            <AssetCard key={asset.key} asset={asset} timestamp={timestamp} />
+            <AssetCard key={asset.key} asset={asset} timestamp={timestamp} schoolSlug={schoolSlug} />
           ))}
         </div>
       )}
@@ -128,12 +131,14 @@ export default function MarketingAssets() {
 function AssetCard({
   asset,
   timestamp,
+  schoolSlug,
 }: {
   asset: (typeof DYNAMIC_ASSETS)[number]
   timestamp: number
+  schoolSlug: string
 }) {
-  const previewSrc = `/og/${asset.key}?t=${timestamp}`
-  const downloadSrc = `/og/${asset.key}?download=1&t=${timestamp}`
+  const previewSrc = `/s/${schoolSlug}/og/${asset.key}?t=${timestamp}`
+  const downloadSrc = `/s/${schoolSlug}/og/${asset.key}?download=1&t=${timestamp}`
   const filename = `${asset.key}.png`
   return (
     <div className="glass rounded-xl p-4 flex flex-col gap-3">
