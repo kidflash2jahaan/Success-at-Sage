@@ -5,14 +5,17 @@ import { brand, bgLight, gradientText } from '../_lib/brand'
 import { loadFonts } from '../_lib/fonts'
 import { getContestSettings, parsePrize, formatShortDate, daysUntil } from '../_lib/data'
 import { requireAdminResponse, responseHeaders } from '../_lib/auth'
+import { resolveTenantBySlug } from '@/lib/tenant'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: { params: Promise<{ schoolSlug: string }> }) {
   const denied = await requireAdminResponse()
   if (denied) return denied
 
-  const [fonts, settings] = await Promise.all([loadFonts(), getContestSettings()])
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
+  const [fonts, settings] = await Promise.all([loadFonts(), getContestSettings(tenant.id)])
   const prize = parsePrize(settings.prize_description)
   const deadline = settings.next_reset_date
   const daysLeft = daysUntil(deadline)

@@ -6,17 +6,20 @@ import { brand, bgLight, gradientText } from '../_lib/brand'
 import { loadFonts } from '../_lib/fonts'
 import { getContestSettings, getLatestPaidWinner, getLeaders, parsePrize, formatPeriod } from '../_lib/data'
 import { requireAdminResponse, responseHeaders } from '../_lib/auth'
+import { resolveTenantBySlug } from '@/lib/tenant'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: { params: Promise<{ schoolSlug: string }> }) {
   const denied = await requireAdminResponse()
   if (denied) return denied
 
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const [fonts, settings, paidWinner] = await Promise.all([
     loadFonts(),
-    getContestSettings(),
-    getLatestPaidWinner(),
+    getContestSettings(tenant.id),
+    getLatestPaidWinner(tenant.id),
   ])
   const prize = parsePrize(settings.prize_description)
 

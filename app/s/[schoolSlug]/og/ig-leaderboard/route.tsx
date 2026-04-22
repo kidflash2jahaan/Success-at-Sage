@@ -7,16 +7,19 @@ import { brand, bgLight, gradientText } from '../_lib/brand'
 import { loadFonts } from '../_lib/fonts'
 import { getContestSettings, getLeaders, parsePrize, formatPeriod, formatShortDate, daysUntil } from '../_lib/data'
 import { requireAdminResponse, responseHeaders } from '../_lib/auth'
+import { resolveTenantBySlug } from '@/lib/tenant'
 
 export const dynamic = 'force-dynamic'
 
 const RANK_COLORS = [brand.amber400, brand.violet400, brand.green400]
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: { params: Promise<{ schoolSlug: string }> }) {
   const denied = await requireAdminResponse()
   if (denied) return denied
 
-  const [fonts, settings] = await Promise.all([loadFonts(), getContestSettings()])
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
+  const [fonts, settings] = await Promise.all([loadFonts(), getContestSettings(tenant.id)])
   const leaders = (await getLeaders(settings)).slice(0, 3)
   const prize = parsePrize(settings.prize_description)
   const period = formatPeriod(settings.period_start)

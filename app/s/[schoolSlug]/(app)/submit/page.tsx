@@ -2,21 +2,25 @@ export const dynamic = 'force-dynamic'
 
 import { requireUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { SAGE_SCHOOL_ID } from '@/lib/constants'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import SubmitForm from '@/components/submit/SubmitForm'
 import Link from 'next/link'
 
 export default async function SubmitPage({
+  params,
   searchParams,
 }: {
+  params: Promise<{ schoolSlug: string }>
   searchParams: Promise<{ course?: string; unit?: string }>
 }) {
   await requireUser()
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const { course: preselectedSlug, unit: preselectedUnitId } = await searchParams
   const [{ data: coursesData }, { data: unitsData }, { data: contestSettings }] = await Promise.all([
-    supabaseAdmin.from('courses').select('id, name, slug').order('name'),
-    supabaseAdmin.from('units').select('id, title, course_id').eq('status', 'approved').order('title'),
-    supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('school_id', SAGE_SCHOOL_ID).single(),
+    supabaseAdmin.from('courses').select('id, name, slug').eq('school_id', tenant.id).order('name'),
+    supabaseAdmin.from('units').select('id, title, course_id').eq('school_id', tenant.id).eq('status', 'approved').order('title'),
+    supabaseAdmin.from('contest_settings').select('prize_description, next_reset_date').eq('school_id', tenant.id).single(),
   ])
 
   const settings = contestSettings as { prize_description?: string; next_reset_date?: string } | null

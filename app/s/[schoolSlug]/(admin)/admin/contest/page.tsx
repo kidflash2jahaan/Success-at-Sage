@@ -1,22 +1,25 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { SAGE_SCHOOL_ID } from '@/lib/constants'
+import { resolveTenantBySlug } from '@/lib/tenant'
 import { requireAdmin, calculateGrade } from '@/lib/auth'
 import { chooseContestWinner, markWinnerPaid, updateContestSettings } from '@/app/actions/admin'
 import { redirect } from 'next/navigation'
 import MarketingAssets from './MarketingAssets'
 
-export default async function AdminContestPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+export default async function AdminContestPage({ params, searchParams }: { params: Promise<{ schoolSlug: string }>; searchParams: Promise<{ saved?: string }> }) {
   await requireAdmin()
+  const { schoolSlug } = await params
+  const tenant = await resolveTenantBySlug(schoolSlug)
   const { saved } = await searchParams
 
   const today = new Date().toISOString().split('T')[0]
   const [{ data: settingsData }, { data: winnersData }] = await Promise.all([
-    supabaseAdmin.from('contest_settings').select('*').eq('school_id', SAGE_SCHOOL_ID).single(),
+    supabaseAdmin.from('contest_settings').select('*').eq('school_id', tenant.id).single(),
     supabaseAdmin
       .from('contest_winners')
       .select('*, users(full_name, email)')
+      .eq('school_id', tenant.id)
       .order('created_at', { ascending: false }),
   ])
 

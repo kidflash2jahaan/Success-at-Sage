@@ -3,7 +3,6 @@
 // admin Supabase client (service role — routes are admin-gated already).
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { SAGE_SCHOOL_ID } from '@/lib/constants'
 
 export type ContestSettings = {
   period_start: string
@@ -30,9 +29,9 @@ export type Winner = {
   total_views?: number
 }
 
-export async function getContestSettings(): Promise<ContestSettings> {
+export async function getContestSettings(schoolId: string): Promise<ContestSettings> {
   const today = new Date().toISOString().split('T')[0]
-  const { data } = await supabaseAdmin.from('contest_settings').select('*').eq('school_id', SAGE_SCHOOL_ID).single()
+  const { data } = await supabaseAdmin.from('contest_settings').select('*').eq('school_id', schoolId).single()
   return (data ?? { period_start: today, next_reset_date: today, prize_description: '$50 Amazon gift card' }) as ContestSettings
 }
 
@@ -46,10 +45,11 @@ export async function getLeaders(settings: ContestSettings): Promise<Leader[]> {
 }
 
 // Most recent paid winner — used for the "winner" IG post template.
-export async function getLatestPaidWinner(): Promise<Winner | null> {
+export async function getLatestPaidWinner(schoolId: string): Promise<Winner | null> {
   const { data } = await supabaseAdmin
     .from('contest_winners')
     .select('*, users(full_name, email)')
+    .eq('school_id', schoolId)
     .not('paid_at', 'is', null)
     .order('paid_at', { ascending: false })
     .limit(1)
