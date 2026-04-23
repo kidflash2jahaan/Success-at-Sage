@@ -40,8 +40,8 @@ const DYNAMIC_ASSETS: Array<{
   },
   {
     key: 'poster-stall',
-    title: 'Poster — Bathroom Stall',
-    description: 'Letter portrait. Print color. Tape inside stalls.',
+    title: 'Poster',
+    description: 'Letter portrait. Print color.',
     w: 816,
     h: 1056,
     aspect: '17 / 22',
