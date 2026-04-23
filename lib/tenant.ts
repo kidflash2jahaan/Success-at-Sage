@@ -3,6 +3,12 @@ import { cache } from 'react'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { notFound } from 'next/navigation'
 
+export const PLATFORM_HOST = 'successaths.com'
+
+export function hubUrl(schoolSlug: string): string {
+  return `https://${schoolSlug}.${PLATFORM_HOST}`
+}
+
 export type Tenant = {
   id: string
   slug: string

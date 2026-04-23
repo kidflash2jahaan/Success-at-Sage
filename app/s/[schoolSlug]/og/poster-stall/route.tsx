@@ -7,7 +7,7 @@ import { getContestSettings, parsePrize, formatShortDate, daysUntil } from '../_
 import { qrDataUrl } from '../_lib/qr'
 import { requireAdminResponse, responseHeaders } from '../_lib/auth'
 import { Wordmark } from '../_lib/wordmark'
-import { resolveTenantBySlug } from '@/lib/tenant'
+import { resolveTenantBySlug, hubUrl } from '@/lib/tenant'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,11 +17,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
 
   const { schoolSlug } = await params
   const tenant = await resolveTenantBySlug(schoolSlug)
-  const hubUrl = `https://${schoolSlug}.successaths.com`
   const [fonts, settings, qr] = await Promise.all([
     loadFonts(),
     getContestSettings(tenant.id),
-    qrDataUrl(hubUrl),
+    qrDataUrl(hubUrl(schoolSlug)),
   ])
   const prize = parsePrize(settings.prize_description)
   const daysLeft = daysUntil(settings.next_reset_date)

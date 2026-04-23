@@ -1,24 +1,8 @@
 'use server'
-import { requireAdmin } from '@/lib/auth'
+import { gateAdmin } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { resolveTenantBySlug, type Tenant } from '@/lib/tenant'
 import { sendApprovalEmail, sendRejectionEmail } from '@/lib/email/resend'
 import { revalidatePath } from 'next/cache'
-
-/**
- * Resolve the tenant from the URL's schoolSlug and verify the caller is
- * authorized to admin it. Returns the tenant so the action can scope
- * mutations by `tenant.id` — not by the caller's own users.school_id.
- *
- * This is what makes superadmin-acting-in-Oakwood safe: the tenant
- * comes from the URL the admin is looking at, not from the row in
- * `users` belonging to the superadmin (which is Sage).
- */
-async function gateAdmin(schoolSlug: string): Promise<Tenant> {
-  const tenant = await resolveTenantBySlug(schoolSlug)
-  await requireAdmin(tenant.id)
-  return tenant
-}
 
 async function fetchMaterialWithUploader(materialId: string, schoolId: string) {
   // The tenant filter is defensive: the row's school_id is already
@@ -41,7 +25,7 @@ async function fetchMaterialWithUploader(materialId: string, schoolId: string) {
 }
 
 export async function approveMaterial(schoolSlug: string, materialId: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   const result = await fetchMaterialWithUploader(materialId, tenant.id)
   if (!result) return
   await supabaseAdmin
@@ -54,7 +38,7 @@ export async function approveMaterial(schoolSlug: string, materialId: string) {
 }
 
 export async function rejectMaterial(schoolSlug: string, materialId: string, note: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   const result = await fetchMaterialWithUploader(materialId, tenant.id)
   if (!result) return
   await supabaseAdmin
@@ -67,7 +51,7 @@ export async function rejectMaterial(schoolSlug: string, materialId: string, not
 }
 
 export async function approveUnit(schoolSlug: string, unitId: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await supabaseAdmin
     .from('units')
     .update({ status: 'approved' })
@@ -77,7 +61,7 @@ export async function approveUnit(schoolSlug: string, unitId: string) {
 }
 
 export async function rejectUnit(schoolSlug: string, unitId: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await supabaseAdmin
     .from('materials')
     .update({ status: 'rejected' })
@@ -93,7 +77,7 @@ export async function rejectUnit(schoolSlug: string, unitId: string) {
 }
 
 export async function deleteMaterial(schoolSlug: string, materialId: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await supabaseAdmin
     .from('materials')
     .delete()
@@ -104,7 +88,7 @@ export async function deleteMaterial(schoolSlug: string, materialId: string) {
 }
 
 export async function adminUpdatePendingUnitTitle(schoolSlug: string, unitId: string, title: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await supabaseAdmin
     .from('units')
     .update({ title: title.trim() })
@@ -114,7 +98,7 @@ export async function adminUpdatePendingUnitTitle(schoolSlug: string, unitId: st
 }
 
 export async function adminMoveMaterialToUnit(schoolSlug: string, materialId: string, newUnitId: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   // Both rows must belong to this tenant; the FK/unique constraints
   // from migration 0004 would catch a cross-tenant attempt but this is
   // explicit and fails fast with a better error.
@@ -132,7 +116,7 @@ export async function adminCreateUnitAndMove(
   courseId: string,
   unitTitle: string,
 ) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   const { data: top } = await supabaseAdmin
     .from('units')
     .select('order_index')
@@ -167,7 +151,7 @@ export async function adminEditMaterial(
   linkUrl?: string,
   attachmentPaths?: string[],
 ) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   const updates: Record<string, unknown> = {
     title: title.trim(),
     type,
@@ -185,7 +169,7 @@ export async function adminEditMaterial(
 }
 
 export async function updateUserInfo(schoolSlug: string, userId: string, fullName: string, graduatingYear: number) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await supabaseAdmin
     .from('users')
     .update({ full_name: fullName.trim(), graduating_year: graduatingYear })
@@ -201,7 +185,7 @@ export async function updateContestSettings(
   periodStart: string,
   prizeEnabled: boolean,
 ) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await Promise.all([
     supabaseAdmin
       .from('contest_settings')
@@ -218,7 +202,7 @@ export async function updateContestSettings(
 }
 
 export async function chooseContestWinner(schoolSlug: string, userId: string, periodLabel: string, periodStart: string, periodEnd: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await supabaseAdmin.from('contest_winners').insert({
     school_id: tenant.id,
     user_id: userId,
@@ -240,7 +224,7 @@ export async function chooseContestWinner(schoolSlug: string, userId: string, pe
 }
 
 export async function markWinnerPaid(schoolSlug: string, winnerId: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await supabaseAdmin
     .from('contest_winners')
     .update({ paid_at: new Date().toISOString() })
@@ -250,7 +234,7 @@ export async function markWinnerPaid(schoolSlug: string, winnerId: string) {
 }
 
 export async function promoteToAdmin(schoolSlug: string, userId: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await supabaseAdmin
     .from('users')
     .update({ role: 'admin' })
@@ -260,7 +244,7 @@ export async function promoteToAdmin(schoolSlug: string, userId: string) {
 }
 
 export async function demoteToStudent(schoolSlug: string, userId: string) {
-  const tenant = await gateAdmin(schoolSlug)
+  const { tenant } = await gateAdmin(schoolSlug)
   await supabaseAdmin
     .from('users')
     .update({ role: 'student' })

@@ -1,5 +1,5 @@
 'use server'
-import { requireUser, requireAdmin } from '@/lib/auth'
+import { requireUser, gateAdmin } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { resolveTenantBySlug } from '@/lib/tenant'
 import { type ActionResult } from '@/app/actions/materials'
@@ -37,8 +37,7 @@ export async function reportMaterial(
 }
 
 export async function dismissReport(schoolSlug: string, reportId: string): Promise<ActionResult> {
-  const tenant = await resolveTenantBySlug(schoolSlug)
-  const admin = await requireAdmin(tenant.id)
+  const { tenant, admin } = await gateAdmin(schoolSlug)
   await supabaseAdmin
     .from('material_reports')
     .update({ status: 'dismissed', resolved_at: new Date().toISOString(), resolved_by: admin.id })
@@ -54,8 +53,7 @@ export async function resolveReportAndDeleteMaterial(
   schoolSlug: string,
   reportId: string,
 ): Promise<ActionResult> {
-  const tenant = await resolveTenantBySlug(schoolSlug)
-  await requireAdmin(tenant.id)
+  const { tenant } = await gateAdmin(schoolSlug)
 
   const { data: report } = await supabaseAdmin
     .from('material_reports')

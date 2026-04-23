@@ -5,6 +5,7 @@ export const materialTypeEnum = pgEnum('material_type', ['note', 'test'])
 export const contentTypeEnum = pgEnum('content_type', ['pdf', 'richtext'])
 export const statusEnum = pgEnum('status', ['pending', 'approved', 'rejected'])
 export const schoolRequestStatusEnum = pgEnum('school_request_status', ['pending', 'approved', 'rejected'])
+export const materialReportStatusEnum = pgEnum('material_report_status', ['pending', 'resolved', 'dismissed'])
 
 // ============================================================================
 // Tenant-management tables
@@ -142,7 +143,7 @@ export const materialReports = pgTable('material_reports', {
   materialId: uuid('material_id').notNull().references(() => materials.id, { onDelete: 'cascade' }),
   reporterUserId: uuid('reporter_user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   reason: text('reason').notNull(),
-  status: text('status').notNull().default('pending'),
+  status: materialReportStatusEnum('status').notNull().default('pending'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   resolvedAt: timestamp('resolved_at', { withTimezone: true }),
   resolvedBy: uuid('resolved_by').references(() => users.id, { onDelete: 'set null' }),

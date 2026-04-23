@@ -1,5 +1,6 @@
 import { getUser } from './supabase/server'
 import { supabaseAdmin } from './supabase/admin'
+import { resolveTenantBySlug } from './tenant'
 import { redirect } from 'next/navigation'
 
 export { calculateGrade } from './grade'
@@ -51,4 +52,15 @@ export async function requireAdmin(tenantSchoolId?: string) {
   if (tenantSchoolId && user.schoolId !== tenantSchoolId) redirect('/')
 
   return user
+}
+
+/**
+ * Tenant + admin gate in one call. The tenant comes from the URL's slug
+ * (what the admin is looking at), not the admin's own users.school_id —
+ * this is what makes a superadmin-acting-in-Oakwood safe.
+ */
+export async function gateAdmin(schoolSlug: string) {
+  const tenant = await resolveTenantBySlug(schoolSlug)
+  const admin = await requireAdmin(tenant.id)
+  return { tenant, admin }
 }
