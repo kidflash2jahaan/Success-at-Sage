@@ -1,16 +1,19 @@
 import Link from 'next/link'
 import FooterLinks from './FooterLinks'
 
+type LegalSlug = 'privacy' | 'terms' | 'faq' | 'contact'
+
 export default function LegalLayout({
   active,
   children,
 }: {
-  active: 'privacy' | 'terms' | 'contact'
+  active: LegalSlug
   children: React.ReactNode
 }) {
-  const otherPages: Array<{ slug: 'privacy' | 'terms' | 'contact'; label: string }> = [
+  const otherPages: Array<{ slug: LegalSlug; label: string }> = [
     { slug: 'privacy', label: 'Privacy' },
     { slug: 'terms', label: 'Terms' },
+    { slug: 'faq', label: 'FAQ' },
     { slug: 'contact', label: 'Contact' },
   ]
   return (
