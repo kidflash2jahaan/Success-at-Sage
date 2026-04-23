@@ -1,4 +1,4 @@
-# Success at Sage — launch copy pack
+# Success at HS — launch copy pack
 
 Everything you need to write is here. Drop it into Instagram, iMessage, email — done.
 
@@ -11,7 +11,7 @@ Everything you need to write is here. Drop it into Instagram, iMessage, email �
 - `@success.at.sage`
 - `@sagehill.notes`
 
-**Profile name:** Success at Sage
+**Profile name:** Success at HS
 **Category:** Education
 
 **Bio (150 chars max):**
@@ -171,7 +171,7 @@ Make this list before Monday. Fill in 20 names.
 
 > Hi — I'm [name].
 >
-> I built a study notes platform for Sage Hill called **Success at Sage**. Quick pitch, because everybody's hungry for lunch.
+> I built a study notes platform for Sage Hill called **Success at HS**. Quick pitch, because everybody's hungry for lunch.
 >
 > It's a student-built site where we can share our **AP review notes, finals study guides, and practice tests** — all in one place, searchable by class and unit. Free for everyone with a Sage Hill email.
 >
@@ -191,12 +191,12 @@ Make this list before Monday. Fill in 20 names.
 
 ## 9. Mr. Campeau email (revised for May pivot)
 
-**Subject:** `Success at Sage — approval to launch May 1 + town meeting Monday`
+**Subject:** `Success at HS — approval to launch May 1 + town meeting Monday`
 
 ```
 Hi Mr. Campeau,
 
-I've been building a study notes platform for Sage Hill called Success at Sage over the past few months. The site is complete and I'd like your approval to officially launch it to students on Monday, May 1st — with a short (~90 second) announcement at Monday's town meeting.
+I've been building a study notes platform for Sage Hill called Success at HS over the past few months. The site is complete and I'd like your approval to officially launch it to students on Monday, May 1st — with a short (~90 second) announcement at Monday's town meeting.
 
 A few things I want to be upfront about:
 
@@ -224,7 +224,7 @@ successatsage.com
 ```
 Hi [IT contact name / IT team],
 
-I'm a student at Sage Hill and I've built a study notes platform for Sage Hill students called Success at Sage — site is live at https://successatsage.com.
+I'm a student at Sage Hill and I've built a study notes platform for Sage Hill students called Success at HS — site is live at https://successatsage.com.
 
 Right now the domain appears to be blocked by the school wifi DNS filter. The Vercel-hosted version (a vercel.app URL) loads fine, which makes me think the custom domain just hasn't been categorized yet.
 

@@ -436,7 +436,7 @@ export default async function OnboardingPage() {
   return (
     <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-[#16213e] border border-white/10 rounded-2xl p-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Welcome to Success at Sage</h1>
+        <h1 className="text-2xl font-bold text-white mb-2">Welcome to Success at HS</h1>
         <p className="text-white/60 mb-8">Tell us a bit about yourself to get started.</p>
         <form action={completeOnboarding} className="flex flex-col gap-4">
           <div>
@@ -525,7 +525,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-[#1a1a2e] flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-[#16213e] border border-white/10 rounded-2xl p-8">
-        <h1 className="text-2xl font-bold text-white mb-8">Sign in to Success at Sage</h1>
+        <h1 className="text-2xl font-bold text-white mb-8">Sign in to Success at HS</h1>
         <button
           onClick={handleGoogle}
           className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 font-semibold rounded-lg py-2.5 mb-6 hover:bg-gray-100 transition-colors"

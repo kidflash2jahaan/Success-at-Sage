@@ -1,4 +1,4 @@
-# Success at Sage — Design Spec
+# Success at HS — Design Spec
 
 **Date:** 2026-04-15  
 **Project:** successatsage (Next.js 16 + Supabase)  
@@ -8,7 +8,7 @@
 
 ## 1. Overview
 
-Success at Sage is a study platform for Sage Hill High School students. Students log in, add their courses to a personal schedule, and access community-submitted study notes and past tests organized by department → course → unit. All submitted content is reviewed and approved by an admin before going live.
+Success at HS is a study platform for Sage Hill High School students. Students log in, add their courses to a personal schedule, and access community-submitted study notes and past tests organized by department → course → unit. All submitted content is reviewed and approved by an admin before going live.
 
 ---
 

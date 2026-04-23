@@ -229,7 +229,7 @@ export default async function LandingPage() {
   return (
     <div className="min-h-screen bg-[#1a1a2e] flex flex-col">
       <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <span className="font-bold text-white">Success at Sage</span>
+        <span className="font-bold text-white">Success at HS</span>
         <div className="flex items-center gap-4">
           <Link href="/browse" className="text-sm text-white/60 hover:text-white">Browse Courses</Link>
           <Link href="/login" className="text-sm text-white/60 hover:text-white">Sign In</Link>
@@ -265,7 +265,7 @@ export default async function LandingPage() {
       </main>
 
       <footer className="px-6 py-4 border-t border-white/10 text-center text-white/20 text-sm">
-        Success at Sage — A passion project for Sage Hill High School
+        Success at HS — A passion project for Sage Hill High School
       </footer>
     </div>
   )

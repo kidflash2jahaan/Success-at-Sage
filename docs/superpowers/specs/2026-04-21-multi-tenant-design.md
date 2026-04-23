@@ -9,7 +9,7 @@
 
 ## 1. Overview
 
-Success at Sage becomes a multi-tenant SaaS platform where every school is an isolated tenant. The Sage-specific brand is retired in favor of a generic parent brand at `successaths.com`; Sage becomes the flagship tenant at `successaths.com/s/sage`. The existing `successatsage.com` domain 301s to Sage's tenant URL to preserve printed posters, QR codes, and word-of-mouth distribution.
+Success at HS becomes a multi-tenant SaaS platform where every school is an isolated tenant. The Sage-specific brand is retired in favor of a generic parent brand at `successaths.com`; Sage becomes the flagship tenant at `successaths.com/s/sage`. The existing `successatsage.com` domain 301s to Sage's tenant URL to preserve printed posters, QR codes, and word-of-mouth distribution.
 
 Architecturally: path-prefix URLs for tenants (`/s/<slug>/...`), email-domain routing at signup, per-school contest toggle, strict tenant isolation enforced by Postgres Row-Level Security with JWT-claim-based policies, and a request-to-create flow for onboarding new schools behind a superadmin review queue.
 

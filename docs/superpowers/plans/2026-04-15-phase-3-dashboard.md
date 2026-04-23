@@ -47,7 +47,7 @@ export default function TopNav({ userName, onMenuClick }: TopNavProps) {
         </svg>
       </button>
       <Link href="/dashboard" className="font-bold text-white text-sm hidden md:block shrink-0">
-        Success at Sage
+        Success at HS
       </Link>
       <form onSubmit={handleSearch} className="flex-1 max-w-md">
         <input
