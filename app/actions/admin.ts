@@ -194,12 +194,25 @@ export async function updateUserInfo(schoolSlug: string, userId: string, fullNam
   revalidatePath('/s/[schoolSlug]/admin/users', 'page')
 }
 
-export async function updateContestSettings(schoolSlug: string, nextResetDate: string, prizeDescription: string, periodStart: string) {
+export async function updateContestSettings(
+  schoolSlug: string,
+  nextResetDate: string,
+  prizeDescription: string,
+  periodStart: string,
+  prizeEnabled: boolean,
+) {
   const tenant = await gateAdmin(schoolSlug)
-  await supabaseAdmin
-    .from('contest_settings')
-    .update({ next_reset_date: nextResetDate, prize_description: prizeDescription, period_start: periodStart })
-    .eq('school_id', tenant.id)
+  await Promise.all([
+    supabaseAdmin
+      .from('contest_settings')
+      .update({ next_reset_date: nextResetDate, prize_description: prizeDescription, period_start: periodStart })
+      .eq('school_id', tenant.id),
+    supabaseAdmin
+      .from('schools')
+      .update({ prize_enabled: prizeEnabled })
+      .eq('id', tenant.id),
+  ])
+  revalidatePath('/s/[schoolSlug]', 'layout')
   revalidatePath('/s/[schoolSlug]/admin/contest', 'page')
   revalidatePath('/s/[schoolSlug]/leaderboard', 'page')
 }

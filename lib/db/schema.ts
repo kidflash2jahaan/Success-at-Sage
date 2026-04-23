@@ -15,7 +15,7 @@ export const schools = pgTable('schools', {
   slug: text('slug').notNull().unique(),
   name: text('name').notNull(),
   displayShort: text('display_short').notNull(),
-  contestEnabled: boolean('contest_enabled').notNull().default(false),
+  prizeEnabled: boolean('prize_enabled').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 

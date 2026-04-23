@@ -34,7 +34,7 @@ export async function approveSchoolRequest(requestId: string) {
       slug: req.proposed_slug,
       name: req.proposed_name,
       display_short: req.proposed_display_short,
-      contest_enabled: false,
+      prize_enabled: false,
     })
     .select('id, slug')
     .single<{ id: string; slug: string }>()

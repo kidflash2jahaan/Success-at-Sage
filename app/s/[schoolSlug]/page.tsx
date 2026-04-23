@@ -75,8 +75,8 @@ export default async function LandingPage({ params }: { params: Promise<{ school
             Made by {tenant.displayShort} students, for {tenant.displayShort} students.
           </p>
 
-          {/* Prize badge — hidden when this school has the contest toggled off */}
-          {tenant.contestEnabled && (
+          {/* Prize badge — hidden when the school has the prize toggled off */}
+          {tenant.prizeEnabled && (
             <div className="animate-fade-up stagger-3 flex items-center justify-center gap-2 mb-6">
               <Link href={`/s/${schoolSlug}/leaderboard`} className="inline-flex items-center gap-2 glass border border-amber-500/25 px-4 py-2 rounded-full text-sm hover:border-amber-500/50 transition-colors">
                 <span className="text-amber-400">🎁</span>

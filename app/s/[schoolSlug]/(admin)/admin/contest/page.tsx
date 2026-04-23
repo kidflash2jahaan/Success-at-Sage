@@ -68,7 +68,8 @@ export default async function AdminContestPage({ params, searchParams }: { param
     const nextReset = formData.get('nextResetDate') as string
     const prize = formData.get('prizeDescription') as string
     const periodStart = formData.get('periodStart') as string
-    await updateContestSettings(schoolSlug, nextReset, prize, periodStart)
+    const prizeEnabled = formData.get('prizeEnabled') === 'on'
+    await updateContestSettings(schoolSlug, nextReset, prize, periodStart, prizeEnabled)
     redirect(`/s/${schoolSlug}/admin/contest?saved=1`)
   }
 
@@ -198,6 +199,21 @@ export default async function AdminContestPage({ params, searchParams }: { param
               className="glass-input rounded-xl px-4 py-2.5 text-sm text-white"
             />
           </div>
+          <label className="glass-input rounded-xl px-4 py-3 flex items-center justify-between gap-4 cursor-pointer group">
+            <div className="flex flex-col">
+              <span className="text-sm text-white font-medium">Prize enabled</span>
+              <span className="text-white/40 text-xs mt-0.5">
+                Contest and leaderboard always run. When off, the prize amount
+                and any &ldquo;win&rdquo; copy are hidden everywhere.
+              </span>
+            </div>
+            <input
+              type="checkbox"
+              name="prizeEnabled"
+              defaultChecked={tenant.prizeEnabled}
+              className="w-5 h-5 accent-violet-600 cursor-pointer shrink-0"
+            />
+          </label>
           <SubmitButton
             pendingLabel="Saving..."
             className="bg-violet-600 hover:bg-violet-500 disabled:opacity-70 disabled:cursor-wait text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"

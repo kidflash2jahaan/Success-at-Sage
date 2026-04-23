@@ -8,7 +8,7 @@ export type Tenant = {
   slug: string
   name: string
   displayShort: string
-  contestEnabled: boolean
+  prizeEnabled: boolean
 }
 
 type SchoolRow = {
@@ -16,7 +16,7 @@ type SchoolRow = {
   slug: string
   name: string
   display_short: string
-  contest_enabled: boolean
+  prize_enabled: boolean
 }
 
 function toTenant(row: SchoolRow): Tenant {
@@ -25,7 +25,7 @@ function toTenant(row: SchoolRow): Tenant {
     slug: row.slug,
     name: row.name,
     displayShort: row.display_short,
-    contestEnabled: row.contest_enabled,
+    prizeEnabled: row.prize_enabled,
   }
 }
 
@@ -33,7 +33,7 @@ function toTenant(row: SchoolRow): Tenant {
 export const resolveTenantBySlug = cache(async (slug: string): Promise<Tenant> => {
   const { data, error } = await supabaseAdmin
     .from('schools')
-    .select('id, slug, name, display_short, contest_enabled')
+    .select('id, slug, name, display_short, prize_enabled')
     .eq('slug', slug)
     .single<SchoolRow>()
   if (error || !data) notFound()
@@ -52,7 +52,7 @@ export const resolveTenantByEmail = cache(async (email: string): Promise<Tenant 
   if (!dom) return null
   const { data: school } = await supabaseAdmin
     .from('schools')
-    .select('id, slug, name, display_short, contest_enabled')
+    .select('id, slug, name, display_short, prize_enabled')
     .eq('id', dom.school_id)
     .single<SchoolRow>()
   return school ? toTenant(school) : null

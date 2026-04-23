@@ -42,8 +42,8 @@ export default async function DashboardPage({ params }: { params: Promise<{ scho
 
   return (
     <div className="p-6">
-      {/* Contest banner — hidden when this school has the contest toggled off */}
-      {tenant.contestEnabled && (
+      {/* Prize banner — hidden when the school has the prize toggled off */}
+      {tenant.prizeEnabled && (
         <Link href={`/s/${schoolSlug}/leaderboard`} className="animate-fade-up block mb-6 glass border border-amber-500/20 hover:border-amber-500/40 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 transition-colors group">
           <div className="flex items-center gap-3">
             <span className="text-2xl">🎁</span>

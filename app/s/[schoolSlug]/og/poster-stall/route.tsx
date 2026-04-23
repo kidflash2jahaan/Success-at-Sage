@@ -20,6 +20,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
   const [fonts, settings, qr] = await Promise.all([loadFonts(), getContestSettings(tenant.id), qrDataUrl()])
   const prize = parsePrize(settings.prize_description)
   const daysLeft = daysUntil(settings.next_reset_date)
+  const prizeEnabled = tenant.prizeEnabled
 
   return new ImageResponse(
     (
@@ -50,43 +51,81 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
           </span>
         </div>
 
-        {/* Headline */}
-        <div style={{ fontSize: 56, fontWeight: 800, color: brand.text, marginTop: 32, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
-          Win
-        </div>
+        {prizeEnabled ? (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {/* Headline */}
+            <div style={{ fontSize: 56, fontWeight: 800, color: brand.text, marginTop: 32, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
+              Win
+            </div>
 
-        {/* Prize hero */}
-        <div
-          style={{
-            fontSize: 260,
-            fontWeight: 900,
-            lineHeight: 0.9,
-            letterSpacing: '-0.05em',
-            marginTop: 4,
-            ...gradientText,
-          }}
-        >
-          {prize.amount}
-        </div>
+            {/* Prize hero */}
+            <div
+              style={{
+                fontSize: 260,
+                fontWeight: 900,
+                lineHeight: 0.9,
+                letterSpacing: '-0.05em',
+                marginTop: 4,
+                ...gradientText,
+              }}
+            >
+              {prize.amount}
+            </div>
 
-        {prize.label && (
-          <div style={{ fontSize: 30, fontWeight: 600, color: brand.text, marginTop: 12, letterSpacing: '-0.01em' }}>
-            {prize.label}
+            {prize.label && (
+              <div style={{ fontSize: 30, fontWeight: 600, color: brand.text, marginTop: 12, letterSpacing: '-0.01em' }}>
+                {prize.label}
+              </div>
+            )}
+
+            <div
+              style={{
+                fontSize: 32,
+                fontWeight: 500,
+                color: brand.textDim,
+                marginTop: 24,
+                lineHeight: 1.3,
+                maxWidth: 560,
+              }}
+            >
+              for the top note-uploader this month. Admin-approved. Free forever.
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {/* Headline */}
+            <div style={{ fontSize: 56, fontWeight: 800, color: brand.text, marginTop: 32, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
+              Upload notes.
+            </div>
+
+            {/* Hero */}
+            <div
+              style={{
+                fontSize: 180,
+                fontWeight: 900,
+                lineHeight: 0.95,
+                letterSpacing: '-0.04em',
+                marginTop: 4,
+                ...gradientText,
+              }}
+            >
+              Top of the board.
+            </div>
+
+            <div
+              style={{
+                fontSize: 32,
+                fontWeight: 500,
+                color: brand.textDim,
+                marginTop: 24,
+                lineHeight: 1.3,
+                maxWidth: 560,
+              }}
+            >
+              Share your best notes. Help your classmates. Admin-approved. Free forever.
+            </div>
           </div>
         )}
-
-        <div
-          style={{
-            fontSize: 32,
-            fontWeight: 500,
-            color: brand.textDim,
-            marginTop: 24,
-            lineHeight: 1.3,
-            maxWidth: 560,
-          }}
-        >
-          for the top note-uploader this month. Admin-approved. Free forever.
-        </div>
 
         {/* QR + info row */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 32, marginTop: 'auto', paddingTop: 32 }}>

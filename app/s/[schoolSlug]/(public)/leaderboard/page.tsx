@@ -68,8 +68,8 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ sc
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      {/* Prize banner — hidden when the school has the contest toggled off */}
-      {tenant.contestEnabled && (
+      {/* Prize banner — hidden when the school has the prize toggled off */}
+      {tenant.prizeEnabled && (
         <div className="animate-fade-up mb-8 glass rounded-2xl px-6 py-5 text-center border border-amber-500/20">
           <div className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-1">Monthly Prize</div>
           <div className="text-2xl font-bold text-white mb-1">{prize}</div>

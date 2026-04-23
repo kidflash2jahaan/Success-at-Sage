@@ -18,7 +18,7 @@ type SchoolRow = {
   slug: string
   name: string
   display_short: string
-  contest_enabled: boolean
+  prize_enabled: boolean
   created_at: string
 }
 
@@ -37,7 +37,7 @@ export default async function SchoolsPage({
       .returns<SchoolRequestRow[]>(),
     supabaseAdmin
       .from('schools')
-      .select('id, slug, name, display_short, contest_enabled, created_at')
+      .select('id, slug, name, display_short, prize_enabled, created_at')
       .order('created_at', { ascending: false })
       .returns<SchoolRow[]>(),
   ])
@@ -107,7 +107,7 @@ export default async function SchoolsPage({
             <li key={s.id} className="glass rounded-xl p-3 flex items-center justify-between gap-3">
               <div>
                 <div className="text-white text-sm font-medium">{s.name} <span className="text-white/30 text-xs font-normal">/{s.slug}</span></div>
-                <div className="text-white/40 text-xs">contest: {s.contest_enabled ? 'on' : 'off'}</div>
+                <div className="text-white/40 text-xs">prize: {s.prize_enabled ? 'on' : 'off'}</div>
               </div>
               <Link href={`/s/${s.slug}/admin`} className="text-xs text-amber-400 hover:text-amber-300 underline underline-offset-2 font-medium">
                 open admin →

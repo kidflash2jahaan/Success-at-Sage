@@ -31,7 +31,7 @@ export default async function SubmitPage({
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      {tenant.contestEnabled && (
+      {tenant.prizeEnabled && (
         <Link href={`/s/${schoolSlug}/leaderboard`} className="block mb-6 glass border border-amber-500/20 hover:border-amber-500/40 rounded-2xl px-5 py-3.5 flex items-center justify-between gap-3 transition-colors group">
           <div className="flex items-center gap-2.5">
             <span className="text-lg">🎁</span>

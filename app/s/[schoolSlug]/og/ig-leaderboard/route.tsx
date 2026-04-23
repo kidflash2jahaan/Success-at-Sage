@@ -24,6 +24,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
   const prize = parsePrize(settings.prize_description)
   const period = formatPeriod(settings.period_start)
   const daysLeft = daysUntil(settings.next_reset_date)
+  const prizeEnabled = tenant.prizeEnabled
 
   // Pad with empty slots if fewer than 3 leaders exist
   const slots: Array<{ full_name: string; submission_count: number; total_views: number } | null> = [
@@ -79,7 +80,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               marginTop: 18,
             }}
           >
-            {`${prize.amount} ${prize.label || 'prize'} for #1 on ${settings.next_reset_date ? formatShortDate(settings.next_reset_date) : 'month end'}`}
+            {prizeEnabled
+              ? `${prize.amount} ${prize.label || 'prize'} for #1 on ${settings.next_reset_date ? formatShortDate(settings.next_reset_date) : 'month end'}`
+              : `Top 3 contributors${settings.next_reset_date ? ` · through ${formatShortDate(settings.next_reset_date)}` : ' this month'}`}
           </div>
         </div>
 

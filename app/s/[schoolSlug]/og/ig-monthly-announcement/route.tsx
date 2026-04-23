@@ -19,6 +19,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
   const prize = parsePrize(settings.prize_description)
   const deadline = settings.next_reset_date
   const daysLeft = daysUntil(deadline)
+  const prizeEnabled = tenant.prizeEnabled
 
   return new ImageResponse(
     (
@@ -61,54 +62,96 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
 
         {/* Hero block */}
         <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'center', marginTop: 20 }}>
-          <div
-            style={{
-              fontSize: 72,
-              fontWeight: 700,
-              color: brand.textDim,
-              lineHeight: 1.1,
-              letterSpacing: '-0.01em',
-              marginBottom: 20,
-            }}
-          >
-            Win
-          </div>
-          <div
-            style={{
-              fontSize: 380,
-              fontWeight: 900,
-              lineHeight: 0.9,
-              letterSpacing: '-0.05em',
-              ...gradientText,
-            }}
-          >
-            {prize.amount}
-          </div>
-          {prize.label && (
-            <div
-              style={{
-                fontSize: 48,
-                fontWeight: 600,
-                color: brand.text,
-                marginTop: 18,
-                letterSpacing: '-0.01em',
-              }}
-            >
-              {prize.label}
+          {prizeEnabled ? (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div
+                style={{
+                  fontSize: 72,
+                  fontWeight: 700,
+                  color: brand.textDim,
+                  lineHeight: 1.1,
+                  letterSpacing: '-0.01em',
+                  marginBottom: 20,
+                }}
+              >
+                Win
+              </div>
+              <div
+                style={{
+                  fontSize: 380,
+                  fontWeight: 900,
+                  lineHeight: 0.9,
+                  letterSpacing: '-0.05em',
+                  ...gradientText,
+                }}
+              >
+                {prize.amount}
+              </div>
+              {prize.label && (
+                <div
+                  style={{
+                    fontSize: 48,
+                    fontWeight: 600,
+                    color: brand.text,
+                    marginTop: 18,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {prize.label}
+                </div>
+              )}
+              <div
+                style={{
+                  fontSize: 44,
+                  fontWeight: 500,
+                  color: brand.textDim,
+                  marginTop: 40,
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                for the top note-uploader this month.
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div
+                style={{
+                  fontSize: 72,
+                  fontWeight: 700,
+                  color: brand.textDim,
+                  lineHeight: 1.1,
+                  letterSpacing: '-0.01em',
+                  marginBottom: 20,
+                }}
+              >
+                Your notes.
+              </div>
+              <div
+                style={{
+                  fontSize: 260,
+                  fontWeight: 900,
+                  lineHeight: 0.9,
+                  letterSpacing: '-0.04em',
+                  ...gradientText,
+                }}
+              >
+                Top of the board.
+              </div>
+              <div
+                style={{
+                  fontSize: 44,
+                  fontWeight: 500,
+                  color: brand.textDim,
+                  marginTop: 40,
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                climb the leaderboard this month.
+              </div>
             </div>
           )}
-          <div
-            style={{
-              fontSize: 44,
-              fontWeight: 500,
-              color: brand.textDim,
-              marginTop: 40,
-              lineHeight: 1.2,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            for the top note-uploader this month.
-          </div>
         </div>
 
         {/* Info strip */}

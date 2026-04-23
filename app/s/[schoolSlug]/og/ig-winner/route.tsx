@@ -22,6 +22,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
     getLatestPaidWinner(tenant.id),
   ])
   const prize = parsePrize(settings.prize_description)
+  const prizeEnabled = tenant.prizeEnabled
 
   let displayName = 'Winner'
   let displayPeriod = formatPeriod(settings.period_start)
@@ -152,7 +153,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               lineHeight: 1.25,
             }}
           >
-            {isPreview ? `leading for ${prize.amount}` : `took home ${prize.amount}`}
+            {prizeEnabled
+              ? isPreview ? `leading for ${prize.amount}` : `took home ${prize.amount}`
+              : isPreview ? 'leading the board this month' : 'this month’s top contributor'}
           </div>
         </div>
 
