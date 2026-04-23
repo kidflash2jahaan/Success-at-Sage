@@ -79,6 +79,19 @@ function SignupForm() {
           Already have an account?{' '}
           <Link href="/login" className="text-violet-400 hover:text-violet-300 transition-colors">Sign in</Link>
         </p>
+
+        <p className="text-center text-white/20 text-[11px] mt-5 leading-relaxed">
+          By creating an account, you agree to our{' '}
+          <Link href="/terms" className="underline underline-offset-2 hover:text-white/50">Terms</Link>
+          {' '}and{' '}
+          <Link href="/privacy" className="underline underline-offset-2 hover:text-white/50">Privacy Policy</Link>.
+        </p>
+
+        <div className="mt-6 flex items-center justify-center gap-4 text-white/25 text-xs">
+          <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
+          <Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
+          <Link href="/contact" className="hover:text-white/60 transition-colors">Contact</Link>
+        </div>
       </div>
     </div>
   )

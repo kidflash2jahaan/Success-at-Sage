@@ -80,7 +80,7 @@ export default async function UnitPage({
           <div className="flex flex-col gap-2">
             {notes.map((m, i) => (
               <div key={m.id} className="animate-fade-up" style={{ animationDelay: `${0.2 + i * 0.06}s` }}>
-                <MaterialCard material={m} accentColor={accentColor} courseSlug={slug} unitId={id} />
+                <MaterialCard material={m} accentColor={accentColor} courseSlug={slug} unitId={id} schoolSlug={schoolSlug} />
               </div>
             ))}
           </div>
@@ -93,7 +93,7 @@ export default async function UnitPage({
           <div className="flex flex-col gap-2">
             {tests.map((m, i) => (
               <div key={m.id} className="animate-fade-up" style={{ animationDelay: `${0.25 + i * 0.06}s` }}>
-                <MaterialCard material={m} accentColor={accentColor} courseSlug={slug} unitId={id} />
+                <MaterialCard material={m} accentColor={accentColor} courseSlug={slug} unitId={id} schoolSlug={schoolSlug} />
               </div>
             ))}
           </div>

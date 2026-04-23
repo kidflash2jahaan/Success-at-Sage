@@ -28,6 +28,7 @@ export default async function AdminLayout({
         {[
           { href: `/s/${schoolSlug}/admin`,             label: 'Dashboard' },
           { href: `/s/${schoolSlug}/admin/submissions`, label: 'Submissions' },
+          { href: `/s/${schoolSlug}/admin/reports`,     label: 'Reports' },
           { href: `/s/${schoolSlug}/admin/courses`,     label: 'All Materials' },
           { href: `/s/${schoolSlug}/admin/users`,       label: 'Users' },
           { href: `/s/${schoolSlug}/admin/contest`,     label: 'Contest' },

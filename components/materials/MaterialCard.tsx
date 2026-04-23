@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { incrementViewCount } from '@/app/actions/materials'
 import { fileNameFromPath, openAttachment } from '@/lib/utils/attachments'
 import MaterialViewer from './MaterialViewer'
+import ReportButton from './ReportButton'
 
 interface Material {
   id: string
@@ -42,11 +43,13 @@ export default function MaterialCard({
   accentColor,
   courseSlug,
   unitId,
+  schoolSlug,
 }: {
   material: Material
   accentColor: string
   courseSlug: string
   unitId: string
+  schoolSlug: string
 }) {
   const [open, setOpen] = useState(false)
   const [viewCount, setViewCount] = useState(material.viewCount)
@@ -110,6 +113,11 @@ export default function MaterialCard({
               Link
             </a>
           )}
+          <ReportButton
+            schoolSlug={schoolSlug}
+            materialId={material.id}
+            materialTitle={material.title}
+          />
           <svg
             className={`w-4 h-4 text-white/25 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
             fill="none" viewBox="0 0 24 24" stroke="currentColor"

@@ -42,6 +42,7 @@ export default function SubmitForm({
   const [contentText, setContentText] = useState('')
   const [attachmentFiles, setAttachmentFiles] = useState<File[]>([])
   const [pdfFiles, setPdfFiles] = useState<File[]>([])
+  const [acknowledged, setAcknowledged] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -90,6 +91,7 @@ export default function SubmitForm({
     if (!creatingUnit && !selectedUnitId) return
     if (creatingUnit && !newUnitTitle.trim()) return
     if (!title) return
+    if (!acknowledged) return
 
     setSubmitting(true)
     setError('')
@@ -293,9 +295,25 @@ export default function SubmitForm({
         </div>
       )}
 
+      {/* Honor-code acknowledgement — required before submit. */}
+      <label className="glass rounded-xl px-4 py-3.5 flex items-start gap-3 cursor-pointer group">
+        <input
+          type="checkbox"
+          checked={acknowledged}
+          onChange={e => setAcknowledged(e.target.checked)}
+          className="mt-0.5 w-4 h-4 accent-violet-600 cursor-pointer shrink-0"
+        />
+        <span className="text-white/70 text-xs leading-relaxed">
+          I confirm this is my own work or publicly available material I have
+          the right to share. I understand that uploading real tests, answer
+          keys, or copyrighted material violates my school&apos;s honor code
+          and will result in my account being removed.
+        </span>
+      </label>
+
       <button
         type="submit"
-        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title || (mode === 'paper' && pdfFiles.length === 0)}
+        disabled={submitting || !selectedCourse || (!creatingUnit && !selectedUnitId) || (creatingUnit && !newUnitTitle.trim()) || !title || (mode === 'paper' && pdfFiles.length === 0) || !acknowledged}
         aria-busy={submitting}
         className="btn-press bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold rounded-xl py-3 text-sm transition-all hover:shadow-[0_0_24px_rgba(124,58,237,0.4)]"
       >
