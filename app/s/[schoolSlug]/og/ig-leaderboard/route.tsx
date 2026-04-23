@@ -72,18 +72,18 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
           >
             {period}
           </div>
-          <div
-            style={{
-              fontSize: 28,
-              fontWeight: 500,
-              color: brand.textDim,
-              marginTop: 18,
-            }}
-          >
-            {prizeEnabled
-              ? `${prize.amount} ${prize.label || 'prize'} for #1 on ${settings.next_reset_date ? formatShortDate(settings.next_reset_date) : 'month end'}`
-              : `Top 3 contributors${settings.next_reset_date ? ` · through ${formatShortDate(settings.next_reset_date)}` : ' this month'}`}
-          </div>
+          {prizeEnabled && (
+            <div
+              style={{
+                fontSize: 28,
+                fontWeight: 500,
+                color: brand.textDim,
+                marginTop: 18,
+              }}
+            >
+              {`${prize.amount} ${prize.label || 'prize'} for #1 on ${settings.next_reset_date ? formatShortDate(settings.next_reset_date) : 'month end'}`}
+            </div>
+          )}
         </div>
 
         {/* Top 3 stack */}

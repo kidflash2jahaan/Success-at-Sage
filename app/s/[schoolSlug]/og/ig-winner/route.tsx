@@ -143,20 +143,20 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               {displayName}
             </div>
           )}
-          <div
-            style={{
-              fontSize: 40,
-              fontWeight: 600,
-              color: brand.text,
-              marginTop: 36,
-              textAlign: 'center',
-              lineHeight: 1.25,
-            }}
-          >
-            {prizeEnabled
-              ? isPreview ? `leading for ${prize.amount}` : `took home ${prize.amount}`
-              : isPreview ? 'leading the board this month' : 'this month’s top contributor'}
-          </div>
+          {prizeEnabled && (
+            <div
+              style={{
+                fontSize: 40,
+                fontWeight: 600,
+                color: brand.text,
+                marginTop: 36,
+                textAlign: 'center',
+                lineHeight: 1.25,
+              }}
+            >
+              {isPreview ? `leading for ${prize.amount}` : `took home ${prize.amount}`}
+            </div>
+          )}
         </div>
 
         {/* Stats */}

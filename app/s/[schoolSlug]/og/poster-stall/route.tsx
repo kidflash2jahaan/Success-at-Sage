@@ -51,7 +51,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
           </span>
         </div>
 
-        {prizeEnabled ? (
+        {prizeEnabled && (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {/* Headline */}
             <div style={{ fontSize: 56, fontWeight: 800, color: brand.text, marginTop: 32, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
@@ -89,40 +89,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               }}
             >
               for the top note-uploader this month. Admin-approved. Free forever.
-            </div>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {/* Headline */}
-            <div style={{ fontSize: 56, fontWeight: 800, color: brand.text, marginTop: 32, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
-              Upload notes.
-            </div>
-
-            {/* Hero */}
-            <div
-              style={{
-                fontSize: 180,
-                fontWeight: 900,
-                lineHeight: 0.95,
-                letterSpacing: '-0.04em',
-                marginTop: 4,
-                ...gradientText,
-              }}
-            >
-              Top of the board.
-            </div>
-
-            <div
-              style={{
-                fontSize: 32,
-                fontWeight: 500,
-                color: brand.textDim,
-                marginTop: 24,
-                lineHeight: 1.3,
-                maxWidth: 560,
-              }}
-            >
-              Share your best notes. Help your classmates. Admin-approved. Free forever.
             </div>
           </div>
         )}

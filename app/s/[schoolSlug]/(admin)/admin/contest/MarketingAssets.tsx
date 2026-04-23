@@ -58,8 +58,8 @@ export default function MarketingAssets({ schoolSlug }: { schoolSlug: string }) 
         Marketing Assets
       </h2>
       <p className="text-white/50 text-xs -mt-1 leading-relaxed">
-        Posts and posters are generated live from the current leaderboard,
-        prize, and deadline. Click Generate to render fresh versions.
+        Posts and posters are generated live from the current leaderboard and
+        deadline. Click Generate to render fresh versions.
       </p>
 
       {/* Static profile picture */}
