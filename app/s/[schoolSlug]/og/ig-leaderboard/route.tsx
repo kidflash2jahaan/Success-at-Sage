@@ -165,7 +165,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               : 'Upload now to claim a spot'}
           </div>
           <div style={{ display: 'flex', fontSize: 28, fontWeight: 700 }}>
-            <span style={{ color: brand.text }}>successatsage</span>
+            <span style={{ color: brand.text }}>{schoolSlug}.successaths</span>
             <span style={{ color: brand.amber400 }}>.com</span>
           </div>
         </div>

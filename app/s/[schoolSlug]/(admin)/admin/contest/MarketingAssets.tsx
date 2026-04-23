@@ -15,8 +15,8 @@ const DYNAMIC_ASSETS: Array<{
   aspect: string
 }> = [
   {
-    key: 'ig-launch',
-    title: 'IG — Launch',
+    key: 'ig-monthly-announcement',
+    title: 'IG — Monthly Announcement',
     description: 'Feed post announcing the prize.',
     w: 1080,
     h: 1080,
@@ -46,14 +46,6 @@ const DYNAMIC_ASSETS: Array<{
     h: 1056,
     aspect: '17 / 22',
   },
-  {
-    key: 'poster-door',
-    title: 'Poster — Classroom Door',
-    description: 'Letter landscape. High-traffic AP rooms.',
-    w: 1056,
-    h: 816,
-    aspect: '22 / 17',
-  },
 ]
 
 export default function MarketingAssets({ schoolSlug }: { schoolSlug: string }) {
@@ -78,7 +70,7 @@ export default function MarketingAssets({ schoolSlug }: { schoolSlug: string }) 
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/brand/profile-picture.png"
+            src={`/s/${schoolSlug}/og/profile-picture`}
             alt="Profile picture"
             width={80}
             height={80}
@@ -93,7 +85,7 @@ export default function MarketingAssets({ schoolSlug }: { schoolSlug: string }) 
           </div>
         </div>
         <a
-          href="/brand/profile-picture.png"
+          href={`/s/${schoolSlug}/og/profile-picture?download=1`}
           download="profile-picture.png"
           className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 px-3 py-2 rounded-lg transition-colors font-medium"
         >

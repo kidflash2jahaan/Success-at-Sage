@@ -107,7 +107,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               Scan to upload
             </div>
             <div style={{ display: 'flex', fontSize: 38, fontWeight: 800, marginTop: 8, letterSpacing: '-0.01em' }}>
-              <span style={{ color: brand.text }}>successatsage</span>
+              <span style={{ color: brand.text }}>{schoolSlug}.successaths</span>
               <span style={{ color: brand.amber400 }}>.com</span>
             </div>
             <div style={{ fontSize: 22, color: brand.textDim, marginTop: 14, fontWeight: 500 }}>

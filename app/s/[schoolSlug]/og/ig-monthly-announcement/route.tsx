@@ -1,4 +1,4 @@
-// Launch announcement — Instagram feed post (1080×1080)
+// Monthly announcement — Instagram feed post (1080×1080)
 // Paired copy lives in marketing/copy/README.md § "Launch post".
 import { ImageResponse } from 'next/og'
 import { brand, bgLight, gradientText } from '../_lib/brand'
@@ -142,13 +142,13 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               Link in bio
             </div>
             <div style={{ fontSize: 40, color: brand.text, fontWeight: 700, marginTop: 6, display: 'flex', alignItems: 'center' }}>
-              <span style={{ color: brand.text }}>successatsage</span>
+              <span style={{ color: brand.text }}>{schoolSlug}.successaths</span>
               <span style={{ color: brand.amber400 }}>.com</span>
             </div>
           </div>
         </div>
       </div>
     ),
-    { width: 1080, height: 1080, fonts, headers: responseHeaders(request, 'ig-launch.png') },
+    { width: 1080, height: 1080, fonts, headers: responseHeaders(request, 'ig-monthly-announcement.png') },
   )
 }
