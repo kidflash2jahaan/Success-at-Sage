@@ -37,26 +37,42 @@ body {
 select option { background: #0d0f24; color: white; }
 
 /* ─── Blob animations ─── */
+/* Wider translations + rotation + opacity pulse so the gradient-bright spots
+   inside each blob (radial-gradients offset off-center) visibly swim around.
+   Disabled via prefers-reduced-motion below. */
 @keyframes blob-1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  25%       { transform: translate(5%, 10%) scale(1.06); }
-  50%       { transform: translate(-4%, 5%) scale(0.94); }
-  75%       { transform: translate(8%, -4%) scale(1.03); }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg);           opacity: 1;    }
+  20%  { transform: translate(32%, 22%) scale(1.18) rotate(45deg);   opacity: 0.85; }
+  40%  { transform: translate(-24%, 40%) scale(0.82) rotate(-55deg); opacity: 1;    }
+  60%  { transform: translate(42%, -18%) scale(1.22) rotate(95deg);  opacity: 0.78; }
+  80%  { transform: translate(-18%, -28%) scale(0.9) rotate(-40deg); opacity: 0.95; }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg);           opacity: 1;    }
 }
 @keyframes blob-2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  30%       { transform: translate(-9%, 7%) scale(1.1); }
-  65%       { transform: translate(7%, -9%) scale(0.91); }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg);            opacity: 1;   }
+  25%  { transform: translate(-38%, 28%) scale(1.25) rotate(-60deg);  opacity: 0.8; }
+  50%  { transform: translate(38%, -26%) scale(0.78) rotate(75deg);   opacity: 1;   }
+  75%  { transform: translate(-28%, -36%) scale(1.14) rotate(-90deg); opacity: 0.88;}
+  100% { transform: translate(0, 0) scale(1) rotate(0deg);            opacity: 1;   }
 }
 @keyframes blob-3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  40%       { transform: translate(11%, -7%) scale(1.07); }
-  75%       { transform: translate(-7%, 9%) scale(0.93); }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg);           opacity: 0.95; }
+  20%  { transform: translate(40%, -30%) scale(1.2) rotate(65deg);   opacity: 1;    }
+  45%  { transform: translate(-32%, 36%) scale(0.84) rotate(-50deg); opacity: 0.82; }
+  70%  { transform: translate(26%, 44%) scale(1.12) rotate(110deg);  opacity: 1;    }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg);           opacity: 0.95; }
 }
 @keyframes blob-4 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  35%       { transform: translate(-11%, -5%) scale(1.09); }
-  70%       { transform: translate(5%, 11%) scale(0.9); }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg);            opacity: 1;    }
+  30%  { transform: translate(-42%, -26%) scale(1.2) rotate(-75deg);  opacity: 0.75; }
+  55%  { transform: translate(32%, 42%) scale(0.8) rotate(55deg);     opacity: 1;    }
+  80%  { transform: translate(-26%, 34%) scale(1.22) rotate(-100deg); opacity: 0.88; }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg);            opacity: 1;    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Targeted at BlobBackground — keep gradients visible, stop the motion. */
+  [aria-hidden="true"] > div[style*="blob-"] { animation: none !important; }
 }
 
 /* ─── Page / element entry animations ─── */
