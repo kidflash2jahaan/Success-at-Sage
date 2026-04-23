@@ -32,6 +32,7 @@ export default async function AdminReportsPage({
     .eq('school_id', tenant.id)
     .eq('status', 'pending')
     .order('created_at', { ascending: false })
+    .limit(100)
 
   const reports = (data ?? []) as unknown as ReportRow[]
 

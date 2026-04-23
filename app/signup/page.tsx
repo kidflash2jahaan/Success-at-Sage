@@ -2,6 +2,7 @@
 import { signUpWithEmail } from '@/app/actions/signup'
 import { getGraduatingYearOptions } from '@/lib/grade'
 import SubmitButton from '@/components/ui/SubmitButton'
+import FooterLinks from '@/components/legal/FooterLinks'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -87,11 +88,7 @@ function SignupForm() {
           <Link href="/privacy" className="underline underline-offset-2 hover:text-white/50">Privacy Policy</Link>.
         </p>
 
-        <div className="mt-6 flex items-center justify-center gap-4 text-white/25 text-xs">
-          <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
-          <Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
-          <Link href="/contact" className="hover:text-white/60 transition-colors">Contact</Link>
-        </div>
+        <FooterLinks className="mt-6 flex items-center justify-center gap-4 text-white/25 text-xs" />
       </div>
     </div>
   )

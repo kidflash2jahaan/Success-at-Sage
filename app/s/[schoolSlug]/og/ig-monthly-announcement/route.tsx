@@ -5,6 +5,7 @@ import { brand, bgLight, gradientText } from '../_lib/brand'
 import { loadFonts } from '../_lib/fonts'
 import { getContestSettings, parsePrize, formatShortDate, daysUntil } from '../_lib/data'
 import { requireAdminResponse, responseHeaders } from '../_lib/auth'
+import { Wordmark } from '../_lib/wordmark'
 import { resolveTenantBySlug } from '@/lib/tenant'
 
 export const dynamic = 'force-dynamic'
@@ -114,29 +115,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.2 }}>
-              <div
-                style={{
-                  fontSize: 180,
-                  fontWeight: 800,
-                  letterSpacing: '-0.04em',
-                  color: brand.text,
-                }}
-              >
-                Success
-              </div>
-              <div
-                style={{
-                  fontSize: 180,
-                  fontWeight: 800,
-                  letterSpacing: '-0.04em',
-                  paddingBottom: '0.12em',
-                  ...gradientText,
-                }}
-              >
-                {`at ${tenant.displayShort}`}
-              </div>
-            </div>
+            <Wordmark displayShort={tenant.displayShort} size={180} />
           )}
         </div>
 

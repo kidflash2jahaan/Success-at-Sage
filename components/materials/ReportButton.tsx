@@ -2,6 +2,8 @@
 import { useState, useTransition } from 'react'
 import { reportMaterial } from '@/app/actions/reports'
 
+type Status = { kind: 'idle' } | { kind: 'done' } | { kind: 'error'; msg: string }
+
 export default function ReportButton({
   schoolSlug,
   materialId,
@@ -13,27 +15,20 @@ export default function ReportButton({
 }) {
   const [open, setOpen] = useState(false)
   const [reason, setReason] = useState('')
-  const [status, setStatus] = useState<'idle' | 'done' | 'error'>('idle')
-  const [errorMsg, setErrorMsg] = useState('')
+  const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [pending, startTransition] = useTransition()
 
   function openModal(e: React.MouseEvent) {
     e.stopPropagation()
     setOpen(true)
     setReason('')
-    setStatus('idle')
-    setErrorMsg('')
+    setStatus({ kind: 'idle' })
   }
 
   function submit() {
     startTransition(async () => {
       const result = await reportMaterial(schoolSlug, materialId, reason)
-      if (result.ok) {
-        setStatus('done')
-      } else {
-        setStatus('error')
-        setErrorMsg(result.error)
-      }
+      setStatus(result.ok ? { kind: 'done' } : { kind: 'error', msg: result.error })
     })
   }
 
@@ -61,7 +56,7 @@ export default function ReportButton({
             onClick={e => e.stopPropagation()}
             className="glass rounded-2xl p-6 w-full max-w-md"
           >
-            {status === 'done' ? (
+            {status.kind === 'done' ? (
               <>
                 <h2 className="text-white font-semibold text-lg mb-2">Report submitted</h2>
                 <p className="text-white/60 text-sm mb-6">
@@ -91,8 +86,8 @@ export default function ReportButton({
                   className="glass-input w-full rounded-xl px-4 py-2.5 text-sm resize-y leading-relaxed"
                   autoFocus
                 />
-                {status === 'error' && (
-                  <p className="text-rose-300 text-xs mt-2">{errorMsg}</p>
+                {status.kind === 'error' && (
+                  <p className="text-rose-300 text-xs mt-2">{status.msg}</p>
                 )}
                 <div className="flex gap-2 mt-5">
                   <button

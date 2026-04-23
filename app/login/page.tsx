@@ -1,6 +1,7 @@
 'use client'
 import { signInWithEmail } from '@/app/actions/login'
 import SubmitButton from '@/components/ui/SubmitButton'
+import FooterLinks from '@/components/legal/FooterLinks'
 import Link from 'next/link'
 import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -65,11 +66,7 @@ function LoginForm() {
           <Link href="/signup" className="text-violet-400 hover:text-violet-300 transition-colors">Sign up</Link>
         </p>
 
-        <div className="mt-10 flex items-center justify-center gap-4 text-white/25 text-xs">
-          <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
-          <Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
-          <Link href="/contact" className="hover:text-white/60 transition-colors">Contact</Link>
-        </div>
+        <FooterLinks className="mt-10 flex items-center justify-center gap-4 text-white/25 text-xs" />
       </div>
     </div>
   )

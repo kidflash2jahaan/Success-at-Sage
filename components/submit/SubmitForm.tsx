@@ -295,7 +295,6 @@ export default function SubmitForm({
         </div>
       )}
 
-      {/* Honor-code acknowledgement — required before submit. */}
       <label className="glass rounded-xl px-4 py-3.5 flex items-start gap-3 cursor-pointer group">
         <input
           type="checkbox"

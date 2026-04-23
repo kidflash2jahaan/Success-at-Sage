@@ -2,9 +2,10 @@
 // Per-tenant: renders "Success at {school.displayShort}" instead of a
 // hardcoded Sage version. Mirrors marketing/src/profile-picture.html.
 import { ImageResponse } from 'next/og'
-import { brand, bgLight, gradientText } from '../_lib/brand'
+import { brand, bgLight } from '../_lib/brand'
 import { loadFonts } from '../_lib/fonts'
 import { requireAdminResponse, responseHeaders } from '../_lib/auth'
+import { Wordmark } from '../_lib/wordmark'
 import { resolveTenantBySlug } from '@/lib/tenant'
 
 export const dynamic = 'force-dynamic'
@@ -38,36 +39,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
         <div style={{ position: 'absolute', bottom: 56, left: 56, width: 60, height: 60, borderBottom: `2px solid ${brand.glassBorder}`, borderLeft: `2px solid ${brand.glassBorder}` }} />
         <div style={{ position: 'absolute', bottom: 56, right: 56, width: 60, height: 60, borderBottom: `2px solid ${brand.glassBorder}`, borderRight: `2px solid ${brand.glassBorder}` }} />
 
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '0 80px',
-            lineHeight: 1.2,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 220,
-              fontWeight: 800,
-              letterSpacing: '-0.04em',
-              color: brand.text,
-            }}
-          >
-            Success
-          </div>
-          <div
-            style={{
-              fontSize: 220,
-              fontWeight: 800,
-              letterSpacing: '-0.04em',
-              paddingBottom: '0.12em',
-              ...gradientText,
-            }}
-          >
-            {`at ${tenant.displayShort}`}
-          </div>
+        <div style={{ display: 'flex', padding: '0 80px' }}>
+          <Wordmark displayShort={tenant.displayShort} size={220} />
         </div>
       </div>
     ),

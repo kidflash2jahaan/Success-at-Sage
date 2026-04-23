@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { requestSchool } from '@/app/actions/request-school'
 import SubmitButton from '@/components/ui/SubmitButton'
+import FooterLinks from '@/components/legal/FooterLinks'
 
 export default async function RequestSchoolPage({
   searchParams,
@@ -57,11 +58,7 @@ export default async function RequestSchoolPage({
         </SubmitButton>
       </form>
 
-      <div className="mt-14 pt-6 border-t border-white/5 flex items-center justify-center gap-4 text-white/25 text-xs">
-        <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
-        <Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
-        <Link href="/contact" className="hover:text-white/60 transition-colors">Contact</Link>
-      </div>
+      <FooterLinks className="mt-14 pt-6 border-t border-white/5 flex items-center justify-center gap-4 text-white/25 text-xs" />
     </div>
   )
 }

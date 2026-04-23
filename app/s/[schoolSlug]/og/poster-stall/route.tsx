@@ -1,12 +1,12 @@
-// Poster — letter portrait (816×1056 @ 96 dpi = 8.5×11"). Centered,
-// concert-poster layout. QR encodes the tenant's subdomain so scanning
-// drops the reader directly onto the school's own hub.
+// Poster — letter portrait (816×1056 @ 96 dpi = 8.5×11"). QR encodes the
+// tenant's subdomain so scanning lands on the school's own hub.
 import { ImageResponse } from 'next/og'
 import { brand, bgLight, gradientText } from '../_lib/brand'
 import { loadFonts } from '../_lib/fonts'
 import { getContestSettings, parsePrize, formatShortDate, daysUntil } from '../_lib/data'
 import { qrDataUrl } from '../_lib/qr'
 import { requireAdminResponse, responseHeaders } from '../_lib/auth'
+import { Wordmark } from '../_lib/wordmark'
 import { resolveTenantBySlug } from '@/lib/tenant'
 
 export const dynamic = 'force-dynamic'
@@ -49,7 +49,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
         <div style={{ position: 'absolute', bottom: 36, left: 36, width: 44, height: 44, borderBottom: `2px solid ${brand.glassBorder}`, borderLeft: `2px solid ${brand.glassBorder}` }} />
         <div style={{ position: 'absolute', bottom: 36, right: 36, width: 44, height: 44, borderBottom: `2px solid ${brand.glassBorder}`, borderRight: `2px solid ${brand.glassBorder}` }} />
 
-        {/* Eyebrow — centered with amber accents on both sides */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{ width: 36, height: 2, background: `linear-gradient(90deg, transparent, ${brand.amber400})` }} />
           <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '0.3em', textTransform: 'uppercase', color: brand.amber400 }}>
@@ -58,7 +57,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
           <div style={{ width: 36, height: 2, background: `linear-gradient(90deg, ${brand.amber400}, transparent)` }} />
         </div>
 
-        {/* Hero — prize amount when enabled, school wordmark when disabled */}
         <div
           style={{
             display: 'flex',
@@ -107,21 +105,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               </div>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.15 }}>
-              <div style={{ fontSize: 130, fontWeight: 800, letterSpacing: '-0.04em', color: brand.text }}>
-                Success
-              </div>
-              <div
-                style={{
-                  fontSize: 130,
-                  fontWeight: 800,
-                  letterSpacing: '-0.04em',
-                  paddingBottom: '0.14em',
-                  ...gradientText,
-                }}
-              >
-                {`at ${tenant.displayShort}`}
-              </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Wordmark displayShort={tenant.displayShort} size={130} lineHeight={1.15} descenderPad="0.14em" />
               <div
                 style={{
                   fontSize: 24,
@@ -139,7 +124,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
           )}
         </div>
 
-        {/* QR block — centered, stacked with URL below */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ fontSize: 18, color: brand.textFaint, fontWeight: 600, letterSpacing: '0.24em', textTransform: 'uppercase', marginBottom: 14 }}>
             Scan to upload
@@ -162,7 +146,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
           </div>
         </div>
 
-        {/* Footer — centered one-line strip */}
         <div
           style={{
             display: 'flex',

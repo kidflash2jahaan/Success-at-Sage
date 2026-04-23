@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import FooterLinks from '@/components/legal/FooterLinks'
 
 export default function RequestThanks() {
   return (
@@ -11,11 +12,7 @@ export default function RequestThanks() {
         Back to home
       </Link>
 
-      <div className="mt-14 pt-6 border-t border-white/5 flex items-center justify-center gap-4 text-white/25 text-xs">
-        <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
-        <Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
-        <Link href="/contact" className="hover:text-white/60 transition-colors">Contact</Link>
-      </div>
+      <FooterLinks className="mt-14 pt-6 border-t border-white/5 flex items-center justify-center gap-4 text-white/25 text-xs" />
     </div>
   )
 }

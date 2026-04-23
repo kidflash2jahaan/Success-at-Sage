@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { resolveTenantBySlug } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
+import FooterLinks from '@/components/legal/FooterLinks'
 
 export default async function LandingPage({ params }: { params: Promise<{ schoolSlug: string }> }) {
   const { schoolSlug } = await params
@@ -122,11 +123,7 @@ export default async function LandingPage({ params }: { params: Promise<{ school
       <footer className="px-6 py-5 text-center text-white/20 text-xs flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-5">
         <span>Success at {tenant.displayShort} — a study platform for {tenant.name}</span>
         <span className="hidden sm:inline text-white/10">·</span>
-        <div className="flex items-center gap-4">
-          <Link href="/privacy" className="hover:text-white/60 transition-colors">Privacy</Link>
-          <Link href="/terms" className="hover:text-white/60 transition-colors">Terms</Link>
-          <Link href="/contact" className="hover:text-white/60 transition-colors">Contact</Link>
-        </div>
+        <FooterLinks className="flex items-center gap-4" />
       </footer>
     </div>
   )
