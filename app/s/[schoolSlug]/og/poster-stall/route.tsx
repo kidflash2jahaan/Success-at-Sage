@@ -51,7 +51,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
           </span>
         </div>
 
-        {prizeEnabled && (
+        {prizeEnabled ? (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {/* Headline */}
             <div style={{ fontSize: 56, fontWeight: 800, color: brand.text, marginTop: 32, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
@@ -89,6 +89,23 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
               }}
             >
               for the top note-uploader this month. Admin-approved. Free forever.
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 56, lineHeight: 1.2 }}>
+            <div style={{ fontSize: 140, fontWeight: 800, letterSpacing: '-0.04em', color: brand.text }}>
+              Success
+            </div>
+            <div
+              style={{
+                fontSize: 140,
+                fontWeight: 800,
+                letterSpacing: '-0.04em',
+                paddingBottom: '0.12em',
+                ...gradientText,
+              }}
+            >
+              {`at ${tenant.displayShort}`}
             </div>
           </div>
         )}

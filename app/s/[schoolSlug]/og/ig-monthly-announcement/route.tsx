@@ -60,9 +60,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
           <div style={{ width: 50, height: 2, background: `linear-gradient(90deg, ${brand.amber400}, transparent)` }} />
         </div>
 
-        {/* Hero block — empty when prize is disabled */}
-        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'center', marginTop: 20 }}>
-          {prizeEnabled && (
+        {/* Hero block — prize amount when enabled, wordmark when disabled */}
+        <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'center', alignItems: prizeEnabled ? 'flex-start' : 'center', marginTop: 20 }}>
+          {prizeEnabled ? (
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <div
                 style={{
@@ -111,6 +111,30 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
                 }}
               >
                 for the top note-uploader this month.
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.2 }}>
+              <div
+                style={{
+                  fontSize: 180,
+                  fontWeight: 800,
+                  letterSpacing: '-0.04em',
+                  color: brand.text,
+                }}
+              >
+                Success
+              </div>
+              <div
+                style={{
+                  fontSize: 180,
+                  fontWeight: 800,
+                  letterSpacing: '-0.04em',
+                  paddingBottom: '0.12em',
+                  ...gradientText,
+                }}
+              >
+                {`at ${tenant.displayShort}`}
               </div>
             </div>
           )}
