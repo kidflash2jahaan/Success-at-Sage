@@ -1,6 +1,6 @@
-// Bathroom stall poster — letter portrait (816×1056 @ 96 dpi = 8.5×11")
-// Designed to be read in ~10 seconds while seated. Big prize amount,
-// clear CTA, QR code prominent.
+// Poster — letter portrait (816×1056 @ 96 dpi = 8.5×11"). Centered,
+// concert-poster layout. QR encodes the tenant's subdomain so scanning
+// drops the reader directly onto the school's own hub.
 import { ImageResponse } from 'next/og'
 import { brand, bgLight, gradientText } from '../_lib/brand'
 import { loadFonts } from '../_lib/fonts'
@@ -17,7 +17,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
 
   const { schoolSlug } = await params
   const tenant = await resolveTenantBySlug(schoolSlug)
-  const [fonts, settings, qr] = await Promise.all([loadFonts(), getContestSettings(tenant.id), qrDataUrl()])
+  const hubUrl = `https://${schoolSlug}.successaths.com`
+  const [fonts, settings, qr] = await Promise.all([
+    loadFonts(),
+    getContestSettings(tenant.id),
+    qrDataUrl(hubUrl),
+  ])
   const prize = parsePrize(settings.prize_description)
   const daysLeft = daysUntil(settings.next_reset_date)
   const prizeEnabled = tenant.prizeEnabled
@@ -30,6 +35,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
           height: 1056,
           display: 'flex',
           flexDirection: 'column',
+          alignItems: 'center',
           padding: 64,
           background: bgLight,
           fontFamily: 'Outfit',
@@ -43,125 +49,147 @@ export async function GET(request: Request, { params }: { params: Promise<{ scho
         <div style={{ position: 'absolute', bottom: 36, left: 36, width: 44, height: 44, borderBottom: `2px solid ${brand.glassBorder}`, borderLeft: `2px solid ${brand.glassBorder}` }} />
         <div style={{ position: 'absolute', bottom: 36, right: 36, width: 44, height: 44, borderBottom: `2px solid ${brand.glassBorder}`, borderRight: `2px solid ${brand.glassBorder}` }} />
 
-        {/* Eyebrow */}
+        {/* Eyebrow — centered with amber accents on both sides */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{ width: 36, height: 2, background: brand.amber400 }} />
-          <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: '0.3em', textTransform: 'uppercase', color: brand.amber400 }}>
-            {tenant.displayShort} · Study Contest
+          <div style={{ width: 36, height: 2, background: `linear-gradient(90deg, transparent, ${brand.amber400})` }} />
+          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: '0.3em', textTransform: 'uppercase', color: brand.amber400 }}>
+            {tenant.displayShort} · {prizeEnabled ? 'Study Contest' : 'Study Notes'}
           </span>
+          <div style={{ width: 36, height: 2, background: `linear-gradient(90deg, ${brand.amber400}, transparent)` }} />
         </div>
 
-        {prizeEnabled ? (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {/* Headline */}
-            <div style={{ fontSize: 56, fontWeight: 800, color: brand.text, marginTop: 32, letterSpacing: '-0.02em', lineHeight: 1.05 }}>
-              Win
-            </div>
-
-            {/* Prize hero */}
-            <div
-              style={{
-                fontSize: 260,
-                fontWeight: 900,
-                lineHeight: 0.9,
-                letterSpacing: '-0.05em',
-                marginTop: 4,
-                ...gradientText,
-              }}
-            >
-              {prize.amount}
-            </div>
-
-            {prize.label && (
-              <div style={{ fontSize: 30, fontWeight: 600, color: brand.text, marginTop: 12, letterSpacing: '-0.01em' }}>
-                {prize.label}
+        {/* Hero — prize amount when enabled, school wordmark when disabled */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            flexGrow: 1,
+            justifyContent: 'center',
+            textAlign: 'center',
+          }}
+        >
+          {prizeEnabled ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <div style={{ fontSize: 36, fontWeight: 700, color: brand.textDim, letterSpacing: '-0.01em' }}>
+                Win
               </div>
-            )}
+              <div
+                style={{
+                  fontSize: 220,
+                  fontWeight: 900,
+                  lineHeight: 0.9,
+                  letterSpacing: '-0.05em',
+                  marginTop: 8,
+                  paddingBottom: '0.08em',
+                  ...gradientText,
+                }}
+              >
+                {prize.amount}
+              </div>
+              {prize.label && (
+                <div style={{ fontSize: 28, fontWeight: 600, color: brand.text, marginTop: 12, letterSpacing: '-0.01em' }}>
+                  {prize.label}
+                </div>
+              )}
+              <div
+                style={{
+                  fontSize: 24,
+                  fontWeight: 500,
+                  color: brand.textDim,
+                  marginTop: 22,
+                  lineHeight: 1.35,
+                  maxWidth: 560,
+                  textAlign: 'center',
+                }}
+              >
+                for the top note-uploader this month. Admin-approved. Free forever.
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', lineHeight: 1.15 }}>
+              <div style={{ fontSize: 130, fontWeight: 800, letterSpacing: '-0.04em', color: brand.text }}>
+                Success
+              </div>
+              <div
+                style={{
+                  fontSize: 130,
+                  fontWeight: 800,
+                  letterSpacing: '-0.04em',
+                  paddingBottom: '0.14em',
+                  ...gradientText,
+                }}
+              >
+                {`at ${tenant.displayShort}`}
+              </div>
+              <div
+                style={{
+                  fontSize: 24,
+                  fontWeight: 500,
+                  color: brand.textDim,
+                  marginTop: 20,
+                  lineHeight: 1.35,
+                  maxWidth: 560,
+                  textAlign: 'center',
+                }}
+              >
+                Student-built study notes. Admin-approved. Free forever.
+              </div>
+            </div>
+          )}
+        </div>
 
-            <div
-              style={{
-                fontSize: 32,
-                fontWeight: 500,
-                color: brand.textDim,
-                marginTop: 24,
-                lineHeight: 1.3,
-                maxWidth: 560,
-              }}
-            >
-              for the top note-uploader this month. Admin-approved. Free forever.
-            </div>
+        {/* QR block — centered, stacked with URL below */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ fontSize: 18, color: brand.textFaint, fontWeight: 600, letterSpacing: '0.24em', textTransform: 'uppercase', marginBottom: 14 }}>
+            Scan to upload
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: 56, lineHeight: 1.2 }}>
-            <div style={{ fontSize: 140, fontWeight: 800, letterSpacing: '-0.04em', color: brand.text }}>
-              Success
-            </div>
-            <div
-              style={{
-                fontSize: 140,
-                fontWeight: 800,
-                letterSpacing: '-0.04em',
-                paddingBottom: '0.12em',
-                ...gradientText,
-              }}
-            >
-              {`at ${tenant.displayShort}`}
-            </div>
-          </div>
-        )}
-
-        {/* QR + info row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 32, marginTop: 'auto', paddingTop: 32 }}>
           <div
             style={{
               display: 'flex',
               background: '#ffffff',
-              padding: 16,
-              borderRadius: 20,
+              padding: 14,
+              borderRadius: 18,
             }}
           >
             {/* Satori requires width/height on <img>; next/image doesn't run inside ImageResponse */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qr} width={200} height={200} alt="" style={{ display: 'flex' }} />
+            <img src={qr} width={196} height={196} alt="" style={{ display: 'flex' }} />
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-            <div style={{ fontSize: 22, color: brand.textFaint, fontWeight: 600, letterSpacing: '0.24em', textTransform: 'uppercase' }}>
-              Scan to upload
-            </div>
-            <div style={{ display: 'flex', fontSize: 38, fontWeight: 800, marginTop: 8, letterSpacing: '-0.01em' }}>
-              <span style={{ color: brand.text }}>{schoolSlug}.successaths</span>
-              <span style={{ color: brand.amber400 }}>.com</span>
-            </div>
-            <div style={{ fontSize: 22, color: brand.textDim, marginTop: 14, fontWeight: 500 }}>
-              AP review notes · finals guides · practice tests
-            </div>
+          <div style={{ display: 'flex', fontSize: 34, fontWeight: 800, marginTop: 18, letterSpacing: '-0.01em' }}>
+            <span style={{ color: brand.text }}>{schoolSlug}.successaths</span>
+            <span style={{ color: brand.amber400 }}>.com</span>
           </div>
         </div>
 
-        {/* Footer strip */}
+        {/* Footer — centered one-line strip */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingTop: 24,
+            justifyContent: 'center',
+            gap: 14,
+            width: '100%',
+            marginTop: 28,
+            paddingTop: 18,
             borderTop: `1px solid ${brand.glassBorder}`,
-            marginTop: 32,
           }}
         >
-          <div style={{ display: 'flex', fontSize: 20, fontWeight: 600 }}>
-            <span style={{ color: brand.textDim }}>
-              {settings.next_reset_date ? `Deadline ${formatShortDate(settings.next_reset_date)}` : 'Monthly contest'}
-            </span>
-            {daysLeft !== null && daysLeft >= 0 && daysLeft <= 31 && (
-              <span style={{ color: brand.amber400, marginLeft: 12 }}>
-                {daysLeft === 0 ? '· today' : `· ${daysLeft}d left`}
+          <span style={{ fontSize: 18, color: brand.textDim, fontWeight: 600 }}>
+            {settings.next_reset_date ? `Deadline ${formatShortDate(settings.next_reset_date)}` : 'Monthly reset'}
+          </span>
+          {daysLeft !== null && daysLeft >= 0 && daysLeft <= 31 && (
+            <>
+              <span style={{ color: brand.textFaint }}>·</span>
+              <span style={{ fontSize: 18, color: brand.amber400, fontWeight: 700 }}>
+                {daysLeft === 0 ? 'today' : `${daysLeft}d left`}
               </span>
-            )}
-          </div>
-          <div style={{ fontSize: 20, color: brand.textFaint, fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-            Student-built · Admin-approved
-          </div>
+            </>
+          )}
+          <span style={{ color: brand.textFaint }}>·</span>
+          <span style={{ fontSize: 16, color: brand.textFaint, fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase' }}>
+            Student-built
+          </span>
         </div>
       </div>
     ),
