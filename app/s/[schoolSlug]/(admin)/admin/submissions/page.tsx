@@ -5,6 +5,37 @@ import { resolveTenantBySlug } from '@/lib/tenant'
 import MaterialsReviewList from '@/components/admin/MaterialsReviewList'
 import UnitReviewer from '@/components/admin/UnitReviewer'
 
+type PendingMaterialRow = {
+  id: string
+  title: string
+  type: 'note' | 'test'
+  content_type: 'richtext' | 'pdf' | null
+  content_json: unknown
+  pdf_path: string | null
+  link_url: string | null
+  attachment_paths: string[] | null
+  unit_id: string
+  created_at: string
+  users: { full_name: string; email: string } | null
+  units: { title: string; courses: { name: string } | null } | null
+}
+
+type PendingUnitRow = {
+  id: string
+  title: string
+  course_id: string
+  courses: { name: string } | null
+  users: { full_name: string } | null
+}
+
+type ApprovedUnitRow = {
+  id: string
+  title: string
+  courses: { name: string } | null
+}
+
+type CourseRow = { id: string; name: string }
+
 export default async function SubmissionsPage({
   params,
 }: {
@@ -39,17 +70,23 @@ export default async function SubmissionsPage({
       .order('name'),
   ])
 
-  // Count pending materials per pending unit by reducing materialsData (which
-  // already includes every pending material in this tenant) — saves a DB roundtrip.
-  const pendingUnitIdSet = new Set((unitsData ?? []).map((u: any) => u.id as string))
+  const materials = (materialsData ?? []) as unknown as PendingMaterialRow[]
+  const units = (unitsData ?? []) as unknown as PendingUnitRow[]
+  const approvedUnits = (approvedUnitsData ?? []) as unknown as ApprovedUnitRow[]
+  const allCourses = (coursesData ?? []) as unknown as CourseRow[]
+
+  // Count pending materials per pending unit by reducing the materials array
+  // (which already includes every pending material in this tenant) — saves a
+  // DB roundtrip.
+  const pendingUnitIdSet = new Set(units.map(u => u.id))
   const materialCountsByUnit: Record<string, number> = {}
-  for (const m of (materialsData ?? []) as { unit_id: string }[]) {
+  for (const m of materials) {
     if (pendingUnitIdSet.has(m.unit_id)) {
       materialCountsByUnit[m.unit_id] = (materialCountsByUnit[m.unit_id] ?? 0) + 1
     }
   }
 
-  const pendingUnits = (unitsData ?? []).map((u: any) => ({
+  const pendingUnits = units.map(u => ({
     id: u.id,
     title: u.title,
     courseName: u.courses?.name ?? '',
@@ -57,15 +94,15 @@ export default async function SubmissionsPage({
     pendingMaterialCount: materialCountsByUnit[u.id] ?? 0,
   }))
 
-  const pending = (materialsData ?? []).map((m: any) => ({
+  const pending = materials.map(m => ({
     id: m.id,
     title: m.title,
     type: m.type,
-    contentType: (m.content_type ?? 'richtext') as 'richtext' | 'pdf',
+    contentType: m.content_type ?? 'richtext',
     contentJson: m.content_json,
-    pdfPath: m.pdf_path as string | null,
-    linkUrl: m.link_url ?? null,
-    attachmentPaths: (m.attachment_paths ?? []) as string[],
+    pdfPath: m.pdf_path,
+    linkUrl: m.link_url,
+    attachmentPaths: m.attachment_paths ?? [],
     createdAt: m.created_at,
     uploaderName: m.users?.full_name ?? 'Unknown',
     uploaderEmail: m.users?.email ?? '',
@@ -98,8 +135,8 @@ export default async function SubmissionsPage({
             <MaterialsReviewList
               schoolSlug={schoolSlug}
               items={pending}
-              availableUnits={(approvedUnitsData ?? []).map((u: any) => ({ id: u.id, title: u.title, courseName: u.courses?.name ?? '' }))}
-              courses={(coursesData ?? []).map((c: any) => ({ id: c.id, name: c.name }))}
+              availableUnits={approvedUnits.map(u => ({ id: u.id, title: u.title, courseName: u.courses?.name ?? '' }))}
+              courses={allCourses.map(c => ({ id: c.id, name: c.name }))}
             />
           </div>
         </div>
