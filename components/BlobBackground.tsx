@@ -10,7 +10,7 @@ export default function BlobBackground() {
       }}
     >
       {/* Blue — top-left */}
-      <div style={{
+      <div className="blob-bg-layer" style={{
         position: 'absolute',
         width: 700, height: 700,
         top: -200, left: -180,
@@ -20,7 +20,7 @@ export default function BlobBackground() {
         animation: 'blob-1 18s ease-in-out infinite',
       }} />
       {/* Violet — top-right */}
-      <div style={{
+      <div className="blob-bg-layer" style={{
         position: 'absolute',
         width: 620, height: 620,
         top: -120, right: -160,
@@ -30,7 +30,7 @@ export default function BlobBackground() {
         animation: 'blob-2 22s ease-in-out infinite',
       }} />
       {/* Teal — bottom-center */}
-      <div style={{
+      <div className="blob-bg-layer" style={{
         position: 'absolute',
         width: 520, height: 520,
         bottom: -120, left: '30%',
@@ -40,7 +40,7 @@ export default function BlobBackground() {
         animation: 'blob-3 16s ease-in-out infinite',
       }} />
       {/* Rose — bottom-right */}
-      <div style={{
+      <div className="blob-bg-layer" style={{
         position: 'absolute',
         width: 380, height: 380,
         bottom: '18%', right: -80,

@@ -1,8 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { resolveTenantBySlug } from '@/lib/tenant'
-import { requireAdmin, calculateGrade } from '@/lib/auth'
+import { gateAdmin, calculateGrade } from '@/lib/auth'
 import { chooseContestWinner, markWinnerPaid, updateContestSettings } from '@/app/actions/admin'
 import { redirect } from 'next/navigation'
 import SubmitButton from '@/components/ui/SubmitButton'
@@ -10,16 +9,19 @@ import MarketingAssets from './MarketingAssets'
 
 export default async function AdminContestPage({ params, searchParams }: { params: Promise<{ schoolSlug: string }>; searchParams: Promise<{ saved?: string }> }) {
   const { schoolSlug } = await params
-  const tenant = await resolveTenantBySlug(schoolSlug)
-  await requireAdmin(tenant.id)
+  const { tenant } = await gateAdmin(schoolSlug)
   const { saved } = await searchParams
 
   const today = new Date().toISOString().split('T')[0]
   const [{ data: settingsData }, { data: winnersData }] = await Promise.all([
-    supabaseAdmin.from('contest_settings').select('*').eq('school_id', tenant.id).single(),
+    supabaseAdmin
+      .from('contest_settings')
+      .select('period_start, next_reset_date, prize_description')
+      .eq('school_id', tenant.id)
+      .single(),
     supabaseAdmin
       .from('contest_winners')
-      .select('*, users(full_name, email)')
+      .select('id, period_label, paid_at, created_at, users(full_name, email)')
       .eq('school_id', tenant.id)
       .order('created_at', { ascending: false }),
   ])
@@ -34,7 +36,7 @@ export default async function AdminContestPage({ params, searchParams }: { param
     p_start: settings.period_start,
     p_end: settings.next_reset_date ?? today,
   })
-  const winners = (winnersData ?? []) as Array<{
+  const winners = (winnersData ?? []) as unknown as Array<{
     id: string
     users: { full_name: string; email: string } | null
     period_label: string

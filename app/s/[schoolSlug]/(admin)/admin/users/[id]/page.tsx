@@ -1,7 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { requireAdmin } from '@/lib/auth'
+import { gateAdmin } from '@/lib/auth'
 import { updateUserInfo } from '@/app/actions/admin'
-import { resolveTenantBySlug } from '@/lib/tenant'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import SubmitButton from '@/components/ui/SubmitButton'
@@ -12,8 +11,7 @@ export default async function EditUserPage({
   params: Promise<{ schoolSlug: string; id: string }>
 }) {
   const { schoolSlug, id } = await params
-  const tenant = await resolveTenantBySlug(schoolSlug)
-  await requireAdmin(tenant.id)
+  const { tenant } = await gateAdmin(schoolSlug)
   const backPath = `/s/${schoolSlug}/admin/users`
 
   // Cross-tenant guard: admin of Sage shouldn't be able to edit an

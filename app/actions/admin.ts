@@ -99,9 +99,8 @@ export async function adminUpdatePendingUnitTitle(schoolSlug: string, unitId: st
 
 export async function adminMoveMaterialToUnit(schoolSlug: string, materialId: string, newUnitId: string) {
   const { tenant } = await gateAdmin(schoolSlug)
-  // Both rows must belong to this tenant; the FK/unique constraints
-  // from migration 0004 would catch a cross-tenant attempt but this is
-  // explicit and fails fast with a better error.
+  // FK constraints would also catch a cross-tenant attempt, but the explicit
+  // school_id filter fails fast with a clearer error.
   await supabaseAdmin
     .from('materials')
     .update({ unit_id: newUnitId })
@@ -203,22 +202,24 @@ export async function updateContestSettings(
 
 export async function chooseContestWinner(schoolSlug: string, userId: string, periodLabel: string, periodStart: string, periodEnd: string) {
   const { tenant } = await gateAdmin(schoolSlug)
-  await supabaseAdmin.from('contest_winners').insert({
-    school_id: tenant.id,
-    user_id: userId,
-    period_label: periodLabel,
-    period_start: periodStart,
-    period_end: periodEnd,
-  })
   // Advance the period to next month's 1st
   const next = new Date(periodEnd + 'T00:00:00')
   next.setMonth(next.getMonth() + 1)
   next.setDate(1)
   const nextReset = next.toISOString().split('T')[0]
-  await supabaseAdmin
-    .from('contest_settings')
-    .update({ period_start: periodEnd, next_reset_date: nextReset })
-    .eq('school_id', tenant.id)
+  await Promise.all([
+    supabaseAdmin.from('contest_winners').insert({
+      school_id: tenant.id,
+      user_id: userId,
+      period_label: periodLabel,
+      period_start: periodStart,
+      period_end: periodEnd,
+    }),
+    supabaseAdmin
+      .from('contest_settings')
+      .update({ period_start: periodEnd, next_reset_date: nextReset })
+      .eq('school_id', tenant.id),
+  ])
   revalidatePath('/s/[schoolSlug]/admin/contest', 'page')
   revalidatePath('/s/[schoolSlug]/leaderboard', 'page')
 }

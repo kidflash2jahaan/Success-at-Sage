@@ -37,9 +37,6 @@ body {
 select option { background: #0d0f24; color: white; }
 
 /* ─── Blob animations ─── */
-/* Wider translations + rotation + opacity pulse so the gradient-bright spots
-   inside each blob (radial-gradients offset off-center) visibly swim around.
-   Disabled via prefers-reduced-motion below. */
 @keyframes blob-1 {
   0%   { transform: translate(0, 0) scale(1) rotate(0deg);           opacity: 1;    }
   20%  { transform: translate(32%, 22%) scale(1.18) rotate(45deg);   opacity: 0.85; }
@@ -71,8 +68,7 @@ select option { background: #0d0f24; color: white; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* Targeted at BlobBackground — keep gradients visible, stop the motion. */
-  [aria-hidden="true"] > div[style*="blob-"] { animation: none !important; }
+  .blob-bg-layer { animation: none !important; }
 }
 
 /* ─── Page / element entry animations ─── */

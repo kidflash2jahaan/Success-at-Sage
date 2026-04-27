@@ -1,16 +1,16 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { resolveTenantBySlug } from '@/lib/tenant'
-import { requireAdmin } from '@/lib/auth'
+import { gateAdmin } from '@/lib/auth'
 import { dismissReport, resolveReportAndDeleteMaterial } from '@/app/actions/reports'
+import { type MaterialReportStatus } from '@/lib/db/schema'
 import SubmitButton from '@/components/ui/SubmitButton'
 import { redirect } from 'next/navigation'
 
 type ReportRow = {
   id: string
   reason: string
-  status: 'pending' | 'resolved' | 'dismissed'
+  status: MaterialReportStatus
   created_at: string
   material_id: string
   materials: { id: string; title: string; type: 'note' | 'test' } | null
@@ -23,8 +23,7 @@ export default async function AdminReportsPage({
   params: Promise<{ schoolSlug: string }>
 }) {
   const { schoolSlug } = await params
-  const tenant = await resolveTenantBySlug(schoolSlug)
-  await requireAdmin(tenant.id)
+  const { tenant } = await gateAdmin(schoolSlug)
 
   const { data } = await supabaseAdmin
     .from('material_reports')

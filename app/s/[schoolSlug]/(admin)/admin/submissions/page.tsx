@@ -16,7 +16,7 @@ export default async function SubmissionsPage({
   const [{ data: materialsData }, { data: unitsData }, { data: approvedUnitsData }, { data: coursesData }] = await Promise.all([
     supabaseAdmin
       .from('materials')
-      .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, created_at, users!uploaded_by(full_name, email), units!unit_id(title, courses(name))')
+      .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, unit_id, created_at, users!uploaded_by(full_name, email), units!unit_id(title, courses(name))')
       .eq('status', 'pending')
       .eq('school_id', tenant.id)
       .order('created_at', { ascending: false }),
@@ -39,16 +39,12 @@ export default async function SubmissionsPage({
       .order('name'),
   ])
 
-  const pendingUnitIds = (unitsData ?? []).map((u: any) => u.id)
+  // Count pending materials per pending unit by reducing materialsData (which
+  // already includes every pending material in this tenant) — saves a DB roundtrip.
+  const pendingUnitIdSet = new Set((unitsData ?? []).map((u: any) => u.id as string))
   const materialCountsByUnit: Record<string, number> = {}
-  if (pendingUnitIds.length > 0) {
-    const { data: counts } = await supabaseAdmin
-      .from('materials')
-      .select('unit_id')
-      .in('unit_id', pendingUnitIds)
-      .eq('status', 'pending')
-      .eq('school_id', tenant.id)
-    for (const m of (counts ?? []) as { unit_id: string }[]) {
+  for (const m of (materialsData ?? []) as { unit_id: string }[]) {
+    if (pendingUnitIdSet.has(m.unit_id)) {
       materialCountsByUnit[m.unit_id] = (materialCountsByUnit[m.unit_id] ?? 0) + 1
     }
   }

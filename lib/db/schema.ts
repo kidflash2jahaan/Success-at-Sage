@@ -6,6 +6,7 @@ export const contentTypeEnum = pgEnum('content_type', ['pdf', 'richtext'])
 export const statusEnum = pgEnum('status', ['pending', 'approved', 'rejected'])
 export const schoolRequestStatusEnum = pgEnum('school_request_status', ['pending', 'approved', 'rejected'])
 export const materialReportStatusEnum = pgEnum('material_report_status', ['pending', 'resolved', 'dismissed'])
+export type MaterialReportStatus = (typeof materialReportStatusEnum.enumValues)[number]
 
 // ============================================================================
 // Tenant-management tables
