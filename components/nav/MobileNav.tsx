@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { motion } from 'motion/react'
 
 type Tab = {
   path: string
@@ -63,7 +64,10 @@ export default function MobileNav({ schoolSlug }: { schoolSlug: string }) {
   const basePath = `/s/${schoolSlug}`
 
   return (
-    <nav
+    <motion.nav
+      initial={{ y: 80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 220, damping: 26, delay: 0.05 }}
       className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-nav border-t border-white/[0.07] flex items-end justify-around px-1"
       style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 6px)', paddingTop: '8px' }}
     >
@@ -75,17 +79,31 @@ export default function MobileNav({ schoolSlug }: { schoolSlug: string }) {
           <Link
             key={tab.path}
             href={href}
-            className={`flex flex-col items-center gap-0.5 min-w-0 flex-1 transition-colors ${
+            className={`relative flex flex-col items-center gap-0.5 min-w-0 flex-1 transition-colors ${
               isSubmit ? 'pb-1' : active ? 'text-violet-400' : 'text-white/30'
             }`}
           >
-            {tab.icon(active)}
+            {/* Animated active-tab indicator — slides between tabs via shared layoutId */}
+            {active && !isSubmit && (
+              <motion.span
+                layoutId="mobileNavActive"
+                className="absolute inset-x-2 inset-y-0 rounded-xl bg-violet-500/10 border border-violet-400/20"
+                transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+              />
+            )}
+            <motion.span
+              className="relative z-10"
+              whileTap={{ scale: 0.85 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 24 }}
+            >
+              {tab.icon(active)}
+            </motion.span>
             {!isSubmit && (
-              <span className="text-[10px] font-medium leading-none">{tab.label}</span>
+              <span className="relative z-10 text-[10px] font-medium leading-none">{tab.label}</span>
             )}
           </Link>
         )
       })}
-    </nav>
+    </motion.nav>
   )
 }

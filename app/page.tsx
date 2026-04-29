@@ -5,6 +5,9 @@ import { getCurrentUser } from '@/lib/auth'
 import { isSuperadmin } from '@/lib/superadmin'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
+import MotionFadeUp from '@/components/motion/MotionFadeUp'
+import { MotionStagger, MotionItem } from '@/components/motion/MotionStagger'
+import MotionCard from '@/components/motion/MotionCard'
 
 /**
  * Root landing — the generic parent brand.
@@ -66,61 +69,74 @@ export default async function RootLanding() {
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 text-center relative">
         <div className="max-w-2xl w-full">
-          <div className="animate-fade-in-down inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-300 glass px-4 py-2 rounded-full mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-400 inline-block" />
-            The study platform for high schools
-          </div>
+          <MotionFadeUp delay={0} y={-8}>
+            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-violet-300 glass px-4 py-2 rounded-full mb-8">
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-400 inline-block animate-pulse" />
+              The study platform for high schools
+            </div>
+          </MotionFadeUp>
 
-          <h1 className="animate-fade-up stagger-2 text-5xl sm:text-6xl font-bold text-white mb-5 leading-[1.1] tracking-tight">
-            Study smarter.<br />
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              Ace every test.
-            </span>
-          </h1>
+          <MotionFadeUp delay={0.12}>
+            <h1 className="text-5xl sm:text-6xl font-bold text-white mb-5 leading-[1.1] tracking-tight">
+              Study smarter.<br />
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  backgroundSize: '200% 200%',
+                  animation: 'gradient-pan 6s ease-in-out infinite',
+                }}
+              >
+                Ace every test.
+              </span>
+            </h1>
+          </MotionFadeUp>
 
-          <p className="animate-fade-up stagger-3 text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed">
-            Student-submitted study notes and practice tests, organized by course and unit —
-            built for each high school, by its own students.
-          </p>
+          <MotionFadeUp delay={0.22}>
+            <p className="text-lg text-white/50 mb-10 max-w-lg mx-auto leading-relaxed">
+              Student-submitted study notes and practice tests, organized by course and unit —
+              built for each high school, by its own students.
+            </p>
+          </MotionFadeUp>
 
-          <div className="animate-fade-up stagger-4 flex items-center justify-center gap-3 flex-wrap">
-            <Link
-              href="/signup"
-              className="btn-press btn-glow font-semibold text-white bg-violet-600 hover:bg-violet-500 px-7 py-3 rounded-xl text-base transition-all hover:shadow-[0_0_30px_rgba(124,58,237,0.35)]"
-            >
-              Create Free Account
-            </Link>
-            <Link
-              href="/request-school"
-              className="btn-press font-semibold text-white/80 hover:text-white glass px-7 py-3 rounded-xl text-base transition-all hover:bg-white/[0.08]"
-            >
-              Bring it to your school
-            </Link>
-          </div>
+          <MotionFadeUp delay={0.32}>
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <Link
+                href="/signup"
+                className="btn-press btn-glow font-semibold text-white bg-violet-600 hover:bg-violet-500 px-7 py-3 rounded-xl text-base transition-all hover:shadow-[0_0_30px_rgba(124,58,237,0.35)]"
+              >
+                Create Free Account
+              </Link>
+              <Link
+                href="/request-school"
+                className="btn-press font-semibold text-white/80 hover:text-white glass px-7 py-3 rounded-xl text-base transition-all hover:bg-white/[0.08]"
+              >
+                Bring it to your school
+              </Link>
+            </div>
+          </MotionFadeUp>
 
           {schools.length > 0 && (
-            <div className="animate-fade-up stagger-6 mt-14">
-              <p className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-4">Participating schools</p>
-              <div className="flex items-center justify-center gap-3 flex-wrap">
-                {schools.map(s => (
-                  <Link
-                    key={s.slug}
-                    href={`/s/${s.slug}`}
-                    className="glass px-5 py-2.5 rounded-xl flex items-center gap-3 hover:bg-white/[0.08] transition-colors group"
-                  >
-                    <span className="text-sm font-semibold text-white group-hover:text-violet-300 transition-colors">{s.display_short}</span>
-                    <span className="text-xs text-white/30">Success at {s.display_short} →</span>
-                  </Link>
-                ))}
+            <MotionFadeUp delay={0.5}>
+              <div className="mt-14">
+                <p className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-4">Participating schools</p>
+                <MotionStagger className="flex items-center justify-center gap-3 flex-wrap" delayChildren={0.6} staggerChildren={0.08}>
+                  {schools.map(s => (
+                    <MotionItem key={s.slug}>
+                      <MotionCard
+                        href={`/s/${s.slug}`}
+                        className="glass px-5 py-2.5 rounded-xl flex items-center gap-3 hover:bg-white/[0.08] transition-colors group"
+                      >
+                        <span className="text-sm font-semibold text-white group-hover:text-violet-300 transition-colors">{s.display_short}</span>
+                        <span className="text-xs text-white/30">Success at {s.display_short} →</span>
+                      </MotionCard>
+                    </MotionItem>
+                  ))}
+                </MotionStagger>
               </div>
-            </div>
+            </MotionFadeUp>
           )}
         </div>
       </main>

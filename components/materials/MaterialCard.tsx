@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { motion } from 'motion/react'
 import { incrementViewCount } from '@/app/actions/materials'
 import { fileNameFromPath, openAttachment } from '@/lib/utils/attachments'
 import MaterialViewer from './MaterialViewer'
@@ -64,7 +65,11 @@ export default function MaterialCard({
   }
 
   return (
-    <div className="glass rounded-xl overflow-hidden card-hover transition-all hover:border-white/[0.13]">
+    <motion.div
+      className="glass rounded-xl overflow-hidden card-hover hover:border-white/[0.13]"
+      whileHover={{ y: -3 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+    >
       <button
         onClick={handleOpen}
         className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-white/[0.04] transition-colors"
@@ -134,6 +139,6 @@ export default function MaterialCard({
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

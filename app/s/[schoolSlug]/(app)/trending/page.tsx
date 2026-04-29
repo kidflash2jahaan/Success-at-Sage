@@ -2,6 +2,9 @@ export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import Link from 'next/link'
+import MotionFadeUp from '@/components/motion/MotionFadeUp'
+import { MotionStagger, MotionItem } from '@/components/motion/MotionStagger'
+import AnimatedCounter from '@/components/motion/AnimatedCounter'
 
 interface TrendingMaterial {
   id: string
@@ -37,70 +40,81 @@ export default async function TrendingPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      <div className="animate-fade-up mb-10">
-        <h1 className="text-3xl font-bold text-white tracking-tight mb-1">Trending</h1>
-        <p className="text-white/40 text-sm">Most-viewed materials of all time</p>
-      </div>
+      <MotionFadeUp>
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-1">Trending</h1>
+          <p className="text-white/40 text-sm">Most-viewed materials of all time</p>
+        </div>
+      </MotionFadeUp>
 
       {materials.length === 0 ? (
-        <div className="glass rounded-2xl px-6 py-14 text-center text-white/25 text-sm">
-          No materials yet.
-        </div>
+        <MotionFadeUp delay={0.1}>
+          <div className="glass rounded-2xl px-6 py-14 text-center text-white/25 text-sm">
+            No materials yet.
+          </div>
+        </MotionFadeUp>
       ) : (
-        <div className="flex flex-col gap-2">
+        <MotionStagger className="flex flex-col gap-2" staggerChildren={0.03} delayChildren={0.12}>
           {materials.map((m, i) => {
             const isTop3 = i < 3
             const barWidth = topViewCount > 0 ? Math.max(4, Math.round((m.viewCount / topViewCount) * 100)) : 4
             const rankColors = ['#fbbf24', '#94a3b8', '#b87333']
 
             return (
-              <Link
-                key={m.id}
-                href={`/courses/${m.courseSlug}/units/${m.unitId}`}
-                className="animate-fade-up glass rounded-xl px-5 py-4 flex items-center gap-4 transition-all hover:bg-white/[0.06] group"
-                style={{ animationDelay: `${0.04 + i * 0.03}s` }}
-              >
-                <div className="w-7 shrink-0 text-center">
-                  {isTop3 ? (
-                    <span className="text-sm font-bold" style={{ color: rankColors[i], textShadow: `0 0 10px ${rankColors[i]}50` }}>
-                      #{i + 1}
-                    </span>
-                  ) : (
-                    <span className="text-xs text-white/20 font-medium">#{i + 1}</span>
-                  )}
-                </div>
+              <MotionItem key={m.id}>
+                <Link
+                  href={`/courses/${m.courseSlug}/units/${m.unitId}`}
+                  className="glass rounded-xl px-5 py-4 flex items-center gap-4 transition-all hover:bg-white/[0.06] hover:translate-y-[-2px] group"
+                >
+                  <div className="w-7 shrink-0 text-center">
+                    {isTop3 ? (
+                      <span
+                        className="text-sm font-bold"
+                        style={{
+                          color: rankColors[i],
+                          textShadow: `0 0 10px ${rankColors[i]}50`,
+                          animation: i === 0 ? 'glow-pulse 2.5s ease-in-out infinite' : undefined,
+                        }}
+                      >
+                        #{i + 1}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-white/20 font-medium">#{i + 1}</span>
+                    )}
+                  </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="text-white/90 text-sm font-medium truncate group-hover:text-white transition-colors">
-                    {m.title}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white/90 text-sm font-medium truncate group-hover:text-white transition-colors">
+                      {m.title}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-white/30 text-xs truncate">{m.courseName}</span>
+                      <span className="text-white/15 text-xs">·</span>
+                      <span className="text-white/20 text-xs truncate">{m.unitTitle}</span>
+                    </div>
+                    <div className="mt-1.5 h-0.5 rounded-full bg-white/[0.06] overflow-hidden w-full max-w-[120px]">
+                      <div
+                        className="h-full rounded-full transition-all duration-1000 ease-out"
+                        style={{
+                          width: `${barWidth}%`,
+                          background: isTop3 ? rankColors[i] : 'rgba(255,255,255,0.2)',
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-white/30 text-xs truncate">{m.courseName}</span>
-                    <span className="text-white/15 text-xs">·</span>
-                    <span className="text-white/20 text-xs truncate">{m.unitTitle}</span>
-                  </div>
-                  <div className="mt-1.5 h-0.5 rounded-full bg-white/[0.06] overflow-hidden w-full max-w-[120px]">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${barWidth}%`,
-                        background: isTop3 ? rankColors[i] : 'rgba(255,255,255,0.2)',
-                      }}
-                    />
-                  </div>
-                </div>
 
-                <div className="shrink-0 text-right">
-                  <div className={`text-sm font-bold ${isTop3 ? '' : 'text-white/40'}`}
-                    style={isTop3 ? { color: rankColors[i] } : undefined}>
-                    {m.viewCount.toLocaleString()}
+                  <div className="shrink-0 text-right">
+                    <div className={`text-sm font-bold ${isTop3 ? '' : 'text-white/40'}`}
+                      style={isTop3 ? { color: rankColors[i] } : undefined}>
+                      <AnimatedCounter value={m.viewCount} duration={1.0} />
+                    </div>
+                    <div className="text-white/20 text-xs">views</div>
                   </div>
-                  <div className="text-white/20 text-xs">views</div>
-                </div>
-              </Link>
+                </Link>
+              </MotionItem>
             )
           })}
-        </div>
+        </MotionStagger>
       )}
     </div>
   )

@@ -1,5 +1,6 @@
 'use client'
 import { useState, useTransition } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import { reportMaterial } from '@/app/actions/reports'
 
 type Status = { kind: 'idle' } | { kind: 'done' } | { kind: 'error'; msg: string }
@@ -46,13 +47,22 @@ export default function ReportButton({
         </svg>
       </button>
 
+      <AnimatePresence>
       {open && (
-        <div
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           onClick={e => { e.stopPropagation(); setOpen(false) }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: 'rgba(6, 6, 15, 0.7)', backdropFilter: 'blur(4px)' }}
+          style={{ background: 'rgba(6, 6, 15, 0.7)', backdropFilter: 'blur(8px)' }}
         >
-          <div
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 12 }}
+            transition={{ type: 'spring', stiffness: 360, damping: 28 }}
             onClick={e => e.stopPropagation()}
             className="glass rounded-2xl p-6 w-full max-w-md"
           >
@@ -109,9 +119,10 @@ export default function ReportButton({
                 </div>
               </>
             )}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </>
   )
 }

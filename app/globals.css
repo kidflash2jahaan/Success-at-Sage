@@ -98,6 +98,32 @@ select option { background: #0d0f24; color: white; }
   100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
 }
 
+/* Slow pan over the gradient on hero text — keeps it alive without
+   distracting the reader. Runs forever. */
+@keyframes gradient-pan {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* Soft drift for badges / accents — subtle vertical bob */
+@keyframes float-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+.animate-float-bob { animation: float-bob 4s ease-in-out infinite; }
+
+/* Glow-pulse for important indicators — used on live status dots, etc. */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+}
+
 /* ─── Animation utility classes ─── */
 .animate-fade-up       { animation: fade-up       0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
 .animate-fade-in       { animation: fade-in       0.4s  ease-out both; }

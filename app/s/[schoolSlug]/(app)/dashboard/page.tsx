@@ -5,6 +5,9 @@ import { getUserCourses } from '@/lib/db/queries/courses'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { resolveTenantBySlug } from '@/lib/tenant'
 import Link from 'next/link'
+import MotionFadeUp from '@/components/motion/MotionFadeUp'
+import { MotionStagger, MotionItem } from '@/components/motion/MotionStagger'
+import MotionCard from '@/components/motion/MotionCard'
 
 export default async function DashboardPage({ params }: { params: Promise<{ schoolSlug: string }> }) {
   const { schoolSlug } = await params
@@ -42,60 +45,64 @@ export default async function DashboardPage({ params }: { params: Promise<{ scho
 
   return (
     <div className="p-6">
-      {/* Prize banner — hidden when the school has the prize toggled off */}
       {tenant.prizeEnabled && (
-        <Link href={`/s/${schoolSlug}/leaderboard`} className="animate-fade-up block mb-6 glass border border-amber-500/20 hover:border-amber-500/40 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 transition-colors group">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🎁</span>
-            <div>
-              <div className="text-white font-semibold text-sm">Win a {prize} this month</div>
-              <div className="text-white/40 text-xs mt-0.5">
-                Submit approved notes to climb the leaderboard{resetDate ? ` · Resets ${resetDate}` : ''}
+        <MotionFadeUp delay={0}>
+          <Link href={`/s/${schoolSlug}/leaderboard`} className="block mb-6 glass border border-amber-500/20 hover:border-amber-500/40 rounded-2xl px-5 py-4 flex items-center justify-between gap-4 transition-colors group">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl animate-float-bob inline-block">🎁</span>
+              <div>
+                <div className="text-white font-semibold text-sm">Win a {prize} this month</div>
+                <div className="text-white/40 text-xs mt-0.5">
+                  Submit approved notes to climb the leaderboard{resetDate ? ` · Resets ${resetDate}` : ''}
+                </div>
               </div>
             </div>
-          </div>
-          <span className="text-amber-400/60 group-hover:text-amber-400 text-sm transition-colors shrink-0">View rankings →</span>
-        </Link>
+            <span className="text-amber-400/60 group-hover:text-amber-400 text-sm transition-colors shrink-0 group-hover:translate-x-1 transition-transform">View rankings →</span>
+          </Link>
+        </MotionFadeUp>
       )}
 
-      <div className="animate-fade-up mb-6 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">My Courses</h1>
-          <p className="text-white/40 text-sm mt-1">{userCourses.length} course{userCourses.length !== 1 ? 's' : ''} in your schedule</p>
-        </div>
-        <Link href={`/s/${schoolSlug}/browse`} className="btn-press mt-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/30 hover:text-white glass px-3 py-2 rounded-xl transition-all hover:bg-white/[0.07]">
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add Courses
-        </Link>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {userCourses.map(({ course, department }, i) => (
-          <Link
-            key={course.id}
-            href={`/s/${schoolSlug}/courses/${course.slug}`}
-            className="animate-fade-up card-hover glass rounded-2xl p-5 transition-all hover:bg-white/[0.07] hover:border-white/[0.14] group"
-            style={{ animationDelay: `${i * 0.06}s` }}
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div
-                className="w-2 h-2 rounded-full"
-                style={{ background: department.colorAccent, boxShadow: `0 0 8px ${department.colorAccent}80` }}
-              />
-              <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: department.colorAccent }}>
-                {department.name}
-              </div>
-            </div>
-            <div className="text-white font-semibold leading-snug group-hover:text-white/90">{course.name}</div>
-            <div className="mt-2 flex items-center gap-2">
-              <span className="text-[11px] text-white/25">{course.unitCount} unit{course.unitCount !== 1 ? 's' : ''}</span>
-              <span className="text-white/15 text-[11px]">·</span>
-              <span className="text-[11px] text-white/25">{course.materialCount} material{course.materialCount !== 1 ? 's' : ''}</span>
-            </div>
+      <MotionFadeUp delay={0.08}>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-white tracking-tight">My Courses</h1>
+            <p className="text-white/40 text-sm mt-1">{userCourses.length} course{userCourses.length !== 1 ? 's' : ''} in your schedule</p>
+          </div>
+          <Link href={`/s/${schoolSlug}/browse`} className="btn-press mt-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-white/30 hover:text-white glass px-3 py-2 rounded-xl transition-all hover:bg-white/[0.07]">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Courses
           </Link>
+        </div>
+      </MotionFadeUp>
+
+      <MotionStagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" delayChildren={0.16} staggerChildren={0.06}>
+        {userCourses.map(({ course, department }) => (
+          <MotionItem key={course.id}>
+            <MotionCard
+              href={`/s/${schoolSlug}/courses/${course.slug}`}
+              className="card-hover glass rounded-2xl p-5 transition-all hover:bg-white/[0.07] hover:border-white/[0.14] group block"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: department.colorAccent, boxShadow: `0 0 8px ${department.colorAccent}80` }}
+                />
+                <div className="text-xs font-semibold uppercase tracking-widest" style={{ color: department.colorAccent }}>
+                  {department.name}
+                </div>
+              </div>
+              <div className="text-white font-semibold leading-snug group-hover:text-white/90">{course.name}</div>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-[11px] text-white/25">{course.unitCount} unit{course.unitCount !== 1 ? 's' : ''}</span>
+                <span className="text-white/15 text-[11px]">·</span>
+                <span className="text-[11px] text-white/25">{course.materialCount} material{course.materialCount !== 1 ? 's' : ''}</span>
+              </div>
+            </MotionCard>
+          </MotionItem>
         ))}
-      </div>
+      </MotionStagger>
     </div>
   )
 }

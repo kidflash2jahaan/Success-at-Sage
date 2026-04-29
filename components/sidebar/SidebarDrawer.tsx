@@ -1,5 +1,6 @@
 'use client'
 import { useEffect } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import Sidebar from './Sidebar'
 
 interface SidebarCourse {
@@ -25,16 +26,31 @@ export default function SidebarDrawer({ schoolSlug, courses, activeCourseSlug, o
   }, [open])
 
   return (
-    <>
+    <AnimatePresence>
       {open && (
-        <div
-          className="fixed inset-0 bg-black/60 z-40 md:hidden"
-          onClick={onClose}
-        />
+        <>
+          <motion.div
+            key="scrim"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/60 z-40 md:hidden"
+            onClick={onClose}
+            style={{ backdropFilter: 'blur(6px)' }}
+          />
+          <motion.div
+            key="drawer"
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ type: 'spring', stiffness: 360, damping: 36 }}
+            className="fixed inset-y-0 left-0 z-50 md:hidden"
+          >
+            <Sidebar schoolSlug={schoolSlug} courses={courses} activeCourseSlug={activeCourseSlug} onClose={onClose} />
+          </motion.div>
+        </>
       )}
-      <div className={`fixed inset-y-0 left-0 z-50 md:hidden transition-transform duration-200 ${open ? 'translate-x-0' : '-translate-x-full'}`}>
-        <Sidebar schoolSlug={schoolSlug} courses={courses} activeCourseSlug={activeCourseSlug} onClose={onClose} />
-      </div>
-    </>
+    </AnimatePresence>
   )
 }

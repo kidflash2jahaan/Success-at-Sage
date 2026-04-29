@@ -4,6 +4,9 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 import { resolveTenantBySlug } from '@/lib/tenant'
 import { getCurrentUser, calculateGrade } from '@/lib/auth'
 import Link from 'next/link'
+import MotionFadeUp from '@/components/motion/MotionFadeUp'
+import { MotionStagger, MotionItem } from '@/components/motion/MotionStagger'
+import AnimatedCounter from '@/components/motion/AnimatedCounter'
 
 interface LeaderEntry {
   id: string
@@ -68,25 +71,28 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ sc
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
-      {/* Prize banner — hidden when the school has the prize toggled off */}
       {tenant.prizeEnabled && (
-        <div className="animate-fade-up mb-8 glass rounded-2xl px-6 py-5 text-center border border-amber-500/20">
-          <div className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-1">Monthly Prize</div>
-          <div className="text-2xl font-bold text-white mb-1">{prize}</div>
-          {resetDate && (
-            <div className="text-white/40 text-sm">
-              Winner chosen on <span className="text-white/70 font-medium">{resetDate}</span>
-            </div>
-          )}
-        </div>
+        <MotionFadeUp delay={0}>
+          <div className="mb-8 glass rounded-2xl px-6 py-5 text-center border border-amber-500/20 animate-float-bob">
+            <div className="text-amber-400 text-xs font-bold uppercase tracking-widest mb-1">Monthly Prize</div>
+            <div className="text-2xl font-bold text-white mb-1">{prize}</div>
+            {resetDate && (
+              <div className="text-white/40 text-sm">
+                Winner chosen on <span className="text-white/70 font-medium">{resetDate}</span>
+              </div>
+            )}
+          </div>
+        </MotionFadeUp>
       )}
 
-      <div className="animate-fade-up mb-10 text-center">
-        <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Top Contributors</h1>
-        <p className="text-white/40 text-sm">
-          Ranked by approved submissions this period
-        </p>
-      </div>
+      <MotionFadeUp delay={0.08}>
+        <div className="mb-10 text-center">
+          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Top Contributors</h1>
+          <p className="text-white/40 text-sm">
+            Ranked by approved submissions this period
+          </p>
+        </div>
+      </MotionFadeUp>
 
       {user && myRank > 0 && (
         <div className="animate-fade-up stagger-2 glass rounded-xl px-5 py-3.5 mb-6 flex items-center justify-between">
@@ -113,11 +119,13 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ sc
       )}
 
       {entries.length === 0 ? (
-        <div className="glass rounded-2xl px-6 py-14 text-center text-white/25 text-sm">
-          No submissions yet this period — be the first!
-        </div>
+        <MotionFadeUp delay={0.2}>
+          <div className="glass rounded-2xl px-6 py-14 text-center text-white/25 text-sm">
+            No submissions yet this period — be the first!
+          </div>
+        </MotionFadeUp>
       ) : (
-        <div className="flex flex-col gap-2">
+        <MotionStagger className="flex flex-col gap-2" staggerChildren={0.045} delayChildren={0.2}>
           {entries.map((entry, i) => {
             const rank = i + 1
             const isMe = user?.id === entry.id
@@ -126,17 +134,21 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ sc
             const { label } = calculateGrade(entry.graduatingYear)
 
             return (
-              <div
+              <MotionItem
                 key={entry.id}
-                className="animate-fade-up glass rounded-xl px-5 py-4 flex items-center gap-4 transition-all hover:bg-white/[0.06]"
-                style={{
-                  animationDelay: `${0.05 + i * 0.045}s`,
-                  ...(isMe ? { borderColor: 'rgba(124,58,237,0.35)' } : {}),
-                }}
+                className="glass rounded-xl px-5 py-4 flex items-center gap-4 transition-all hover:bg-white/[0.06] hover:translate-y-[-1px]"
+                style={isMe ? { borderColor: 'rgba(124,58,237,0.35)' } : undefined}
               >
                 <div className="w-8 shrink-0 text-center">
                   {medalColor ? (
-                    <span className="text-base font-bold" style={{ color: medalColor, textShadow: `0 0 12px ${medalColor}60` }}>
+                    <span
+                      className="text-base font-bold inline-block"
+                      style={{
+                        color: medalColor,
+                        textShadow: `0 0 12px ${medalColor}60`,
+                        animation: rank === 1 ? 'glow-pulse 2.5s ease-in-out infinite' : undefined,
+                      }}
+                    >
                       #{rank}
                     </span>
                   ) : (
@@ -158,19 +170,21 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ sc
                 <div className="flex items-center gap-4 shrink-0">
                   <div className="text-right">
                     <div className="text-sm font-bold" style={{ color: medalColor ?? 'rgba(255,255,255,0.7)' }}>
-                      {entry.submissionCount}
+                      <AnimatedCounter value={entry.submissionCount} duration={0.9} />
                     </div>
                     <div className="text-white/25 text-xs">submitted</div>
                   </div>
                   <div className="text-right hidden sm:block">
-                    <div className="text-sm font-semibold text-white/50">{entry.totalViews}</div>
+                    <div className="text-sm font-semibold text-white/50">
+                      <AnimatedCounter value={entry.totalViews} duration={1.1} />
+                    </div>
                     <div className="text-white/25 text-xs">views</div>
                   </div>
                 </div>
-              </div>
+              </MotionItem>
             )
           })}
-        </div>
+        </MotionStagger>
       )}
     </div>
   )
