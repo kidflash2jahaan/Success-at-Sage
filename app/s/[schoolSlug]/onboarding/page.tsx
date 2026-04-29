@@ -2,7 +2,6 @@ import { completeOnboarding } from '@/app/actions/auth'
 import { getUser } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { resolveTenantBySlug } from '@/lib/tenant'
-import { getGraduatingYearOptions } from '@/lib/grade'
 import SubmitButton from '@/components/ui/SubmitButton'
 import { redirect } from 'next/navigation'
 
@@ -18,8 +17,6 @@ export default async function OnboardingPage({ params }: { params: Promise<{ sch
     .eq('id', authUser.id)
     .single()
   if (existing) redirect(`/s/${schoolSlug}/dashboard`)
-
-  const years = getGraduatingYearOptions()
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -38,18 +35,6 @@ export default async function OnboardingPage({ params }: { params: Promise<{ sch
                 defaultValue={authUser.user_metadata?.full_name ?? ''}
                 className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
               />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Graduating Year</label>
-              <select
-                name="graduatingYear"
-                required
-                className="glass-input w-full rounded-xl px-4 py-2.5 text-sm"
-              >
-                {years.map(({ year, label }) => (
-                  <option key={year} value={year}>{year} — {label}</option>
-                ))}
-              </select>
             </div>
             <SubmitButton
               pendingLabel="Setting up..."

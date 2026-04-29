@@ -2,6 +2,7 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { resolveTenantByEmail } from '@/lib/tenant'
+import { deriveGraduatingYearFromEmail } from '@/lib/grade'
 import { redirect } from 'next/navigation'
 
 /**
@@ -21,7 +22,10 @@ export async function signUpWithEmail(formData: FormData) {
   const email = ((formData.get('email') as string) ?? '').trim().toLowerCase()
   const password = formData.get('password') as string
   const fullName = formData.get('fullName') as string
-  const graduatingYear = parseInt(formData.get('graduatingYear') as string)
+  // Graduating year is auto-derived from the school's email convention:
+  // first two digits → class of 20NN. Faculty / staff / non-conforming
+  // emails fall through to UNKNOWN_GRADUATING_YEAR ("Other").
+  const graduatingYear = deriveGraduatingYearFromEmail(email)
 
   const tenant = await resolveTenantByEmail(email)
   if (!tenant) {

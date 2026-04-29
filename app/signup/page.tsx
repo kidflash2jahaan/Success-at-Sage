@@ -1,6 +1,5 @@
 'use client'
 import { signUpWithEmail } from '@/app/actions/signup'
-import { getGraduatingYearOptions } from '@/lib/grade'
 import SubmitButton from '@/components/ui/SubmitButton'
 import FooterLinks from '@/components/legal/FooterLinks'
 import Link from 'next/link'
@@ -15,7 +14,6 @@ const ERRORS: Record<string, string> = {
 function SignupForm() {
   const params = useSearchParams()
   const errorMessage = ERRORS[params.get('error') ?? '']
-  const years = getGraduatingYearOptions()
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -58,14 +56,6 @@ function SignupForm() {
               <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Password</label>
               <input name="password" type="password" required placeholder="Min. 8 characters" minLength={8}
                 className="glass-input w-full rounded-xl px-4 py-2.5 text-sm" />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-white/50 mb-1.5 uppercase tracking-wider">Graduating Year</label>
-              <select name="graduatingYear" required className="glass-input w-full rounded-xl px-4 py-2.5 text-sm">
-                {years.map(({ year, label }) => (
-                  <option key={year} value={year}>{year} — {label}</option>
-                ))}
-              </select>
             </div>
             <SubmitButton
               pendingLabel="Creating account..."

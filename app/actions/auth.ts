@@ -2,6 +2,7 @@
 import { getUser } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 import { resolveTenantByEmail, resolveTenantBySlug } from '@/lib/tenant'
+import { deriveGraduatingYearFromEmail } from '@/lib/grade'
 import { redirect } from 'next/navigation'
 
 export async function completeOnboarding(formData: FormData) {
@@ -9,8 +10,11 @@ export async function completeOnboarding(formData: FormData) {
   if (!authUser) redirect('/login')
 
   const fullName = formData.get('fullName') as string
-  const graduatingYear = parseInt(formData.get('graduatingYear') as string)
   const email = (authUser.email ?? '').trim().toLowerCase()
+  // Auto-derive graduating year from the email's two-digit prefix
+  // (school convention: 29pardhananij@... → class of 2029). Non-conforming
+  // emails fall through to UNKNOWN_GRADUATING_YEAR ("Other").
+  const graduatingYear = deriveGraduatingYearFromEmail(email)
 
   const adminEmails = (process.env.ADMIN_EMAILS ?? '').split(',').map(e => e.trim().toLowerCase())
   const isSuperadmin = adminEmails.includes(email)
