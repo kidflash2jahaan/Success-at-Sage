@@ -9,18 +9,22 @@ const OLD_DOMAIN = 'successatsage.com'
 
 const nextConfig: NextConfig = {
   async redirects() {
+    // Sage's tenant URL on the new platform is the subdomain form:
+    // sage.successaths.com (the proxy then rewrites that to /s/sage/* on the
+    // server). Redirecting to the subdomain keeps the public-facing URL clean
+    // for anyone arriving from old links / QR codes.
     const hostRedirects = PRIMARY_DOMAIN && PRIMARY_DOMAIN !== OLD_DOMAIN
       ? [
           {
             source: '/:path*',
             has: [{ type: 'host' as const, value: OLD_DOMAIN }],
-            destination: `https://${PRIMARY_DOMAIN}/s/sage/:path*`,
+            destination: `https://sage.${PRIMARY_DOMAIN}/:path*`,
             permanent: true,
           },
           {
             source: '/:path*',
             has: [{ type: 'host' as const, value: `www.${OLD_DOMAIN}` }],
-            destination: `https://${PRIMARY_DOMAIN}/s/sage/:path*`,
+            destination: `https://sage.${PRIMARY_DOMAIN}/:path*`,
             permanent: true,
           },
         ]
