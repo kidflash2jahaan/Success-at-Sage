@@ -103,9 +103,11 @@ Pulls them into co-designing the solution. Way better than a half-baked on-the-s
 ## Asks (if they say yes)
 
 - Faculty admin contact name
-- 1-line town meeting mention?
+- **Any institutional channel for announcement** — newsletter paragraph, an email from the Dean to seniors/juniors, advisory-period mention, or a faculty member spending 60 seconds in their AP review class
 - IT whitelist push for `sage.successaths.com`
 - Any required edits to overview / TOS / contest
+
+*(There's no town meeting between now and end-of-year, so don't ask for that. Frame the institutional ask as flexible — "whatever feels right to you" — rather than naming a specific channel.)*
 
 ---
 

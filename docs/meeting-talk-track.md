@@ -192,7 +192,9 @@
 
 **If they said yes (with or without conditions), confirm the asks:**
 
-> "Three quick things on my end: a faculty admin contact name, whether you'd be open to a one-line town-meeting mention, and an IT helpdesk push for `sage.successaths.com`."
+> "Three quick things on my end: a faculty admin contact name, whether there's any institutional channel you're comfortable announcing on — a newsletter mention, an email to seniors, whatever feels right — and an IT helpdesk push for `sage.successaths.com`."
+
+*(The town meeting between now and end-of-year already passed, so don't ask for one. Keep the institutional ask flexible — newsletter / Dean's email / advisory-period mention — and let them pick the channel.)*
 
 **Close:**
 
