@@ -1,5 +1,6 @@
 'use client'
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { reportMaterial } from '@/app/actions/reports'
 
@@ -18,6 +19,11 @@ export default function ReportButton({
   const [reason, setReason] = useState('')
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [pending, startTransition] = useTransition()
+  // Track when the component is mounted on the client so the portal target
+  // (document.body) is available. Without this guard, createPortal would
+  // run on the server during SSR and crash.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
 
   function openModal(e: React.MouseEvent) {
     e.stopPropagation()
@@ -33,21 +39,14 @@ export default function ReportButton({
     })
   }
 
-  return (
-    <>
-      <button
-        type="button"
-        onClick={openModal}
-        aria-label="Report this material"
-        title="Report this material"
-        className="flex items-center gap-1 text-xs text-white/30 hover:text-rose-300 px-2 py-0.5 rounded-full border border-white/5 hover:border-rose-400/30 transition-colors"
-      >
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21V5a2 2 0 012-2h12l-2 5 2 5H5" />
-        </svg>
-      </button>
-
-      <AnimatePresence>
+  // Modal markup. Rendered into a portal at document.body so that
+  // ancestor transforms (e.g. MaterialCard's hover translateY which Motion
+  // applies via transform) don't redefine "fixed to viewport" for this
+  // overlay. CSS spec: any ancestor with transform / filter / perspective
+  // creates a containing block for fixed-positioned descendants — without
+  // a portal, the modal anchors to the card, not the screen.
+  const modal = (
+    <AnimatePresence>
       {open && (
         <motion.div
           initial={{ opacity: 0 }}
@@ -55,7 +54,7 @@ export default function ReportButton({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={e => { e.stopPropagation(); setOpen(false) }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
           style={{ background: 'rgba(6, 6, 15, 0.7)', backdropFilter: 'blur(8px)' }}
         >
           <motion.div
@@ -122,7 +121,23 @@ export default function ReportButton({
           </motion.div>
         </motion.div>
       )}
-      </AnimatePresence>
+    </AnimatePresence>
+  )
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={openModal}
+        aria-label="Report this material"
+        title="Report this material"
+        className="flex items-center gap-1 text-xs text-white/30 hover:text-rose-300 px-2 py-0.5 rounded-full border border-white/5 hover:border-rose-400/30 transition-colors"
+      >
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21V5a2 2 0 012-2h12l-2 5 2 5H5" />
+        </svg>
+      </button>
+      {mounted && createPortal(modal, document.body)}
     </>
   )
 }
