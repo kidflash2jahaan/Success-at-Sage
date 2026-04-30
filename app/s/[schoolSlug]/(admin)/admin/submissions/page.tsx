@@ -47,7 +47,12 @@ export default async function SubmissionsPage({
   const [{ data: materialsData }, { data: unitsData }, { data: approvedUnitsData }, { data: coursesData }] = await Promise.all([
     supabaseAdmin
       .from('materials')
-      .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, unit_id, created_at, users!uploaded_by(full_name, email), units!unit_id(title, courses(name))')
+      // Embed hints use constraint names because the composite FKs added
+      // in migration 0004 (materials_uploaded_by_fk, materials_unit_fk)
+      // make column-name hints (`users!uploaded_by` etc.) ambiguous —
+      // PostgREST returns PGRST200 and supabase-js silently yields []. The
+      // constraint-name hint is unambiguous.
+      .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, unit_id, created_at, users!materials_uploaded_by_fk(full_name, email), units!materials_unit_fk(title, courses(name))')
       .eq('status', 'pending')
       .eq('school_id', tenant.id)
       .order('created_at', { ascending: false }),

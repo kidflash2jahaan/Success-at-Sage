@@ -15,7 +15,8 @@ export default async function AdminCoursesPage({
   const [{ data }, { data: unitsData }, { data: coursesData }] = await Promise.all([
     supabaseAdmin
       .from('materials')
-      .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, units!unit_id(id, title, courses(name))')
+      // Constraint-name hint — see submissions/page.tsx for context.
+      .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, units!materials_unit_fk(id, title, courses(name))')
       .eq('status', 'approved')
       .eq('school_id', tenant.id)
       .order('created_at', { ascending: false }),

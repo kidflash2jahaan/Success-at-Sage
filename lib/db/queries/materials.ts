@@ -3,7 +3,10 @@ import { supabaseAdmin } from '@/lib/supabase/admin'
 export async function getApprovedMaterialsForUnit(unitId: string) {
   const { data } = await supabaseAdmin
     .from('materials')
-    .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, view_count, created_at, users!uploaded_by(full_name)')
+    // Constraint-name hint: `users!uploaded_by` is ambiguous post-migration
+    // 0004 (composite FK materials_uploaded_by_fk). PostgREST returns PGRST200
+    // for the column-hint form; the constraint-name form resolves cleanly.
+    .select('id, title, type, content_type, content_json, pdf_path, link_url, attachment_paths, view_count, created_at, users!materials_uploaded_by_fk(full_name)')
     .eq('unit_id', unitId)
     .eq('status', 'approved')
     .order('created_at')
