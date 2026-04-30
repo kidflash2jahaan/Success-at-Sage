@@ -244,12 +244,7 @@ export async function promoteToAdmin(schoolSlug: string, userId: string) {
   revalidatePath('/s/[schoolSlug]/admin/users', 'page')
 }
 
-export async function demoteToStudent(schoolSlug: string, userId: string) {
-  const { tenant } = await gateAdmin(schoolSlug)
-  await supabaseAdmin
-    .from('users')
-    .update({ role: 'student' })
-    .eq('id', userId)
-    .eq('school_id', tenant.id)
-  revalidatePath('/s/[schoolSlug]/admin/users', 'page')
-}
+// Demotion is intentionally not exposed as a server action — admin promotion
+// is one-way from the dashboard. If a real demotion is needed, do it as a
+// SQL UPDATE on users.role. (An accidental click previously took out my own
+// admin access during testing; this prevents the recurrence.)

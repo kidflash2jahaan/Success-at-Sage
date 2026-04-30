@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { supabaseAdmin } from '@/lib/supabase/admin'
-import { promoteToAdmin, demoteToStudent } from '@/app/actions/admin'
+import { promoteToAdmin } from '@/app/actions/admin'
 import { calculateGrade } from '@/lib/auth'
 import { resolveTenantBySlug } from '@/lib/tenant'
 import Link from 'next/link'
@@ -52,13 +52,14 @@ export default async function AdminUsersPage({
                 <Link href={`/s/${schoolSlug}/admin/users/${user.id}`} className="text-xs text-white/40 hover:text-white/70 transition-colors">
                   Edit
                 </Link>
-                {user.role === 'student' ? (
+                {/* Promotion is one-way from this dashboard — admin role can only
+                    be revoked at the database level (and for good reason: an
+                    accidental click otherwise has nuked admin access during
+                    testing). If a real demotion is ever needed, it's a SQL
+                    UPDATE on users.role. */}
+                {user.role === 'student' && (
                   <form action={promoteToAdmin.bind(null, schoolSlug, user.id)}>
                     <SubmitButton pendingLabel="..." className="text-xs text-purple-400 hover:text-purple-300 disabled:opacity-60 disabled:cursor-wait">Make Admin</SubmitButton>
-                  </form>
-                ) : (
-                  <form action={demoteToStudent.bind(null, schoolSlug, user.id)}>
-                    <SubmitButton pendingLabel="..." className="text-xs text-white/30 hover:text-white/60 disabled:opacity-60 disabled:cursor-wait">Remove Admin</SubmitButton>
                   </form>
                 )}
               </div>
