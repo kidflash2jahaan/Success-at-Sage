@@ -4,7 +4,7 @@
 
 ---
 
-**What it is.** Success at Sage is the Sage Hill instance of **Success at HS** — a free, peer-reviewed study platform that operates per school. Students share notes, study guides, and practice tests, organized by course and unit. Every submission is manually reviewed by an admin before it becomes visible to peers — nothing goes live without approval.
+**What it is.** Success at Sage is a free, peer-reviewed study platform built exclusively for Sage Hill students. Students share notes, study guides, and practice tests, organized by course and unit. Every submission is manually reviewed by an admin before it becomes visible to peers — nothing goes live without approval.
 
 **Built and maintained by:** Jahaan Pardhanani, independently. No faculty or staff time is required to operate it.
 
@@ -34,13 +34,13 @@
 
 - **Collected:** name, graduating year, email, submission content, and view counts for aggregate leaderboard purposes. No grades, no financial data.
 - **Stored on:** Supabase (Postgres, US region) for database and file storage; Vercel for hosting; transactional email via Resend. All US-based providers.
-- **Access:** Jahaan, plus any tenant admin the school designates. No third parties, no advertising, no data sharing or sale.
+- **Access:** Jahaan, plus any admin the school designates. No third parties, no advertising, no data sharing or sale.
 - **Retention:** material remains until the student or an admin removes it. Account and all uploads can be fully deleted on request within 7 days. Full data export available at no cost on request.
 - **Public policies:** privacy policy, terms of service, and FAQ are linked from the site footer (`sage.successaths.com/privacy`, `/terms`, `/faq`).
 
 ## Monthly contest *(happy to modify or remove)*
 
-To encourage participation, the student with the most approved submissions each month wins a $50 Amazon gift card. Winners are determined only from admin-approved material, so low-quality spam does not win. **Prize funding: self-funded by Jahaan.** The contest is configurable per school and is currently off by default until approval. Happy to reduce, rework, or drop the feature.
+To encourage participation, the student with the most approved submissions each month wins a $50 Amazon gift card. Winners are determined only from admin-approved material, so low-quality spam does not win. **Prize funding: self-funded by Jahaan.** The contest is currently off by default until approval. Happy to reduce, rework, or drop the feature.
 
 ## Hosting, cost, and continuity
 
@@ -49,11 +49,10 @@ To encourage participation, the student with the most approved submissions each 
   - `success-at-sage.vercel.app` — Vercel preview URL, works on any network including Sage wifi
   - `successatsage.com` — older URL, 301-redirects to the new domain so prior posters and links continue to work
 - **Cost** is covered entirely by me; the school bears no financial responsibility.
-- **Continuity.** Documented handoff plan: when I graduate (or earlier if needed), admin access transfers to a designated faculty sponsor + rising student admin team, OR Sage's tenant is shut down entirely — the school's call. Either way, no platform code or data needs to live on Sage's infrastructure. Platform is provided as-is with no SLA or liability to the school.
+- **Continuity.** Documented handoff plan: when I graduate (or earlier if needed), admin access transfers to a designated faculty sponsor + rising student admin team, OR the platform is shut down entirely — the school's call. Either way, no platform code or data needs to live on Sage's infrastructure. Platform is provided as-is with no SLA or liability to the school.
 
 ## Open items I'd welcome school input on
 
-- **Branding** — the platform is generically branded "Success at HS"; the Sage tenant displays "Success at Sage" through the per-school template. Happy to adjust either if preferred.
 - **Prize structure** — open to adjusting or removing the contest entirely.
 - **Faculty oversight** — happy to grant any faculty member designated by the school full admin rights, identical to mine — including the ability to delete any submission, remove any account, or export all data. Would also welcome a more formal faculty-sponsor relationship if useful.
 - **Data governance** — happy to adopt any school-required privacy policy, TOS, or data handling terms beyond what's already public.
