@@ -4,6 +4,18 @@
 
 ---
 
+## Why they'd want this — subtext only, **never say out loud**
+
+You're offering value, not asking for a favor. Read this once before walking in, then forget the words and just walk in confident:
+
+- **Mr. Campeau** — concrete operationalization of the honor code; peer-support culture made visible; student-initiative win. Zero faculty workload.
+- **Dr. Balossi** — "Sage Hill student built a platform now used by N schools" is an admissions / alumni / fundraising story. Improved AP outcomes at no school cost. Proof Sage's mission shows up in practice, not just on the wall.
+- **For both** — revocable in one click. No Sage infrastructure. Faculty admin available. The parent-call scenario is already pre-planned.
+
+*Internalize this so you don't sound supplicant. Don't say any of it out loud — saying these reasons reads as managing them, and admins smell that.*
+
+---
+
 ## Opening (90 seconds, out loud)
 
 Hand them the printed overview PDFs as you sit down — *"I brought a one-pager in case it's useful to follow along or for after."* Then talk them through it without them needing to read it.
